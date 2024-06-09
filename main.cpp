@@ -3,7 +3,7 @@
 #include <iostream>
 #include <thread>
 #include <atomic>
-
+#include "TelemetryManager.h"
 
 
 using namespace mavsdk;
@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
     }
 
     // Initialize MAVSDK
-    Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::GroundStation}};
+    Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::CompanionComputer}};
     ConnectionResult connection_result = mavsdk.add_any_connection(argv[1]);
 
     if (connection_result != ConnectionResult::Success) {
@@ -77,6 +77,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    TelemetryManager telemetryManager{mavsdk};
     // Create the Telemetry object
     Telemetry telemetry{system.value()};
 

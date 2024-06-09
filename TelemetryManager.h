@@ -3,11 +3,8 @@
 
 #include <mavsdk/mavsdk.h>
 #include <mavsdk/plugins/telemetry/telemetry.h>
-#include <thread>
 #include <atomic>
 #include <mutex>
-#include <condition_variable>
-#include <deque>
 #include <iostream>
 
 using namespace mavsdk;
@@ -23,22 +20,29 @@ public:
     // Methods to get the latest telemetry data
     Telemetry::Position getLatestPosition();
     Telemetry::Health getLatestHealth();
-
+    Telemetry::Altitude getAltitude();
+    Telemetry::EulerAngle getEulerAngle();
+    Telemetry::FlightMode getFlightMode();
+    Telemetry::Heading getHeading();
+    Telemetry::VelocityNed getVelocity();
 private:
-    void telemetryThread();
+    void subscribeTelemetry();
 
     Mavsdk& _mavsdk;
     std::shared_ptr<System> _system;
     std::unique_ptr<Telemetry> _telemetry;
 
-    std::thread _thread;
     std::atomic<bool> _running;
-    std::mutex _mutex;
-    std::condition_variable _cv;
 
     // Containers to store telemetry data
     Telemetry::Position _latest_position;
     Telemetry::Health _latest_health;
+    Telemetry::Altitude _latest_altitude;
+    Telemetry::EulerAngle _latest_euler_angle;
+    Telemetry::FlightMode _latest_flight_mode;
+    Telemetry::Heading _latest_heading;
+    Telemetry::VelocityNed _latest_velocity;
+
 
     std::mutex _data_mutex;
 };
