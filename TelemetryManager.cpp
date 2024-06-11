@@ -8,7 +8,7 @@ TelemetryManager::TelemetryManager(Mavsdk& mavsdk)
     _mavsdk.subscribe_on_new_system([this, &discovered_system]() {
         const auto system = _mavsdk.systems().back();
 
-        if (system->has_autopilot()) {
+        if (system && system->has_autopilot()){
             _system = system;
             discovered_system = true;
         }

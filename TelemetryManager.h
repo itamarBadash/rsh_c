@@ -16,6 +16,7 @@ public:
 
     void start();
     void stop();
+    bool isRunning(){return _running;}
 
     // Methods to get the latest telemetry data
     Telemetry::Position getLatestPosition();

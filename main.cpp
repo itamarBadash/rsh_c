@@ -80,6 +80,7 @@ int main(int argc, char** argv) {
     TelemetryManager telemetryManager{mavsdk};
     // Create the Telemetry object
     Telemetry telemetry{system.value()};
+    
 
     // Start the telemetry thread
     std::thread telemetry_thread(telemetry_thread_function, std::ref(telemetry));
