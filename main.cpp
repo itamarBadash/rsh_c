@@ -93,10 +93,7 @@ int main(int argc, char** argv) {
                       << "Gyro: " << data.health.is_gyrometer_calibration_ok << ", "
                       << "Acc: " << data.health.is_accelerometer_calibration_ok << ", "
                       << "Mag: " << data.health.is_magnetometer_calibration_ok << ", "
-                      << "Level: " << data.health.is_level_calibration_ok << std::endl;
-
-            std::cout << "Altitude: "
-                      << data.altitude.relative_altitude_m << std::endl;
+                      <<  std::endl;
 
             std::cout << "Euler Angles: "
                       << data.euler_angle.roll_deg << ", "
