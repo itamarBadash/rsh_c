@@ -8,6 +8,15 @@
 #include <iostream>
 
 using namespace mavsdk;
+struct TelemetryData {
+    Telemetry::Position position;
+    Telemetry::Health health;
+    Telemetry::Altitude altitude;
+    Telemetry::EulerAngle euler_angle;
+    Telemetry::FlightMode flight_mode;
+    Telemetry::Heading heading;
+    Telemetry::VelocityNed velocity;
+};
 
 class TelemetryManager {
 public:
@@ -16,9 +25,11 @@ public:
 
     void start();
     void stop();
-    bool isRunning(){return _running;}
+    bool isRunning() { return _running; }
 
     // Methods to get the latest telemetry data
+    TelemetryData getTelemetryData();
+
     Telemetry::Position getLatestPosition();
     Telemetry::Health getLatestHealth();
     Telemetry::Altitude getAltitude();
@@ -26,6 +37,7 @@ public:
     Telemetry::FlightMode getFlightMode();
     Telemetry::Heading getHeading();
     Telemetry::VelocityNed getVelocity();
+
 private:
     void subscribeTelemetry();
 
@@ -35,15 +47,8 @@ private:
 
     std::atomic<bool> _running;
 
-    // Containers to store telemetry data
-    Telemetry::Position _latest_position;
-    Telemetry::Health _latest_health;
-    Telemetry::Altitude _latest_altitude;
-    Telemetry::EulerAngle _latest_euler_angle;
-    Telemetry::FlightMode _latest_flight_mode;
-    Telemetry::Heading _latest_heading;
-    Telemetry::VelocityNed _latest_velocity;
-
+    // Struct to store telemetry data
+    TelemetryData _latest_telemetry_data;
 
     std::mutex _data_mutex;
 };

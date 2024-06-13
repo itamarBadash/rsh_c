@@ -7,9 +7,15 @@
     <ClCompile Include="C:\Users\Badash\CLionProjects\base\TelemetryManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\Badash\CLionProjects\base\CommandManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\Users\Badash\CLionProjects\base\TelemetryManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Badash\CLionProjects\base\CommandManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

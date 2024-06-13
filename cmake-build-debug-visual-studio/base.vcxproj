@@ -320,6 +320,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\Badash\CLionProjects\base\main.cpp" />
     <ClCompile Include="C:\Users\Badash\CLionProjects\base\TelemetryManager.cpp" />
     <ClInclude Include="C:\Users\Badash\CLionProjects\base\TelemetryManager.h" />
+    <ClCompile Include="C:\Users\Badash\CLionProjects\base\CommandManager.cpp" />
+    <ClInclude Include="C:\Users\Badash\CLionProjects\base\CommandManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:\Users\Badash\CLionProjects\base\cmake-build-debug-visual-studio\ZERO_CHECK.vcxproj">

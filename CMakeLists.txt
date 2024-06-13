@@ -16,6 +16,8 @@ link_directories(${CMAKE_PREFIX_PATH}/lib)
 add_executable(base main.cpp
         TelemetryManager.cpp
         TelemetryManager.h
+        CommandManager.cpp
+        CommandManager.h
 )
 
 # Link MAVSDK libraries
