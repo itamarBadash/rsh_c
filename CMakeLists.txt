@@ -11,7 +11,7 @@ include_directories(${CMAKE_PREFIX_PATH}/include)
 include_directories(${CMAKE_PREFIX_PATH}/include/mavsdk)
 
 # Add MAVSDK library paths
-link_directories(${CMAKE_PREFIX_PATH}/lib)
+#ink_directories(${CMAKE_PREFIX_PATH}/lib)
 
 add_executable(base main.cpp
         TelemetryManager.cpp
@@ -19,6 +19,8 @@ add_executable(base main.cpp
         CommandManager.cpp
         CommandManager.h
 )
+find_package(MAVSDK REQUIRED)
 
 # Link MAVSDK libraries
-target_link_libraries(base mavsdk)
+target_link_libraries(base
+        MAVSDK::mavsdk)
