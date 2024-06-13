@@ -1,5 +1,8 @@
 #include "TelemetryManager.h"
-
+#include <chrono>
+#include <thread>
+#include <iostream>
+// Include this header for std::this_thread
 TelemetryManager::TelemetryManager(Mavsdk& mavsdk)
         : _mavsdk(mavsdk), _running(false) {
 
