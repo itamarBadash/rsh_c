@@ -77,20 +77,51 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    TelemetryManager telemetryManager{mavsdk};
-    // Create the Telemetry object
-    Telemetry telemetry{system.value()};
-    
+    try {
+        TelemetryManager telemetry_manager(mavsdk);
+        telemetry_manager.start();
 
-    // Start the telemetry thread
-    std::thread telemetry_thread(telemetry_thread_function, std::ref(telemetry));
+        while (true) {
+            TelemetryData data = telemetry_manager.getTelemetryData();
 
-    std::cout << "Press Enter to stop..." << std::endl;
-    std::cin.get(); // Wait for user input
+            std::cout << "Position: "
+                      << data.position.latitude_deg << ", "
+                      << data.position.longitude_deg << ", "
+                      << data.position.absolute_altitude_m << std::endl;
 
-    // Stop the telemetry thread
-    keep_running = false;
-    telemetry_thread.join(); // Wait for the thread to finish
+            std::cout << "Health: "
+                      << "Gyro: " << data.health.is_gyrometer_calibration_ok << ", "
+                      << "Acc: " << data.health.is_accelerometer_calibration_ok << ", "
+                      << "Mag: " << data.health.is_magnetometer_calibration_ok << ", "
+                      << "Level: " << data.health.is_level_calibration_ok << std::endl;
+
+            std::cout << "Altitude: "
+                      << data.altitude.relative_altitude_m << std::endl;
+
+            std::cout << "Euler Angles: "
+                      << data.euler_angle.roll_deg << ", "
+                      << data.euler_angle.pitch_deg << ", "
+                      << data.euler_angle.yaw_deg << std::endl;
+
+            std::cout << "Flight Mode: "
+                      << static_cast<int>(data.flight_mode) << std::endl;
+
+            std::cout << "Heading: "
+                      << data.heading.heading_deg << std::endl;
+
+            std::cout << "Velocity NED: "
+                      << data.velocity.north_m_s << ", "
+                      << data.velocity.east_m_s << ", "
+                      << data.velocity.down_m_s << std::endl;
+
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+        }
+
+        telemetry_manager.stop();
+    } catch (const std::runtime_error& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
+    }
 
     return 0;
 }
