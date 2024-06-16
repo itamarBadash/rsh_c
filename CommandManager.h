@@ -9,6 +9,8 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <functional>
+#include <map>
 
 class CommandManager {
 public:
@@ -32,9 +34,9 @@ public:
     Result set_flight_mode(uint8_t base_mode, uint32_t custom_mode);
     Result arm();
     Result disarm();
-    // Manual control commands
     Result start_manual_control();
     Result set_manual_control(float x, float y, float z, float r);
+    bool ConnectionCheck();
 
     // Command handler
     Result handle_command(const std::string& command, const std::vector<float>& parameters);
@@ -45,7 +47,20 @@ private:
     std::shared_ptr<mavsdk::MavlinkPassthrough> mavlink_passthrough;
     std::shared_ptr<mavsdk::System> system;
 
+    bool viable;
+
     Result send_mavlink_command(uint8_t base_mode, uint32_t custom_mode);
+    // Helper types for command handlers
+    using CommandHandler = std::function<Result(const std::vector<float>&)>;
+
+    // Command handler map
+    std::map<std::string, CommandHandler> command_map;
+
+    // Initialize command handlers
+    void initialize_command_handlers();
+    CommandManager::Result execute_action(std::function<mavsdk::Action::Result()> action_func, const std::string& action_name)
+
+
 };
 
 #endif // COMMANDMANAGER_H

@@ -2,9 +2,9 @@
 #include <chrono>
 #include <thread>
 #include <iostream>
-// Include this header for std::this_thread
+
 TelemetryManager::TelemetryManager(Mavsdk& mavsdk)
-        : _mavsdk(mavsdk), _running(false) {
+        : _mavsdk(mavsdk), _running(false), viable(false) {
 
     std::cout << "Waiting to discover system..." << std::endl;
     bool discovered_system = false;
@@ -14,6 +14,14 @@ TelemetryManager::TelemetryManager(Mavsdk& mavsdk)
         if (system && system->has_autopilot()) {
             _system = system;
             discovered_system = true;
+            viable = true;
+
+            _system->subscribe_is_connected([this](bool connected) {
+                viable = connected;
+                if (!connected) {
+                    stop();
+                }
+            });
         }
     });
 
@@ -43,7 +51,7 @@ TelemetryManager::~TelemetryManager() {
 void TelemetryManager::start() {
     {
         std::lock_guard<std::mutex> lock(_data_mutex);
-        if (_running) return;
+        if (_running || !viable) return;
         _running = true;
     }
     subscribeTelemetry();
@@ -135,6 +143,7 @@ Telemetry::VelocityNed TelemetryManager::getVelocity() {
     std::lock_guard<std::mutex> lock(_data_mutex);
     return _latest_telemetry_data.velocity;
 }
+
 TelemetryData TelemetryManager::getTelemetryData() {
     std::lock_guard<std::mutex> lock(_data_mutex);
     return _latest_telemetry_data;

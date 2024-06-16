@@ -6,45 +6,10 @@
 #include "TelemetryManager.h"
 
 
+int TelemetryManagerTest(Mavsdk &mavsdk);
+
 using namespace mavsdk;
 
-std::atomic<bool> keep_running{true}; // Atomic flag to control the loop
-std::atomic<double> latitude{0.0};
-std::atomic<double> longitude{0.0};
-std::atomic<float> battery_percentage{0.0};
-
-void initialize_telemetry(Telemetry& telemetry) {
-    // Fetch initial position
-    Telemetry::Position position = telemetry.position();
-    latitude.store(position.latitude_deg);
-    longitude.store(position.longitude_deg);
-
-    // Fetch initial battery status
-    Telemetry::Battery battery = telemetry.battery();
-    battery_percentage.store(battery.remaining_percent * 100);
-}
-
-void telemetry_thread_function(Telemetry& telemetry) {
-    // Initialize telemetry data
-    initialize_telemetry(telemetry);
-
-    // Subscribe to position updates
-    telemetry.subscribe_position([](Telemetry::Position position) {
-        latitude.store(position.latitude_deg);
-        longitude.store(position.longitude_deg);
-    });
-
-    // Subscribe to battery updates
-    telemetry.subscribe_battery([](Telemetry::Battery battery) {
-        battery_percentage.store(battery.remaining_percent * 100);
-    });
-
-    // Loop to keep the thread alive and print the latest telemetry data
-    while (keep_running) {
-        std::this_thread::sleep_for(std::chrono::seconds(5));
-        std::cout << "Latitude: " << latitude.load() << ", Longitude: " << longitude.load() << std::endl;
-    }
-}
 
 void usage(const std::string& bin_name) {
     std::cerr << "Usage: " << bin_name << " <connection_url>\n"
@@ -77,6 +42,12 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+
+    return TelemetryManagerTest(mavsdk);
+
+}
+
+int TelemetryManagerTest(Mavsdk &mavsdk) {
     try {
         TelemetryManager telemetry_manager(mavsdk);
         telemetry_manager.start();
@@ -119,6 +90,6 @@ int main(int argc, char** argv) {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;
     }
-
-    return 0;
 }
+
+
