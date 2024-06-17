@@ -34,9 +34,7 @@ public:
     Result set_flight_mode(uint8_t base_mode, uint32_t custom_mode);
     Result arm();
     Result disarm();
-    Result start_manual_control();
     Result set_manual_control(float x, float y, float z, float r);
-    bool ConnectionCheck();
 
     // Command handler
     Result handle_command(const std::string& command, const std::vector<float>& parameters);
