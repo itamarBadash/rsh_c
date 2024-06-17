@@ -58,7 +58,7 @@ private:
 
     // Initialize command handlers
     void initialize_command_handlers();
-    CommandManager::Result execute_action(std::function<mavsdk::Action::Result()> action_func, const std::string& action_name)
+    CommandManager::Result execute_action(std::function<mavsdk::Action::Result()> action_func, const std::string& action_name);
 
 
 };

@@ -8,6 +8,7 @@ TelemetryManager::TelemetryManager(Mavsdk& mavsdk)
 
     std::cout << "Waiting to discover system..." << std::endl;
     bool discovered_system = false;
+
     _mavsdk.subscribe_on_new_system([this, &discovered_system]() {
         const auto system = _mavsdk.systems().back();
 
