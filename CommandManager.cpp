@@ -30,7 +30,6 @@ void CommandManager::initialize_command_handlers() {
                 }
                 return Result::Failure;
             }},
-            {"start_manual_control", [this](const std::vector<float>&) { return start_manual_control(); }},
             {"set_manual_control", [this](const std::vector<float>& params) {
                 if (params.size() == 4) {
                     return set_manual_control(params[0], params[1], params[2], params[3]);
