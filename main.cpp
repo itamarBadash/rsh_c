@@ -145,7 +145,7 @@ int commandManagerTest(std::shared_ptr<mavsdk::System> system){
     }
 
     // Test setting manual control
-    result = commandManager.set_manual_control(0.0, 0.5, -0.5, 0.0);
+    result = commandManager.set_manual_control(0.0, 0.0, 0.5, 0.0);
     if (result != CommandManager::Result::Success) {
         std::cerr << "Set manual control failed\n";
         return 1;

@@ -71,6 +71,7 @@ CommandManager::Result CommandManager::arm() {
 
 CommandManager::Result CommandManager::set_manual_control(float x, float y, float z, float r) {
     auto result = manual_control->set_manual_control_input(x, y, z, r);
+
     if (!viable || result != mavsdk::ManualControl::Result::Success) {
         std::cerr << "Manual control input failed: " << result << std::endl;
         return Result::Failure;
