@@ -127,6 +127,7 @@ CommandManager::Result CommandManager::execute_action(std::function<mavsdk::Acti
         std::cerr << action_name << " failed: " << result << std::endl;
         return Result::Failure;
     }
+    std::cout << "command successful\n";
 
     return Result::Success;
 }
