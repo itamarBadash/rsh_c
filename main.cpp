@@ -95,10 +95,9 @@ int TelemetryManagerTest(Mavsdk &mavsdk) {
         return 1;
     }
 }
-int commandManagerTest(mavsdk::System& system){
-    auto system_ptr = std::shared_ptr<mavsdk::System>(&system, [](mavsdk::System*){});
+int commandManagerTest(std::shared_ptr<mavsdk::System> system){
 
-    CommandManager commandManager(system_ptr);
+    CommandManager commandManager(system);
 
     // Test arming the system
     CommandManager::Result result = commandManager.arm();
