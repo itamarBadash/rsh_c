@@ -55,7 +55,10 @@ int main(int argc, char** argv) {
     CommandManager commandManager(system);
     commandManager.arm();
     commandManager.takeoff();
-    commandManager.move_forward(50);
+    std::this_thread::sleep_for(std::chrono::seconds(30));
+    std::cout << "starting movement "
+              << std::endl;
+    commandManager.move_forward(100);
     commandManager.return_to_launch();
     commandManager.land();
 
