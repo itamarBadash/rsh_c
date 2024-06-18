@@ -38,6 +38,7 @@ public:
     Telemetry::Heading getHeading();
     Telemetry::VelocityNed getVelocity();
 
+
 private:
     void subscribeTelemetry();
 
