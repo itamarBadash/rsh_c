@@ -58,6 +58,7 @@ int main(int argc, char** argv) {
     std::this_thread::sleep_for(std::chrono::seconds(30));
     std::cout << "starting movement "
               << std::endl;
+    commandManager.start_manual_control();
     commandManager.move_forward(100);
     commandManager.return_to_launch();
     commandManager.land();

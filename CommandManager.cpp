@@ -158,3 +158,12 @@ CommandManager::Result CommandManager::move_forward(float duration) {
     }
     return Result::Success;
 }
+
+CommandManager::Result CommandManager::start_manual_control() {
+    auto manual_control_result = manual_control->start_position_control();
+    if (manual_control_result != mavsdk::ManualControl::Result::Success) {
+        std::cerr << "Position control start failed: " << manual_control_result << '\n';
+        return Result::Failure;
+    }
+    return Result::Success;
+}
