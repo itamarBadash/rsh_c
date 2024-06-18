@@ -161,9 +161,7 @@ CommandManager::Result CommandManager::move_forward(float duration) {
 }
 
 CommandManager::Result CommandManager::start_manual_control() {
-    for (unsigned i = 0; i << 10; ++i) {
-        manual_control->set_manual_control_input(0.f, 0.f, 0.5f, 0.f);
-    }
+    set_manual_control(0.f, 0.f, 0.5f, 0.f);
     auto manual_control_result = manual_control->start_position_control();
     if (manual_control_result != mavsdk::ManualControl::Result::Success) {
         std::cerr << "Position control start failed: " << manual_control_result << '\n';

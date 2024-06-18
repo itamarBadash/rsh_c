@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
     CommandManager commandManager(system);
     commandManager.arm();
     commandManager.takeoff();
-    std::this_thread::sleep_for(std::chrono::seconds(30));
+    std::this_thread::sleep_for(std::chrono::seconds(15));
     std::cout << "starting movement "
               << std::endl;
     commandManager.start_manual_control();
