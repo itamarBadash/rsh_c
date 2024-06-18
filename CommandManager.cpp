@@ -1,5 +1,6 @@
 #include "CommandManager.h"
 #include <iostream>
+#include <chrono>
 
 CommandManager::CommandManager(const std::shared_ptr<mavsdk::System>& system) : system(system)
 {
@@ -70,12 +71,18 @@ CommandManager::Result CommandManager::arm() {
 }
 
 CommandManager::Result CommandManager::set_manual_control(float x, float y, float z, float r) {
+    auto start = std::chrono::high_resolution_clock::now();
+
     auto result = manual_control->set_manual_control_input(x, y, z, r);
 
     if (!viable || result != mavsdk::ManualControl::Result::Success) {
         std::cerr << "Manual control input failed: " << result << std::endl;
         return Result::Failure;
     }
+
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = end - start;
+    std::cout << "set_manual_control execution time: " << elapsed.count() << " seconds" << std::endl;
 
     return Result::Success;
 }
