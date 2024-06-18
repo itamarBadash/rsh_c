@@ -150,12 +150,11 @@ CommandManager::Result CommandManager::move_forward(float duration) {
     constexpr float yaw = 0.0; // Yaw setting for manual control
     const int iterations = static_cast<int>(move_duration / control_interval);
 
-    for (int i = 0; i < iterations; ++i) {
-        auto result = set_manual_control(forward_speed, 0.0, throttle, yaw);
+    for (int i = 0; i < 100; ++i) {
+        auto result = set_manual_control(1, 0, 1, 0);
         if (result != Result::Success) {
             return result;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(control_interval * 1000)));
     }
     return Result::Success;
 }
