@@ -52,12 +52,13 @@ int main(int argc, char** argv) {
     std::this_thread::sleep_for(std::chrono::seconds(10));
 
     // Execute commandManagerTest in the main thread
-    int command_result = commandManagerTest(system);
+    CommandManager commandManager(system);
+    commandManager.takeoff();
 
     // Wait for the telemetry thread to finish
     telemetry_thread.join();
 
-    return command_result;
+    return 0;
 }
 
 

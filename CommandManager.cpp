@@ -43,6 +43,7 @@ void CommandManager::initialize_command_handlers() {
 }
 
 CommandManager::Result CommandManager::takeoff() {
+    action->set_takeoff_altitude(20);
     return execute_action([this]() { return action->takeoff(); }, "Takeoff");
 }
 
