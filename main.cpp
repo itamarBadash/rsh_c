@@ -99,7 +99,7 @@ int TelemetryManagerTest(Mavsdk &mavsdk) {
                       << data.velocity.east_m_s << ", "
                       << data.velocity.down_m_s << std::endl;
             std::cout << "Altitude: "
-                      << data.altitude << std::endl;
+                      << data.altitude.altitude_local_m << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(5));
         }
 
