@@ -53,15 +53,6 @@ int main(int argc, char** argv) {
 
     // Execute commandManagerTest in the main thread
     CommandManager commandManager(system);
-    commandManager.arm();
-    commandManager.takeoff();
-    std::this_thread::sleep_for(std::chrono::seconds(15));
-    std::cout << "starting movement "
-              << std::endl;
-    commandManager.start_manual_control();
-    commandManager.move_forward(100);
-    commandManager.return_to_launch();
-    commandManager.land();
 
     // Wait for the telemetry thread to finish
     telemetry_thread.join();
