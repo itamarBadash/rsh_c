@@ -36,7 +36,6 @@ public:
     Result disarm();
     Result set_manual_control(float x, float y, float z, float r);
     Result start_manual_control();
-    Result move_forward(float duration);
     // Command handler
     Result handle_command(const std::string& command, const std::vector<float>& parameters);
 

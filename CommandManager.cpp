@@ -142,24 +142,6 @@ CommandManager::Result CommandManager::execute_action(std::function<mavsdk::Acti
     return Result::Success;
 }
 
-CommandManager::Result CommandManager::move_forward(float duration) {
-    float move_duration = duration; // Adjust the duration to match 50 meters based on your system's speed
-    constexpr float control_interval = 0.01; // Time interval for each manual control input in seconds
-    constexpr float forward_speed = 0.9; // Forward speed setting for manual control, adjust based on your system's scale
-    constexpr float throttle = 0.8; // Throttle setting for manual control, adjust based on your system's scale
-    constexpr float yaw = 0.0; // Yaw setting for manual control
-    const int iterations = static_cast<int>(move_duration / control_interval);
-
-    for (int i = 0; i < 10000; ++i) {
-        auto result = set_manual_control(1, 0, 1, 0);
-        if (result != Result::Success) {
-            return result;
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
-    }
-    return Result::Success;
-}
-
 CommandManager::Result CommandManager::start_manual_control() {
     set_manual_control(0.f, 0.f, 0.5f, 0.f);
     auto manual_control_result = manual_control->start_position_control();
