@@ -4,9 +4,11 @@
 #include <thread>
 #include <atomic>
 #include "TelemetryManager.h"
-
+#include "CommandManager.h"
 
 int TelemetryManagerTest(Mavsdk &mavsdk);
+
+int commandManagerTest(std::shared_ptr<mavsdk::System> system);
 
 using namespace mavsdk;
 
@@ -36,16 +38,18 @@ int main(int argc, char** argv) {
     }
 
     // Wait for the first autopilot system to connect
-    auto system = mavsdk.first_autopilot(3.0);
-    if (!system) {
+    auto maybe_system = mavsdk.first_autopilot(3.0);
+    if (!maybe_system) {
         std::cerr << "Timed out waiting for system\n";
         return 1;
     }
 
+    auto system = maybe_system.value();
 
-    return TelemetryManagerTest(mavsdk);
-
+    return commandManagerTest(system);
 }
+
+
 
 int TelemetryManagerTest(Mavsdk &mavsdk) {
     try {
@@ -91,5 +95,71 @@ int TelemetryManagerTest(Mavsdk &mavsdk) {
         return 1;
     }
 }
+int commandManagerTest(std::shared_ptr<mavsdk::System> system) {
+    CommandManager commandManager(system);
 
+    // Test arming the system
+    CommandManager::Result result = commandManager.arm();
+    if (result != CommandManager::Result::Success) {
+        std::cerr << "Arm failed\n";
+        return 1;
+    } else {
+        std::cout << "Arm successful\n";
+    }
 
+    // Test taking off
+    result = commandManager.takeoff();
+    if (result != CommandManager::Result::Success) {
+        std::cerr << "Takeoff failed\n";
+        return 1;
+    } else {
+        std::cout << "Takeoff successful\n";
+    }
+
+    // Test landing
+    result = commandManager.land();
+    if (result != CommandManager::Result::Success) {
+        std::cerr << "Land failed\n";
+        return 1;
+    } else {
+        std::cout << "Land successful\n";
+    }
+
+    // Test returning to launch
+    result = commandManager.return_to_launch();
+    if (result != CommandManager::Result::Success) {
+        std::cerr << "Return to launch failed\n";
+        return 1;
+    } else {
+        std::cout << "Return to launch successful\n";
+    }
+
+    // Test setting flight mode
+    result = commandManager.set_flight_mode(1, 2);
+    if (result != CommandManager::Result::Success) {
+        std::cerr << "Set flight mode failed\n";
+        return 1;
+    } else {
+        std::cout << "Set flight mode successful\n";
+    }
+
+    // Test setting manual control
+    result = commandManager.set_manual_control(1.0, 0.5, -0.5, 0.0);
+    if (result != CommandManager::Result::Success) {
+        std::cerr << "Set manual control failed\n";
+        return 1;
+    } else {
+        std::cout << "Set manual control successful\n";
+    }
+
+    // Test disarming the system
+    result = commandManager.disarm();
+    if (result != CommandManager::Result::Success) {
+        std::cerr << "Disarm failed\n";
+        return 1;
+    } else {
+        std::cout << "Disarm successful\n";
+    }
+
+    return 0;
+}
