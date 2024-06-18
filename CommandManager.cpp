@@ -85,7 +85,6 @@ CommandManager::Result CommandManager::set_manual_control(float x, float y, floa
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = end - start;
-    std::cout << "set_manual_control execution time: " << elapsed.count() << " seconds" << std::endl;
 
     return Result::Success;
 }
