@@ -75,6 +75,7 @@ int TelemetryManagerTest(Mavsdk &mavsdk) {
             std::cout << "Position: "
                       << data.position.latitude_deg << ", "
                       << data.position.longitude_deg << ", "
+                      << data.position.relative_altitude_m << ", "
                       << data.position.absolute_altitude_m << std::endl;
 
             std::cout << "Health: "
@@ -99,7 +100,7 @@ int TelemetryManagerTest(Mavsdk &mavsdk) {
                       << data.velocity.east_m_s << ", "
                       << data.velocity.down_m_s << std::endl;
             std::cout << "Altitude: "
-                      << data.altitude.altitude_local_m << std::endl;
+                      << telemetry_manager.getRelativeAltitude() << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(5));
         }
 

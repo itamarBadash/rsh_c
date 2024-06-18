@@ -32,7 +32,7 @@ public:
 
     Telemetry::Position getLatestPosition();
     Telemetry::Health getLatestHealth();
-    Telemetry::Altitude getAltitude();
+    float getRelativeAltitude();
     Telemetry::EulerAngle getEulerAngle();
     Telemetry::FlightMode getFlightMode();
     Telemetry::Heading getHeading();

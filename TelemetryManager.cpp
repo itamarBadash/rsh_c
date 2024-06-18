@@ -120,9 +120,9 @@ Telemetry::Health TelemetryManager::getLatestHealth() {
     return _latest_telemetry_data.health;
 }
 
-Telemetry::Altitude TelemetryManager::getAltitude() {
+float TelemetryManager::getRelativeAltitude() {
     std::lock_guard<std::mutex> lock(_data_mutex);
-    return _latest_telemetry_data.altitude;
+    return _latest_telemetry_data.position.relative_altitude_m;
 }
 
 Telemetry::EulerAngle TelemetryManager::getEulerAngle() {
