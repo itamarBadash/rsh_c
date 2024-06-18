@@ -46,7 +46,16 @@ int main(int argc, char** argv) {
 
     auto system = maybe_system.value();
 
-    return commandManagerTest(system);
+    // Start TelemetryManagerTest in a separate thread
+    std::thread telemetry_thread(TelemetryManagerTest, std::ref(mavsdk));
+
+    // Execute commandManagerTest in the main thread
+    int command_result = commandManagerTest(system);
+
+    // Wait for the telemetry thread to finish
+    telemetry_thread.join();
+
+    return command_result;
 }
 
 
