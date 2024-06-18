@@ -35,7 +35,7 @@ public:
     Result arm();
     Result disarm();
     Result set_manual_control(float x, float y, float z, float r);
-
+    CommandManager::Result CommandManager::move_forward(float meters);
     // Command handler
     Result handle_command(const std::string& command, const std::vector<float>& parameters);
 

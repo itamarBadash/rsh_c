@@ -1,6 +1,8 @@
 #include "CommandManager.h"
 #include <iostream>
 #include <chrono>
+#include <thread>
+
 
 CommandManager::CommandManager(const std::shared_ptr<mavsdk::System>& system) : system(system)
 {
@@ -138,5 +140,22 @@ CommandManager::Result CommandManager::execute_action(std::function<mavsdk::Acti
     }
     std::cout << "command successful\n";
 
+    return Result::Success;
+}
+CommandManager::Result CommandManager::move_forward(float duration) {
+    float move_duration = duration; // Adjust the duration to match 50 meters based on your system's speed
+    constexpr float control_interval = 0.01; // Time interval for each manual control input in seconds
+    constexpr float forward_speed = 0.9; // Forward speed setting for manual control, adjust based on your system's scale
+    constexpr float throttle = 0.8; // Throttle setting for manual control, adjust based on your system's scale
+    constexpr float yaw = 0.0; // Yaw setting for manual control
+    const int iterations = static_cast<int>(move_duration / control_interval);
+
+    for (int i = 0; i < iterations; ++i) {
+        auto result = set_manual_control(forward_speed, 0.0, throttle, yaw);
+        if (result != Result::Success) {
+            return result;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(control_interval * 1000)));
+    }
     return Result::Success;
 }

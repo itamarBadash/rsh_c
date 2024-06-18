@@ -7,7 +7,7 @@
 #include "CommandManager.h"
 
 int TelemetryManagerTest(Mavsdk &mavsdk);
-
+CommandManager::Result move_forward_50_meters();
 int commandManagerTest(std::shared_ptr<mavsdk::System> system);
 
 using namespace mavsdk;
@@ -55,6 +55,9 @@ int main(int argc, char** argv) {
     CommandManager commandManager(system);
     commandManager.arm();
     commandManager.takeoff();
+    commandManager.move_forward(50);
+    commandManager.return_to_launch();
+    commandManager.land();
 
     // Wait for the telemetry thread to finish
     telemetry_thread.join();
@@ -179,6 +182,3 @@ int commandManagerTest(std::shared_ptr<mavsdk::System> system){
 
     return 0;
 }
-
-
-
