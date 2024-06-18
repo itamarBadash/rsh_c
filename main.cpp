@@ -49,6 +49,8 @@ int main(int argc, char** argv) {
     // Start TelemetryManagerTest in a separate thread
     std::thread telemetry_thread(TelemetryManagerTest, std::ref(mavsdk));
 
+    std::this_thread::sleep_for(std::chrono::seconds(10));
+
     // Execute commandManagerTest in the main thread
     int command_result = commandManagerTest(system);
 
