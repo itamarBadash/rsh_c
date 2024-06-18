@@ -64,13 +64,6 @@ void TelemetryManager::stop() {
         if (!_running) return;
         _running = false;
     }
-    _telemetry->subscribe_position(nullptr);
-    _telemetry->subscribe_health(nullptr);
-    _telemetry->subscribe_altitude(nullptr);
-    _telemetry->subscribe_attitude_euler(nullptr);
-    _telemetry->subscribe_flight_mode(nullptr);
-    _telemetry->subscribe_velocity_ned(nullptr);
-    _telemetry->subscribe_heading(nullptr);
 }
 
 void TelemetryManager::subscribeTelemetry() {
@@ -105,6 +98,7 @@ void TelemetryManager::subscribeTelemetry() {
     });
 
     _telemetry->subscribe_heading([this](Telemetry::Heading heading) {
+
         std::lock_guard<std::mutex> lock(_data_mutex);
         _latest_telemetry_data.heading = heading;
     });

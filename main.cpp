@@ -67,7 +67,7 @@ int TelemetryManagerTest(Mavsdk &mavsdk) {
         TelemetryManager telemetry_manager(mavsdk);
         telemetry_manager.start();
 
-        while (true) {
+        while (telemetry_manager.isRunning()) {
             TelemetryData data = telemetry_manager.getTelemetryData();
 
             std::cout << "Position: "
@@ -107,6 +107,7 @@ int TelemetryManagerTest(Mavsdk &mavsdk) {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;
     }
+    return 0;
 }
 int commandManagerTest(std::shared_ptr<mavsdk::System> system){
 
