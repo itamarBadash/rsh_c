@@ -142,6 +142,7 @@ CommandManager::Result CommandManager::execute_action(std::function<mavsdk::Acti
 
     return Result::Success;
 }
+
 CommandManager::Result CommandManager::move_forward(float duration) {
     float move_duration = duration; // Adjust the duration to match 50 meters based on your system's speed
     constexpr float control_interval = 0.01; // Time interval for each manual control input in seconds
