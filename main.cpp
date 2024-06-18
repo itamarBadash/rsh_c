@@ -53,6 +53,7 @@ int main(int argc, char** argv) {
 
     // Execute commandManagerTest in the main thread
     CommandManager commandManager(system);
+    commandManager.arm();
     commandManager.takeoff();
 
     // Wait for the telemetry thread to finish
