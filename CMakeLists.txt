@@ -6,6 +6,11 @@ set(CMAKE_CXX_STANDARD 17)
 # Set CMAKE_PREFIX_PATH to the install directory of MAVSDK
 set(CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/MAVSDK/install)
 
+find_package(MAVSDK REQUIRED)
+find_package(Boost 1.85.0 REQUIRED COMPONENTS system thread)
+include_directories(${Boost_INCLUDE_DIRS})
+target_link_libraries(${Boost_LIBRARIES})
+
 # Add MAVSDK includes
 include_directories(${CMAKE_PREFIX_PATH}/include)
 include_directories(${CMAKE_PREFIX_PATH}/include/mavsdk)
@@ -18,9 +23,14 @@ add_executable(base main.cpp
         TelemetryManager.h
         CommandManager.cpp
         CommandManager.h
+        CommunicationManager.cpp
+        CommunicationManager.h
+        CommunicationManager.h
 )
-find_package(MAVSDK REQUIRED)
+
 
 # Link MAVSDK libraries
 target_link_libraries(base
-        MAVSDK::mavsdk)
+        MAVSDK::mavsdk
+        ${Boost_INCLUDE_DIRS}
+)
