@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/MAVSDK/install)
 
 find_package(MAVSDK REQUIRED)
-find_package(Boost 1.85.0 REQUIRED COMPONENTS system thread)
+find_package(Boost REQUIRED COMPONENTS system thread)
 include_directories(${Boost_INCLUDE_DIRS})
 target_link_libraries(${Boost_LIBRARIES})
 
