@@ -9,7 +9,6 @@ set(CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/MAVSDK/install)
 find_package(MAVSDK REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system thread)
 include_directories(${Boost_INCLUDE_DIRS})
-target_link_libraries(${Boost_LIBRARIES})
 
 # Add MAVSDK includes
 include_directories(${CMAKE_PREFIX_PATH}/include)
