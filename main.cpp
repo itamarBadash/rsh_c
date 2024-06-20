@@ -61,7 +61,6 @@ int main(int argc, char** argv) {
 
     std::this_thread::sleep_for(std::chrono::seconds(10));
 
-    Execute commandManagerTest in the main thread
     CommandManager commandManager(system);
 
 
