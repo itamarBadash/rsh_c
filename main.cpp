@@ -57,17 +57,16 @@ int main(int argc, char** argv) {
         std::cout << "sucuss" << std::endl;
     }
 
-    // Start TelemetryManagerTest in a separate thread
-    //std::thread telemetry_thread(TelemetryManagerTest, std::ref(mavsdk));
+    std::thread telemetry_thread(TelemetryManagerTest, std::ref(mavsdk));
 
-    //std::this_thread::sleep_for(std::chrono::seconds(10));
+    std::this_thread::sleep_for(std::chrono::seconds(10));
 
-    // Execute commandManagerTest in the main thread
+    Execute commandManagerTest in the main thread
     CommandManager commandManager(system);
 
 
     // Wait for the telemetry thread to finish
-   // telemetry_thread.join();
+    telemetry_thread.join();
 
     return 0;
 }
