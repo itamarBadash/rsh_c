@@ -5,9 +5,9 @@
 #include <atomic>
 #include "TelemetryManager.h"
 #include "CommandManager.h"
+#include "CommunicationManager.h"
 
 int TelemetryManagerTest(Mavsdk &mavsdk);
-CommandManager::Result move_forward_50_meters();
 int commandManagerTest(std::shared_ptr<mavsdk::System> system);
 
 using namespace mavsdk;

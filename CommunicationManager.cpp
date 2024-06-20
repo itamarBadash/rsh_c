@@ -1,24 +1,48 @@
 #include "CommunicationManager.h"
 
-CommunicationManager::CommunicationManager(const std::string& host, const std::string& port)
-        : io_service_(), socket_(io_service_) {
-    boost::asio::ip::tcp::resolver resolver(io_service_);
-    boost::asio::ip::tcp::resolver::query query(host, port);
-    boost::asio::ip::tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
-
-    boost::asio::connect(socket_, endpoint_iterator);
+CommunicationManager::CommunicationManager(const std::string& port, unsigned int baud_rate, boost::asio::io_service* io_service)
+        : internal_io_service_(io_service ? nullptr : std::make_unique<boost::asio::io_service>()),
+          io_service_(io_service ? *io_service : *internal_io_service_),
+          serial_port_(io_service_, port) {
+    serial_port_.set_option(boost::asio::serial_port_base::baud_rate(baud_rate));
 }
 
-void CommunicationManager::send(const std::string& message) {
-    boost::asio::write(socket_, boost::asio::buffer(message));
+void CommunicationManager::write(const std::string& data) {
+    boost::asio::async_write(serial_port_, boost::asio::buffer(data),
+                             boost::bind(&CommunicationManager::handle_write, this,
+                                         boost::asio::placeholders::error,
+                                         boost::asio::placeholders::bytes_transferred));
 }
 
-std::string CommunicationManager::receive() {
-    boost::asio::streambuf buffer;
-    boost::asio::read_until(socket_, buffer, "\n");
+void CommunicationManager::read() {
+    boost::asio::async_read_until(serial_port_, buffer_, '\n',
+                                  boost::bind(&CommunicationManager::handle_read, this,
+                                              boost::asio::placeholders::error,
+                                              boost::asio::placeholders::bytes_transferred));
+}
 
-    std::istream input_stream(&buffer);
-    std::string response;
-    std::getline(input_stream, response);
-    return response;
+void CommunicationManager::run() {
+    io_service_.run();
+}
+
+void CommunicationManager::handle_write(const boost::system::error_code& error, std::size_t bytes_transferred) {
+    if (!error) {
+        std::cout << "Successfully wrote " << bytes_transferred << " bytes." << std::endl;
+    } else {
+        std::cerr << "Error on write: " << error.message() << std::endl;
+    }
+}
+
+void CommunicationManager::handle_read(const boost::system::error_code& error, std::size_t bytes_transferred) {
+    if (!error) {
+        std::istream is(&buffer_);
+        std::string line;
+        std::getline(is, line);
+        std::cout << "Read: " << line << std::endl;
+
+        // Continue reading
+        read();
+    } else {
+        std::cerr << "Error on read: " << error.message() << std::endl;
+    }
 }
