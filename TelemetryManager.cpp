@@ -50,11 +50,9 @@ TelemetryManager::~TelemetryManager() {
 }
 
 void TelemetryManager::start() {
-    {
         std::lock_guard<std::mutex> lock(_data_mutex);
         if (_running || !viable) return;
         _running = true;
-    }
     subscribeTelemetry();
 }
 
