@@ -1,22 +1,39 @@
-#ifndef COMMUNICATIONMANAGER_H
-#define COMMUNICATIONMANAGER_H
+#ifndef COMMUNICATION_MANAGER_H
+#define COMMUNICATION_MANAGER_H
 
 #include <iostream>
 #include <boost/asio.hpp>
 #include <boost/bind/bind.hpp>
 #include <memory>
-
+#include <regex>
 
 class CommunicationManager {
 public:
-    // Constructor to initialize the serial port with an optional external io_service
-    CommunicationManager(const std::string& port, unsigned int baud_rate, boost::asio::io_service* io_service = nullptr);
+    enum class Result {
+        Success,
+        Error,
+        NotConnected,
+        AlreadyConnected,
+        InvalidPort
+    };
+
+    // Constructor to initialize the io_service
+    CommunicationManager();
+
+    // Function to connect to the serial port
+    Result connect(const std::string& port, unsigned int baud_rate);
+
+    // Function to disconnect from the serial port
+    void disconnect();
 
     // Function to write data to the serial port
-    void write(const std::string& data);
+    Result write(const std::string& data);
 
     // Function to start reading data from the serial port
-    void read();
+    Result read();
+
+    // Function to check if the serial port is open
+    bool isConnected() const;
 
     // Function to run the io_service
     void run();
@@ -28,10 +45,13 @@ private:
     // Handler for read operations
     void handle_read(const boost::system::error_code& error, std::size_t bytes_transferred);
 
-    std::unique_ptr<boost::asio::io_service> internal_io_service_; // Internal io_service object if no external one is provided
-    boost::asio::io_service& io_service_;                          // Reference to the io_service object
-    boost::asio::serial_port serial_port_;                         // Serial port object
+    // Function to validate the port string
+    static bool validatePort(const std::string& port);
+
+    boost::asio::io_service io_service_;                          // Internal io_service object
+    std::unique_ptr<boost::asio::serial_port> serial_port_;        // Serial port object
     boost::asio::streambuf buffer_;                                // Buffer to store read data
+    bool connected_;                                               // Connection status
 };
 
-#endif // COMMUNICATIONMANAGER_H
+#endif // COMMUNICATION_MANAGER_H

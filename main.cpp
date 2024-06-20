@@ -46,16 +46,28 @@ int main(int argc, char** argv) {
 
     auto system = maybe_system.value();
 
-    // Start TelemetryManagerTest in a separate thread
-    std::thread telemetry_thread(TelemetryManagerTest, std::ref(mavsdk));
+    CommunicationManager comm;
+    std::string port = "/dev/ttyUSB0";
 
-    std::this_thread::sleep_for(std::chrono::seconds(10));
+    auto result = comm.connect(port, 9600);
+    if (result != CommunicationManager::Result::Success) {
+        std::cerr << "Failed to connect to the serial port." << std::endl;
+        return 1;
+    } else{
+        std::cout << "sucuss" << std::endl;
+    }
+
+    // Start TelemetryManagerTest in a separate thread
+    //std::thread telemetry_thread(TelemetryManagerTest, std::ref(mavsdk));
+
+    //std::this_thread::sleep_for(std::chrono::seconds(10));
 
     // Execute commandManagerTest in the main thread
     CommandManager commandManager(system);
 
+
     // Wait for the telemetry thread to finish
-    telemetry_thread.join();
+   // telemetry_thread.join();
 
     return 0;
 }
