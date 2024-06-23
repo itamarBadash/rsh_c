@@ -9,7 +9,7 @@
 
 int TelemetryManagerTest(Mavsdk &mavsdk);
 int commandManagerTest(std::shared_ptr<mavsdk::System> system);
-
+void test_communication_manager();
 using namespace mavsdk;
 
 
@@ -68,25 +68,7 @@ int main(int argc, char** argv) {
     telemetry_thread.join();
 */
 
-    CommunicationManager cm;
-    try {
-        auto result = cm.connect("/dev/ttyUSB0", 57600);
-        if (result != CommunicationManager::Result::Success) {
-            std::cerr << "Failed to connect to serial port." << std::endl;
-            return 1;
-        }
-
-        std::cout << "Connected to serial port." << std::endl;
-
-        cm.write("Hello, serial port!");
-        std::string response = cm.read();
-        std::cout << "Received: " << response << std::endl;
-
-        cm.disconnect();
-        std::cout << "Disconnected from serial port." << std::endl;
-    } catch (const std::exception& ex) {
-        std::cerr << "Exception: " << ex.what() << std::endl;
-    }
+    test_communication_manager();
     return 0;
 }
 
@@ -205,4 +187,42 @@ int commandManagerTest(std::shared_ptr<mavsdk::System> system){
     }
 
     return 0;
+}
+void test_communication_manager() {
+    CommunicationManager cm;
+
+    // Connect to the serial port
+    auto result = cm.connect("/dev/ttyUSB0", 9600); // Adjust the port name as necessary
+    if (result != CommunicationManager::Result::Success) {
+        std::cerr << "Failed to connect to the serial port." << std::endl;
+        return;
+    }
+
+    std::cout << "Connected to the serial port." << std::endl;
+
+    // Write data asynchronously
+    result = cm.write("Hello, serial port!\n");
+    if (result != CommunicationManager::Result::Success) {
+        std::cerr << "Failed to write to the serial port." << std::endl;
+        return;
+    }
+
+    std::cout << "Data written to the serial port." << std::endl;
+
+    // Read data asynchronously
+    cm.read();
+
+    // Run the IO service in a separate thread
+    std::thread io_thread([&cm]() {
+        cm.run();
+    });
+
+    // Simulate some delay to allow async operations to complete
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+
+    // Clean up
+    cm.disconnect();
+    io_thread.join();
+
+    std::cout << "Disconnected from the serial port." << std::endl;
 }

@@ -58,7 +58,7 @@ CommunicationManager::Result CommunicationManager::write(const std::string& data
     return Result::Success;
 }
 
-std::string CommunicationManager::read() {
+void CommunicationManager::read() {
     if (!connected_) {
         throw std::runtime_error("Not connected");
     }
@@ -67,13 +67,6 @@ std::string CommunicationManager::read() {
                                   strand_.wrap(boost::bind(&CommunicationManager::handle_read, this,
                                                            boost::asio::placeholders::error,
                                                            boost::asio::placeholders::bytes_transferred)));
-    io_service_.run_one(); // Run one operation to process the async_read_until
-    io_service_.reset();   // Reset the io_service to allow further runs
-
-    std::istream is(&buffer_);
-    std::string line;
-    std::getline(is, line);
-    return line;
 }
 
 bool CommunicationManager::isConnected() const {
@@ -106,5 +99,11 @@ void CommunicationManager::handle_read(const boost::system::error_code& error, s
     if (error) {
         std::cerr << "Error on read: " << error.message() << std::endl;
         connected_ = false;
+    } else {
+        std::istream is(&buffer_);
+        std::string line;
+        std::getline(is, line);
+        std::cout << "Read: " << line << std::endl;
     }
 }
+
