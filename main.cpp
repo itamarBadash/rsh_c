@@ -12,7 +12,7 @@ int commandManagerTest(std::shared_ptr<mavsdk::System> system);
 using namespace mavsdk;
 
 int main() {
-    CommunicationManager cm("/dev/ttyS0", B57600); // Adjust the port and baud rate as needed
+    CommunicationManager cm("/dev/ttyS0", 57600); // Adjust the port and baud rate as needed
     cm.run();
     return 0;
 }
