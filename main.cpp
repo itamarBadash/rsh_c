@@ -192,7 +192,7 @@ void test_communication_manager() {
     CommunicationManager cm;
 
     // Connect to the serial port
-    auto result = cm.connect("/dev/ttyUSB0", 9600); // Adjust the port name as necessary
+    auto result = cm.connect("/dev/ttyUSB0", 57600); // Adjust the port name as necessary
     if (result != CommunicationManager::Result::Success) {
         std::cerr << "Failed to connect to the serial port." << std::endl;
         return;
