@@ -32,7 +32,7 @@ void CommunicationManager::handle_read(const boost::system::error_code& ec, std:
         std::cout << "Received: " << message << std::endl;
         read();
     } else {
-        std::cout << "error " << std::endl;
+        std::cerr << "Error during read: " << ec.message() << std::endl;
         do_close();
     }
 }
@@ -59,6 +59,7 @@ void CommunicationManager::handle_write(const boost::system::error_code& ec, std
             write();
         }
     } else {
+        std::cerr << "Error during write: " << ec.message() << std::endl;
         do_close();
     }
 }
