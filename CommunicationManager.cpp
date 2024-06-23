@@ -32,6 +32,7 @@ void CommunicationManager::handle_read(const boost::system::error_code& ec, std:
         std::cout << "Received: " << message << std::endl;
         read();
     } else {
+        std::cout << "error " << std::endl;
         do_close();
     }
 }

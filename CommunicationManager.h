@@ -7,6 +7,7 @@
 #include <thread>
 #include <mutex>
 #include <deque>
+#include <string> // Include the string header
 
 class CommunicationManager {
 public:
