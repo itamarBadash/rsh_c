@@ -60,6 +60,7 @@ void CommunicationManager::openPort() {
     if (tcsetattr(serial_port, TCSANOW, &tty) != 0) {
         std::cerr << "Error " << errno << " from tcsetattr: " << strerror(errno) << std::endl;
         closePort();
+        return;
     }
 }
 
