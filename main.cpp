@@ -35,14 +35,6 @@ void send_and_receive(CommunicationManager &cm, const std::string &message) {
         std::cout << "No response received." << std::endl;
     }
 }
-void usage(const std::string& bin_name) {
-    std::cerr << "Usage: " << bin_name << " <connection_url>\n"
-              << "Connection URL format should be:\n"
-              << " For TCP: tcp://[server_host][:server_port]\n"
-              << " For UDP: udp://[bind_host][:bind_port]\n"
-              << " For Serial: serial:///path/to/serial/dev[:baudrate]\n"
-              << "For example, to connect to the simulator use URL: udp://:14540\n";
-}
 
 int main() {
     CommunicationManager cm;
@@ -73,6 +65,14 @@ int main() {
     std::cout << "Serial port closed." << std::endl;
 
     return 0;
+}
+void usage(const std::string& bin_name) {
+    std::cerr << "Usage: " << bin_name << " <connection_url>\n"
+              << "Connection URL format should be:\n"
+              << " For TCP: tcp://[server_host][:server_port]\n"
+              << " For UDP: udp://[bind_host][:bind_port]\n"
+              << " For Serial: serial:///path/to/serial/dev[:baudrate]\n"
+              << "For example, to connect to the simulator use URL: udp://:14540\n";
 }
 
 int TelemetryManagerTest(Mavsdk &mavsdk) {
