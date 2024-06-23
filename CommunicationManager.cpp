@@ -3,7 +3,8 @@
 CommunicationManager::CommunicationManager()
         : io_service_(),
           serial_port_(std::make_unique<boost::asio::serial_port>(io_service_)),
-          connected_(false) {}
+          connected_(false),
+          strand_(io_service_) {}
 
 CommunicationManager::~CommunicationManager() {
     disconnect();
