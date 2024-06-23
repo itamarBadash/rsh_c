@@ -1,4 +1,5 @@
 #include "CommunicationManager.h"
+#include <boost/bind/bind.hpp>
 
 CommunicationManager::CommunicationManager()
         : io_service_(),
@@ -107,5 +108,7 @@ void CommunicationManager::handle_read(const boost::system::error_code& error, s
     if (error) {
         std::cerr << "Error on read: " << error.message() << std::endl;
         connected_ = false;
+    } else {
+        std::cout << "Successfully read " << bytes_transferred << " bytes." << std::endl;
     }
 }
