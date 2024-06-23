@@ -12,8 +12,18 @@ int commandManagerTest(std::shared_ptr<mavsdk::System> system);
 using namespace mavsdk;
 
 int main() {
-    CommunicationManager cm("/dev/ttyUSB0", 57600); // Adjust the port and baud rate as needed
-    cm.run();
+    CommunicationManager commManager("/dev/ttyUSB0", 57600);
+
+    // Write a message
+    commManager.write("Hello from main");
+
+    // Simulate some delay to allow message processing
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    // Get the latest response
+    std::string response = commManager.getLatestResponse();
+    std::cout << "Latest response: " << response << std::endl;
+
     return 0;
 }
 

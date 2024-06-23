@@ -5,13 +5,19 @@
 #include <termios.h>
 #include <cstring>
 #include <errno.h>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <queue>
 
 CommunicationManager::CommunicationManager(const std::string &port, int baud_rate)
-        : port_name(port), baud_rate(baud_rate), serial_port(-1) {
+        : port_name(port), baud_rate(baud_rate), serial_port(-1), stop_flag(false) {
     openPort();
+    startWorker();
 }
 
 CommunicationManager::~CommunicationManager() {
+    stopWorker();
     closePort();
 }
 
@@ -73,6 +79,44 @@ void CommunicationManager::closePort() {
     }
 }
 
+void CommunicationManager::startWorker() {
+    worker_thread = std::thread(&CommunicationManager::workerFunction, this);
+}
+
+void CommunicationManager::stopWorker() {
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        stop_flag = true;
+    }
+    cond_var.notify_all();
+    if (worker_thread.joinable()) {
+        worker_thread.join();
+    }
+}
+
+void CommunicationManager::workerFunction() {
+    while (true) {
+        std::unique_lock<std::mutex> lock(mutex);
+        cond_var.wait(lock, [this]() { return !message_queue.empty() || stop_flag; });
+
+        if (stop_flag) {
+            break;
+        }
+
+        std::string message = std::move(message_queue.front());
+        message_queue.pop();
+        lock.unlock();
+
+        sendMessage(message);
+
+        std::string response = receiveMessage();
+        if (!response.empty()) {
+            std::lock_guard<std::mutex> response_lock(response_mutex);
+            last_response = response;
+        }
+    }
+}
+
 void CommunicationManager::sendMessage(const std::string &message) {
     if (serial_port < 0) {
         std::cerr << "Serial port not opened." << std::endl;
@@ -84,12 +128,6 @@ void CommunicationManager::sendMessage(const std::string &message) {
         std::cerr << "Error writing to serial port: " << strerror(errno) << std::endl;
     } else {
         std::cout << "Message sent: " << message << std::endl;
-        // Wait for ACK
-        if (waitForAcknowledgement()) {
-            std::cout << "ACK received" << std::endl;
-        } else {
-            std::cout << "No ACK received" << std::endl;
-        }
     }
 }
 
@@ -106,40 +144,21 @@ std::string CommunicationManager::receiveMessage() {
     if (n > 0) {
         std::string response(buffer, n);
         std::cout << "Received: " << response << std::endl;
-        sendAcknowledgement();
         return response;
     } else {
-        std::cout << "No response received." << std::endl;
         return "";
     }
 }
 
-void CommunicationManager::sendAcknowledgement() {
-    std::string ack = "ACK";
-    int n = write(serial_port, ack.c_str(), ack.size());
-    if (n < 0) {
-        std::cerr << "Error writing acknowledgement: " << strerror(errno) << std::endl;
-    } else {
-        std::cout << "Acknowledgement sent" << std::endl;
+void CommunicationManager::write(const std::string &message) {
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        message_queue.push(message);
     }
+    cond_var.notify_all();
 }
 
-bool CommunicationManager::waitForAcknowledgement() {
-    char buffer[256];
-    memset(buffer, 0, sizeof(buffer));
-    int n = read(serial_port, buffer, sizeof(buffer));
-
-    if (n > 0) {
-        std::string response(buffer, n);
-        return response.find("ACK") != std::string::npos;
-    }
-    return false;
-}
-
-void CommunicationManager::run() {
-    while (true) {
-        sendMessage("Hello");
-        receiveMessage();
-        sleep(2);
-    }
+std::string CommunicationManager::getLatestResponse() {
+    std::lock_guard<std::mutex> lock(response_mutex);
+    return last_response;
 }
