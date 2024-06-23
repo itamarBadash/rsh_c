@@ -9,10 +9,32 @@
 
 int TelemetryManagerTest(Mavsdk &mavsdk);
 int commandManagerTest(std::shared_ptr<mavsdk::System> system);
-void test_communication_manager();
 using namespace mavsdk;
 
+void send_and_receive(CommunicationManager &cm, const std::string &message) {
+    // Send message
+    auto result = cm.write(message);
+    if (result != CommunicationManager::Result::Success) {
+        std::cerr << "Failed to write to the serial port." << std::endl;
+        return;
+    }
 
+    std::cout << "Message sent: " << message << std::endl;
+
+    // Read response
+    cm.read();
+
+    // Run the IO service to process the read operation
+    cm.run();
+
+    // Check if read is complete
+    if (cm.isReadComplete()) {
+        std::string response = cm.getReadData();
+        std::cout << "Received: " << response << std::endl;
+    } else {
+        std::cout << "No response received." << std::endl;
+    }
+}
 void usage(const std::string& bin_name) {
     std::cerr << "Usage: " << bin_name << " <connection_url>\n"
               << "Connection URL format should be:\n"
@@ -68,8 +90,32 @@ int main(int argc, char** argv) {
     telemetry_thread.join();
 */
 
-    test_communication_manager();
-    return 0;
+    CommunicationManager cm;
+
+    // Connect to the serial port
+    auto result = cm.connect("/dev/ttyUSB0", 57600); // Adjust the port name as necessary
+    if (result != CommunicationManager::Result::Success) {
+        std::cerr << "Failed to connect to the serial port." << std::endl;
+        return 1;
+    }
+
+    std::cout << "Serial port opened successfully." << std::endl;
+
+    // Main loop for continuous communication
+    try {
+        while (true) {
+            send_and_receive(cm, "Hello"); // You can modify the message as needed
+            std::this_thread::sleep_for(std::chrono::seconds(2)); // Adjust the delay as needed
+        }
+    } catch (const std::exception &e) {
+        std::cerr << "Program terminated with exception: " << e.what() << std::endl;
+    } catch (...) {
+        std::cerr << "Program terminated with unknown exception." << std::endl;
+    }
+
+    // Close the serial connection
+    cm.disconnect();
+    std::cout << "Serial port closed." << std::endl;    return 0;
 }
 
 int TelemetryManagerTest(Mavsdk &mavsdk) {
@@ -187,48 +233,4 @@ int commandManagerTest(std::shared_ptr<mavsdk::System> system){
     }
 
     return 0;
-}
-void test_communication_manager() {
-    CommunicationManager cm;
-
-    // Connect to the serial port
-    auto result = cm.connect("/dev/ttyUSB0", 57600); // Adjust the port name as necessary
-    if (result != CommunicationManager::Result::Success) {
-        std::cerr << "Failed to connect to the serial port." << std::endl;
-        return;
-    }
-
-    std::cout << "Connected to the serial port." << std::endl;
-
-    // Write data asynchronously
-    result = cm.write("Hello, serial port!\n");
-    if (result != CommunicationManager::Result::Success) {
-        std::cerr << "Failed to write to the serial port." << std::endl;
-        return;
-    }
-
-    std::cout << "Data written to the serial port." << std::endl;
-
-    // Read data asynchronously
-    cm.read();
-
-    // Run the IO service in a separate thread
-    std::thread io_thread([&cm]() {
-        cm.run();
-    });
-
-    // Wait for the read to complete
-    while (!cm.isReadComplete()) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
-
-    // Get and print the read data
-    std::string data = cm.getReadData();
-    std::cout << "Data read from serial port: " << data << std::endl;
-
-    // Clean up
-    cm.disconnect();
-    io_thread.join();
-
-    std::cout << "Disconnected from the serial port." << std::endl;
 }
