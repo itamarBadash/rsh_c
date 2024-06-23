@@ -4,9 +4,11 @@ CommunicationManager::CommunicationManager(boost::asio::io_service& io_service, 
         : io_service_(io_service),
           serial_port_(io_service, port) {
     serial_port_.set_option(boost::asio::serial_port_base::baud_rate(baud_rate));
+    std::cout << "Serial port opened on " << port << " with baud rate " << baud_rate << std::endl;
 }
 
 void CommunicationManager::start() {
+    std::cout << "Starting read operation" << std::endl;
     read();
 }
 
@@ -19,6 +21,7 @@ void CommunicationManager::close() {
 }
 
 void CommunicationManager::read() {
+    std::cout << "Initiating async read" << std::endl;
     boost::asio::async_read_until(serial_port_, boost::asio::dynamic_buffer(read_msg_), '\n',
                                   boost::bind(&CommunicationManager::handle_read, this,
                                               boost::asio::placeholders::error,
@@ -46,6 +49,7 @@ void CommunicationManager::do_write(const std::string& data) {
 }
 
 void CommunicationManager::write() {
+    std::cout << "Initiating async write" << std::endl;
     boost::asio::async_write(serial_port_, boost::asio::buffer(write_msgs_.front()),
                              boost::bind(&CommunicationManager::handle_write, this,
                                          boost::asio::placeholders::error,
@@ -54,6 +58,7 @@ void CommunicationManager::write() {
 
 void CommunicationManager::handle_write(const boost::system::error_code& ec, std::size_t /*bytes_transferred*/) {
     if (!ec) {
+        std::cout << "Write completed" << std::endl;
         write_msgs_.pop_front();
         if (!write_msgs_.empty()) {
             write();
@@ -67,5 +72,6 @@ void CommunicationManager::handle_write(const boost::system::error_code& ec, std
 void CommunicationManager::do_close() {
     if (serial_port_.is_open()) {
         serial_port_.close();
+        std::cout << "Serial port closed" << std::endl;
     }
 }
