@@ -30,7 +30,7 @@ public:
     Result write(const std::string& data);
 
     // Function to start reading data from the serial port
-    Result read();
+    std::string read();
 
     // Function to check if the serial port is open
     bool isConnected() const;
