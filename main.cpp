@@ -15,14 +15,11 @@ int main() {
     CommunicationManager commManager("/dev/ttyUSB0", 57600);
 
     // Write a message
-    commManager.write("Hello from main");
-
-    // Simulate some delay to allow message processing
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    while (true)
+        std::this_thread::sleep_for(std::chrono::seconds(1));
 
     // Get the latest response
     std::string response = commManager.getLatestResponse();
-    std::cout << "Latest response: " << response << std::endl;
 
     return 0;
 }
