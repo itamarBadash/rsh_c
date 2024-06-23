@@ -1,48 +1,33 @@
-#ifndef COMMUNICATIONMANAGER_H
-#define COMMUNICATIONMANAGER_H
+#ifndef COMMUNICATION_MANAGER_H
+#define COMMUNICATION_MANAGER_H
 
+#include <iostream>
 #include <boost/asio.hpp>
 #include <boost/bind/bind.hpp>
-#include <boost/system/error_code.hpp>
-#include <iostream>
-#include <memory>
-#include <regex>
-#include <string>
+#include <thread>
+#include <mutex>
+#include <deque>
 
 class CommunicationManager {
 public:
-    enum class Result {
-        Success,
-        Error,
-        NotConnected,
-        AlreadyConnected,
-        InvalidPort
-    };
+    CommunicationManager(boost::asio::io_service& io_service, const std::string& port, unsigned int baud_rate);
 
-    CommunicationManager();
-    ~CommunicationManager();
-
-    Result connect(const std::string& port, unsigned int baud_rate);
-    void disconnect();
-    Result write(const std::string& data);
-    void read();
-    std::string getReadData() const;
-    bool isReadComplete() const;
-    bool isConnected() const;
-    void run();
+    void start();
+    void write(const std::string& data);
+    void close();
 
 private:
-    bool validatePort(const std::string& port);
-    void handle_write(const boost::system::error_code& error, std::size_t bytes_transferred);
-    void handle_read(const boost::system::error_code& error, std::size_t bytes_transferred);
+    void read();
+    void handle_read(const boost::system::error_code& ec, std::size_t bytes_transferred);
+    void do_write(const std::string& data);
+    void write();
+    void handle_write(const boost::system::error_code& ec, std::size_t bytes_transferred);
+    void do_close();
 
-    boost::asio::io_context io_service_;
-    std::unique_ptr<boost::asio::serial_port> serial_port_;
-    bool connected_;
-    boost::asio::strand<boost::asio::io_context::executor_type> strand_;
-    boost::asio::streambuf buffer_;
-    std::string read_data_;
-    bool read_complete_;
+    boost::asio::io_service& io_service_;
+    boost::asio::serial_port serial_port_;
+    std::deque<std::string> write_msgs_;
+    std::string read_msg_;
 };
 
-#endif // COMMUNICATIONMANAGER_H
+#endif // COMMUNICATION_MANAGER_H
