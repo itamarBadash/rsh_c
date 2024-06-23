@@ -1,34 +1,39 @@
 #include "CommunicationManager.h"
+#include <boost/bind.hpp>
+#include <iostream>
+#include <regex>
 
 CommunicationManager::CommunicationManager()
         : io_service_(),
           serial_port_(std::make_unique<boost::asio::serial_port>(io_service_)),
-          connected_(false) {}
+          connected_(false),
+          strand_(io_service_) {}
 
-CommunicationManager::Result CommunicationManager::connect(const std::string& port, unsigned int baud_rate) {
+CommunicationManager::~CommunicationManager() {
+    disconnect();
+}
+
+void CommunicationManager::connect(const std::string& port, unsigned int baud_rate) {
     if (connected_) {
-        return Result::AlreadyConnected;
+        throw std::runtime_error("Already connected");
     }
 
     if (!validatePort(port)) {
-        return Result::InvalidPort;
+        throw std::invalid_argument("Invalid port format");
     }
 
     boost::system::error_code ec;
     serial_port_->open(port, ec);
     if (ec) {
-        std::cerr << "Error opening serial port: " << ec.message() << std::endl;
-        return Result::Error;
+        throw std::runtime_error("Error opening serial port: " + ec.message());
     }
 
     serial_port_->set_option(boost::asio::serial_port_base::baud_rate(baud_rate), ec);
     if (ec) {
-        std::cerr << "Error setting baud rate: " << ec.message() << std::endl;
-        return Result::Error;
+        throw std::runtime_error("Error setting baud rate: " + ec.message());
     }
 
     connected_ = true;
-    return Result::Success;
 }
 
 void CommunicationManager::disconnect() {
@@ -42,26 +47,32 @@ void CommunicationManager::disconnect() {
     }
 }
 
-CommunicationManager::Result CommunicationManager::write(const std::string& data) {
+void CommunicationManager::write(const std::string& data) {
     if (!connected_) {
-        return Result::NotConnected;
+        throw std::runtime_error("Not connected");
     }
     boost::asio::async_write(*serial_port_, boost::asio::buffer(data),
-                             boost::bind(&CommunicationManager::handle_write, this,
-                                         boost::asio::placeholders::error,
-                                         boost::asio::placeholders::bytes_transferred));
-    return Result::Success;
+                             strand_.wrap(boost::bind(&CommunicationManager::handle_write, this,
+                                                      boost::asio::placeholders::error,
+                                                      boost::asio::placeholders::bytes_transferred)));
 }
 
-CommunicationManager::Result CommunicationManager::read() {
+std::string CommunicationManager::read() {
     if (!connected_) {
-        return Result::NotConnected;
+        throw std::runtime_error("Not connected");
     }
+
     boost::asio::async_read_until(*serial_port_, buffer_, '\n',
-                                  boost::bind(&CommunicationManager::handle_read, this,
-                                              boost::asio::placeholders::error,
-                                              boost::asio::placeholders::bytes_transferred));
-    return Result::Success;
+                                  strand_.wrap(boost::bind(&CommunicationManager::handle_read, this,
+                                                           boost::asio::placeholders::error,
+                                                           boost::asio::placeholders::bytes_transferred)));
+    io_service_.run_one(); // Run one operation to process the async_read_until
+    io_service_.reset();   // Reset the io_service to allow further runs
+
+    std::istream is(&buffer_);
+    std::string line;
+    std::getline(is, line);
+    return line;
 }
 
 bool CommunicationManager::isConnected() const {
@@ -74,10 +85,8 @@ void CommunicationManager::run() {
 
 bool CommunicationManager::validatePort(const std::string& port) {
 #ifdef _WIN32
-    // For Windows, port should be in the form "COMx"
-        std::regex pattern("^COM[0-9]+$");
+    std::regex pattern("^COM[0-9]+$");
 #else
-    // For Linux, port should be in the form "/dev/ttyUSBx" or "/dev/ttySx"
     std::regex pattern("^/dev/tty(USB|S)[0-9]+$");
 #endif
     return std::regex_match(port, pattern);
@@ -93,15 +102,7 @@ void CommunicationManager::handle_write(const boost::system::error_code& error, 
 }
 
 void CommunicationManager::handle_read(const boost::system::error_code& error, std::size_t bytes_transferred) {
-    if (!error) {
-        std::istream is(&buffer_);
-        std::string line;
-        std::getline(is, line);
-        std::cout << "Read: " << line << std::endl;
-
-        // Continue reading
-        read();
-    } else {
+    if (error) {
         std::cerr << "Error on read: " << error.message() << std::endl;
         connected_ = false;
     }
