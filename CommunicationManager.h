@@ -1,34 +1,25 @@
-#ifndef COMMUNICATION_MANAGER_H
-#define COMMUNICATION_MANAGER_H
+#ifndef COMMUNICATIONMANAGER_H
+#define COMMUNICATIONMANAGER_H
 
-#include <iostream>
-#include <boost/asio.hpp>
-#include <boost/bind/bind.hpp>
-#include <thread>
-#include <mutex>
-#include <deque>
-#include <string> // Include the string header
+#include <string>
 
 class CommunicationManager {
 public:
-    CommunicationManager(boost::asio::io_service& io_service, const std::string& port, unsigned int baud_rate);
+    CommunicationManager(const std::string &port, int baud_rate);
+    ~CommunicationManager();
 
-    void start();
-    void write(const std::string& data);
-    void close();
+    void sendMessage(const std::string &message);
+    std::string receiveMessage();
+    void run();
 
 private:
-    void read();
-    void handle_read(const boost::system::error_code& ec, std::size_t bytes_transferred);
-    void do_write(const std::string& data);
-    void write();
-    void handle_write(const boost::system::error_code& ec, std::size_t bytes_transferred);
-    void do_close();
+    int serial_port;
+    std::string port_name;
+    int baud_rate;
 
-    boost::asio::io_service& io_service_;
-    boost::asio::serial_port serial_port_;
-    std::deque<std::string> write_msgs_;
-    std::string read_msg_;
+    void openPort();
+    void closePort();
+    void sendAcknowledgement();
 };
 
-#endif // COMMUNICATION_MANAGER_H
+#endif // COMMUNICATIONMANAGER_H

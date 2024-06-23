@@ -1,77 +1,96 @@
 #include "CommunicationManager.h"
+#include <iostream>
+#include <unistd.h>
+#include <fcntl.h>
+#include <termios.h>
+#include <cstring>
 
-CommunicationManager::CommunicationManager(boost::asio::io_service& io_service, const std::string& port, unsigned int baud_rate)
-        : io_service_(io_service),
-          serial_port_(io_service, port) {
-    serial_port_.set_option(boost::asio::serial_port_base::baud_rate(baud_rate));
-    std::cout << "Serial port opened on " << port << " with baud rate " << baud_rate << std::endl;
+CommunicationManager::CommunicationManager(const std::string &port, int baud_rate)
+        : port_name(port), baud_rate(baud_rate), serial_port(-1) {
+    openPort();
 }
 
-void CommunicationManager::start() {
-    std::cout << "Starting read operation" << std::endl;
-    read();
+CommunicationManager::~CommunicationManager() {
+    closePort();
 }
 
-void CommunicationManager::write(const std::string& data) {
-    io_service_.post(boost::bind(&CommunicationManager::do_write, this, data));
+void CommunicationManager::openPort() {
+    serial_port = open(port_name.c_str(), O_RDWR);
+
+    if (serial_port < 0) {
+        std::cerr << "Error " << errno << " opening " << port_name << ": " << strerror(errno) << std::endl;
+    }
+
+    termios tty;
+    if (tcgetattr(serial_port, &tty) != 0) {
+        std::cerr << "Error " << errno << " from tcgetattr: " << strerror(errno) << std::endl;
+    }
+
+    cfsetospeed(&tty, baud_rate);
+    cfsetispeed(&tty, baud_rate);
+
+    tty.c_cflag &= ~PARENB; // No parity bit
+    tty.c_cflag &= ~CSTOPB; // Only one stop bit
+    tty.c_cflag &= ~CSIZE;
+    tty.c_cflag |= CS8; // 8 bits per byte
+    tty.c_cflag &= ~CRTSCTS; // No flow control
+    tty.c_cflag |= CREAD | CLOCAL; // Turn on read and ignore control lines
+
+    tty.c_lflag &= ~ICANON;
+    tty.c_lflag &= ~ECHO;
+    tty.c_lflag &= ~ECHOE;
+    tty.c_lflag &= ~ECHONL;
+    tty.c_lflag &= ~ISIG; // Disable interpretation of INTR, QUIT and SUSP
+
+    tty.c_iflag &= ~(IXON | IXOFF | IXANY); // Turn off s/w flow ctrl
+    tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL); // Disable special handling of received bytes
+
+    tty.c_oflag &= ~OPOST; // Prevent special interpretation of output bytes (e.g. newline chars)
+    tty.c_oflag &= ~ONLCR; // Prevent conversion of newline to carriage return/line feed
+
+    tty.c_cc[VTIME] = 1;    // Wait for up to 1s (10 deciseconds), returning as soon as any data is received.
+    tty.c_cc[VMIN] = 0;
+
+    if (tcsetattr(serial_port, TCSANOW, &tty) != 0) {
+        std::cerr << "Error " << errno << " from tcsetattr: " << strerror(errno) << std::endl;
+    }
 }
 
-void CommunicationManager::close() {
-    io_service_.post(boost::bind(&CommunicationManager::do_close, this));
+void CommunicationManager::closePort() {
+    close(serial_port);
 }
 
-void CommunicationManager::read() {
-    std::cout << "Initiating async read" << std::endl;
-    boost::asio::async_read_until(serial_port_, boost::asio::dynamic_buffer(read_msg_), '\n',
-                                  boost::bind(&CommunicationManager::handle_read, this,
-                                              boost::asio::placeholders::error,
-                                              boost::asio::placeholders::bytes_transferred));
+void CommunicationManager::sendMessage(const std::string &message) {
+    write(serial_port, message.c_str(), message.size());
+    std::cout << "Message sent: " << message << std::endl;
 }
 
-void CommunicationManager::handle_read(const boost::system::error_code& ec, std::size_t bytes_transferred) {
-    if (!ec) {
-        std::string message(read_msg_.substr(0, bytes_transferred));
-        read_msg_.erase(0, bytes_transferred);
-        std::cout << "Received: " << message << std::endl;
-        read();
+std::string CommunicationManager::receiveMessage() {
+    char buffer[256];
+    memset(buffer, 0, sizeof(buffer));
+    int n = read(serial_port, buffer, sizeof(buffer));
+
+    if (n > 0) {
+        std::string response(buffer);
+        std::cout << "Received: " << response << std::endl;
+        sendAcknowledgement();
+        return response;
     } else {
-        std::cerr << "Error during read: " << ec.message() << std::endl;
-        do_close();
+        std::cout << "No response received." << std::endl;
+        return "";
     }
 }
 
-void CommunicationManager::do_write(const std::string& data) {
-    bool write_in_progress = !write_msgs_.empty();
-    write_msgs_.push_back(data);
-    if (!write_in_progress) {
-        write();
-    }
+void CommunicationManager::sendAcknowledgement() {
+    std::string ack = "ACK";
+    write(serial_port, ack.c_str(), ack.size());
+    std::cout << "Acknowledgement sent" << std::endl;
 }
 
-void CommunicationManager::write() {
-    std::cout << "Initiating async write" << std::endl;
-    boost::asio::async_write(serial_port_, boost::asio::buffer(write_msgs_.front()),
-                             boost::bind(&CommunicationManager::handle_write, this,
-                                         boost::asio::placeholders::error,
-                                         boost::asio::placeholders::bytes_transferred));
-}
-
-void CommunicationManager::handle_write(const boost::system::error_code& ec, std::size_t /*bytes_transferred*/) {
-    if (!ec) {
-        std::cout << "Write completed" << std::endl;
-        write_msgs_.pop_front();
-        if (!write_msgs_.empty()) {
-            write();
-        }
-    } else {
-        std::cerr << "Error during write: " << ec.message() << std::endl;
-        do_close();
-    }
-}
-
-void CommunicationManager::do_close() {
-    if (serial_port_.is_open()) {
-        serial_port_.close();
-        std::cout << "Serial port closed" << std::endl;
+void CommunicationManager::run() {
+    while (true) {
+        sendMessage("Hello");
+        receiveMessage();
+        sleep(2);
     }
 }

@@ -11,27 +11,9 @@ int TelemetryManagerTest(Mavsdk &mavsdk);
 int commandManagerTest(std::shared_ptr<mavsdk::System> system);
 using namespace mavsdk;
 
-
 int main() {
-    try {
-        boost::asio::io_service io_service;
-
-        CommunicationManager cm(io_service, "/dev/ttyUSB0", 57600);
-        cm.start();
-
-        std::thread t([&io_service]() { io_service.run(); });
-
-        std::string line;
-        while (std::getline(std::cin, line)) {
-            cm.write(line + "\n");
-        }
-
-        cm.close();
-        t.join();
-    } catch (std::exception& e) {
-        std::cerr << "Exception: " << e.what() << std::endl;
-    }
-
+    CommunicationManager cm("/dev/ttyS0", B57600); // Adjust the port and baud rate as needed
+    cm.run();
     return 0;
 }
 
