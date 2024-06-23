@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <cstring>
+#include <errno.h>
 
 CommunicationManager::CommunicationManager(const std::string &port, int baud_rate)
         : port_name(port), baud_rate(baud_rate), serial_port(-1) {
@@ -15,15 +16,20 @@ CommunicationManager::~CommunicationManager() {
 }
 
 void CommunicationManager::openPort() {
-    serial_port = open(port_name.c_str(), O_RDWR);
+    serial_port = open(port_name.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
 
     if (serial_port < 0) {
         std::cerr << "Error " << errno << " opening " << port_name << ": " << strerror(errno) << std::endl;
+        return;
     }
+
+    fcntl(serial_port, F_SETFL, 0);
 
     termios tty;
     if (tcgetattr(serial_port, &tty) != 0) {
         std::cerr << "Error " << errno << " from tcgetattr: " << strerror(errno) << std::endl;
+        closePort();
+        return;
     }
 
     cfsetospeed(&tty, baud_rate);
@@ -48,30 +54,54 @@ void CommunicationManager::openPort() {
     tty.c_oflag &= ~OPOST; // Prevent special interpretation of output bytes (e.g. newline chars)
     tty.c_oflag &= ~ONLCR; // Prevent conversion of newline to carriage return/line feed
 
-    tty.c_cc[VTIME] = 1;    // Wait for up to 1s (10 deciseconds), returning as soon as any data is received.
+    tty.c_cc[VTIME] = 10;    // Wait for up to 1s (10 deciseconds), returning as soon as any data is received.
     tty.c_cc[VMIN] = 0;
 
     if (tcsetattr(serial_port, TCSANOW, &tty) != 0) {
         std::cerr << "Error " << errno << " from tcsetattr: " << strerror(errno) << std::endl;
+        closePort();
     }
 }
 
 void CommunicationManager::closePort() {
-    close(serial_port);
+    if (serial_port >= 0) {
+        close(serial_port);
+        serial_port = -1;
+    }
 }
 
 void CommunicationManager::sendMessage(const std::string &message) {
-    write(serial_port, message.c_str(), message.size());
-    std::cout << "Message sent: " << message << std::endl;
+    if (serial_port < 0) {
+        std::cerr << "Serial port not opened." << std::endl;
+        return;
+    }
+
+    int n = write(serial_port, message.c_str(), message.size());
+    if (n < 0) {
+        std::cerr << "Error writing to serial port: " << strerror(errno) << std::endl;
+    } else {
+        std::cout << "Message sent: " << message << std::endl;
+        // Wait for ACK
+        if (waitForAcknowledgement()) {
+            std::cout << "ACK received" << std::endl;
+        } else {
+            std::cout << "No ACK received" << std::endl;
+        }
+    }
 }
 
 std::string CommunicationManager::receiveMessage() {
+    if (serial_port < 0) {
+        std::cerr << "Serial port not opened." << std::endl;
+        return "";
+    }
+
     char buffer[256];
     memset(buffer, 0, sizeof(buffer));
     int n = read(serial_port, buffer, sizeof(buffer));
 
     if (n > 0) {
-        std::string response(buffer);
+        std::string response(buffer, n);
         std::cout << "Received: " << response << std::endl;
         sendAcknowledgement();
         return response;
@@ -83,8 +113,24 @@ std::string CommunicationManager::receiveMessage() {
 
 void CommunicationManager::sendAcknowledgement() {
     std::string ack = "ACK";
-    write(serial_port, ack.c_str(), ack.size());
-    std::cout << "Acknowledgement sent" << std::endl;
+    int n = write(serial_port, ack.c_str(), ack.size());
+    if (n < 0) {
+        std::cerr << "Error writing acknowledgement: " << strerror(errno) << std::endl;
+    } else {
+        std::cout << "Acknowledgement sent" << std::endl;
+    }
+}
+
+bool CommunicationManager::waitForAcknowledgement() {
+    char buffer[256];
+    memset(buffer, 0, sizeof(buffer));
+    int n = read(serial_port, buffer, sizeof(buffer));
+
+    if (n > 0) {
+        std::string response(buffer, n);
+        return response.find("ACK") != std::string::npos;
+    }
+    return false;
 }
 
 void CommunicationManager::run() {

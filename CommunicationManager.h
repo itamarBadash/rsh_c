@@ -20,6 +20,7 @@ private:
     void openPort();
     void closePort();
     void sendAcknowledgement();
+    bool waitForAcknowledgement();
 };
 
 #endif // COMMUNICATIONMANAGER_H
