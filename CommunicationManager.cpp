@@ -1,4 +1,5 @@
 #include "CommunicationManager.h"
+#include <functional> // For std::bind
 
 CommunicationManager::CommunicationManager(boost::asio::io_service& io_service, const std::string& port, unsigned int baud_rate)
         : io_service_(io_service),
@@ -18,7 +19,7 @@ void CommunicationManager::start() {
 }
 
 void CommunicationManager::write(const std::string& data) {
-    io_service_.post(boost::bind(&CommunicationManager::do_write, this, data));
+    io_service_.post(std::bind(&CommunicationManager::do_write, this, data));
 }
 
 void CommunicationManager::close() {
@@ -26,7 +27,7 @@ void CommunicationManager::close() {
     if (read_thread_.joinable()) {
         read_thread_.join();
     }
-    io_service_.post(boost::bind(&CommunicationManager::do_close, this));
+    io_service_.post(std::bind(&CommunicationManager::do_close, this));
 }
 
 void CommunicationManager::read_loop() {
@@ -59,9 +60,9 @@ void CommunicationManager::do_write(const std::string& data) {
     write_msgs_.push_back(data);
     if (!write_in_progress) {
         boost::asio::async_write(serial_port_, boost::asio::buffer(write_msgs_.front()),
-                                 boost::bind(&CommunicationManager::handle_write, this,
-                                             boost::asio::placeholders::error,
-                                             boost::asio::placeholders::bytes_transferred));
+                                 std::bind(&CommunicationManager::handle_write, this,
+                                           std::placeholders::_1,
+                                           std::placeholders::_2));
     }
 }
 
@@ -71,9 +72,9 @@ void CommunicationManager::handle_write(const boost::system::error_code& ec, std
         write_msgs_.pop_front();
         if (!write_msgs_.empty()) {
             boost::asio::async_write(serial_port_, boost::asio::buffer(write_msgs_.front()),
-                                     boost::bind(&CommunicationManager::handle_write, this,
-                                                 boost::asio::placeholders::error,
-                                                 boost::asio::placeholders::bytes_transferred));
+                                     std::bind(&CommunicationManager::handle_write, this,
+                                               std::placeholders::_1,
+                                               std::placeholders::_2));
         }
     } else {
         std::cerr << "Error during write: " << ec.message() << std::endl;
