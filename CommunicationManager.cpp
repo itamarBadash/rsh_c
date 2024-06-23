@@ -51,7 +51,8 @@ CommunicationManager::Result CommunicationManager::write(const std::string& data
     if (!connected_) {
         return Result::NotConnected;
     }
-    boost::asio::async_write(*serial_port_, boost::asio::buffer(data),
+    std::string data_with_newline = data + "\n";  // Add newline character
+    boost::asio::async_write(*serial_port_, boost::asio::buffer(data_with_newline),
                              strand_.wrap(boost::bind(&CommunicationManager::handle_write, this,
                                                       boost::asio::placeholders::error,
                                                       boost::asio::placeholders::bytes_transferred)));
