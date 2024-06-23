@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
         usage(argv[0]);
         return 1;
     }
-
+/*
     // Initialize MAVSDK
     Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::CompanionComputer}};
     ConnectionResult connection_result = mavsdk.add_any_connection(argv[1]);
@@ -59,13 +59,32 @@ int main(int argc, char** argv) {
 
     std::thread telemetry_thread(TelemetryManagerTest, std::ref(mavsdk));
 
-    std::this_thread::sleep_for(std::chrono::seconds(10));
+   std::this_thread::sleep_for(std::chrono::seconds(10));
 
     CommandManager commandManager(system);
 
 
-    // Wait for the telemetry thread to finish
+     Wait for the telemetry thread to finish
     telemetry_thread.join();
+*/
+
+    CommunicationManager cm;
+    try {
+        cm.connect("/dev/ttyUSB0", 9600);
+        std::cout << "Connected to serial port." << std::endl;
+
+        cm.write("Hello, serial port!");
+        std::string response = cm.read();
+        std::cout << "Received: " << response << std::endl;
+
+        cm.disconnect();
+        std::cout << "Disconnected from serial port." << std::endl;
+    } catch (const std::exception& ex) {
+        std::cerr << "Exception: " << ex.what() << std::endl;
+    }
+
+    return 0;
+}
 
     return 0;
 }
