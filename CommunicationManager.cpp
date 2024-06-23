@@ -4,7 +4,7 @@ CommunicationManager::CommunicationManager()
         : io_service_(),
           serial_port_(std::make_unique<boost::asio::serial_port>(io_service_)),
           connected_(false),
-          strand_(io_service_),
+          strand_(boost::asio::make_strand(io_service_)),
           read_complete_(false) {}
 
 CommunicationManager::~CommunicationManager() {
@@ -53,9 +53,10 @@ CommunicationManager::Result CommunicationManager::write(const std::string& data
         return Result::NotConnected;
     }
     boost::asio::async_write(*serial_port_, boost::asio::buffer(data),
-                             strand_.wrap(boost::bind(&CommunicationManager::handle_write, this,
-                                                      boost::asio::placeholders::error,
-                                                      boost::asio::placeholders::bytes_transferred)));
+                             boost::asio::bind_executor(strand_,
+                                                        boost::bind(&CommunicationManager::handle_write, this,
+                                                                    boost::asio::placeholders::error,
+                                                                    boost::asio::placeholders::bytes_transferred)));
     return Result::Success;
 }
 
@@ -66,9 +67,10 @@ void CommunicationManager::read() {
 
     read_complete_ = false;
     boost::asio::async_read_until(*serial_port_, buffer_, '\n',
-                                  strand_.wrap(boost::bind(&CommunicationManager::handle_read, this,
-                                                           boost::asio::placeholders::error,
-                                                           boost::asio::placeholders::bytes_transferred)));
+                                  boost::asio::bind_executor(strand_,
+                                                             boost::bind(&CommunicationManager::handle_read, this,
+                                                                         boost::asio::placeholders::error,
+                                                                         boost::asio::placeholders::bytes_transferred)));
 }
 
 std::string CommunicationManager::getReadData() const {
