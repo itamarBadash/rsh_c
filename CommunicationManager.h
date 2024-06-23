@@ -36,10 +36,10 @@ private:
     void handle_write(const boost::system::error_code& error, std::size_t bytes_transferred);
     void handle_read(const boost::system::error_code& error, std::size_t bytes_transferred);
 
-    boost::asio::io_service io_service_;
+    boost::asio::io_context io_service_;
     std::unique_ptr<boost::asio::serial_port> serial_port_;
     bool connected_;
-    boost::asio::io_service::strand strand_;
+    boost::asio::strand<boost::asio::io_context::executor_type> strand_;
     boost::asio::streambuf buffer_;
     std::string read_data_;
     bool read_complete_;
