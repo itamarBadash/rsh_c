@@ -17,9 +17,7 @@ int main() {
     // Write a message
     while (true)
         std::this_thread::sleep_for(std::chrono::seconds(1));
-
-    // Get the latest response
-    std::string response = commManager.getLatestResponse();
+    
 
     return 0;
 }
