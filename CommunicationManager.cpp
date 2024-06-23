@@ -4,7 +4,8 @@ CommunicationManager::CommunicationManager()
         : io_service_(),
           serial_port_(std::make_unique<boost::asio::serial_port>(io_service_)),
           connected_(false),
-          strand_(io_service_) {}
+          strand_(io_service_),
+          read_complete_(false) {}
 
 CommunicationManager::~CommunicationManager() {
     disconnect();
@@ -63,10 +64,19 @@ void CommunicationManager::read() {
         throw std::runtime_error("Not connected");
     }
 
+    read_complete_ = false;
     boost::asio::async_read_until(*serial_port_, buffer_, '\n',
                                   strand_.wrap(boost::bind(&CommunicationManager::handle_read, this,
                                                            boost::asio::placeholders::error,
                                                            boost::asio::placeholders::bytes_transferred)));
+}
+
+std::string CommunicationManager::getReadData() const {
+    return read_data_;
+}
+
+bool CommunicationManager::isReadComplete() const {
+    return read_complete_;
 }
 
 bool CommunicationManager::isConnected() const {
@@ -101,9 +111,8 @@ void CommunicationManager::handle_read(const boost::system::error_code& error, s
         connected_ = false;
     } else {
         std::istream is(&buffer_);
-        std::string line;
-        std::getline(is, line);
-        std::cout << "Read: " << line << std::endl;
+        std::getline(is, read_data_);
+        read_complete_ = true;
+        std::cout << "Read: " << read_data_ << std::endl;
     }
 }
-

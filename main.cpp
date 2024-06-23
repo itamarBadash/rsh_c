@@ -217,8 +217,14 @@ void test_communication_manager() {
         cm.run();
     });
 
-    // Simulate some delay to allow async operations to complete
-    std::this_thread::sleep_for(std::chrono::seconds(2));
+    // Wait for the read to complete
+    while (!cm.isReadComplete()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+
+    // Get and print the read data
+    std::string data = cm.getReadData();
+    std::cout << "Data read from serial port: " << data << std::endl;
 
     // Clean up
     cm.disconnect();
