@@ -52,11 +52,15 @@ CommunicationManager::Result CommunicationManager::write(const std::string& data
     if (!connected_) {
         return Result::NotConnected;
     }
-    boost::asio::async_write(*serial_port_, boost::asio::buffer(data),
-                             boost::asio::bind_executor(strand_,
-                                                        boost::bind(&CommunicationManager::handle_write, this,
-                                                                    boost::asio::placeholders::error,
-                                                                    boost::asio::placeholders::bytes_transferred)));
+
+    auto self(shared_from_this());
+    boost::asio::post(strand_, [this, self, data]() {
+        boost::asio::async_write(*serial_port_, boost::asio::buffer(data),
+                                 boost::asio::bind_executor(strand_,
+                                                            std::bind(&CommunicationManager::handle_write, this,
+                                                                      std::placeholders::_1,
+                                                                      std::placeholders::_2)));
+    });
     return Result::Success;
 }
 
@@ -66,11 +70,14 @@ void CommunicationManager::read() {
     }
 
     read_complete_ = false;
-    boost::asio::async_read_until(*serial_port_, buffer_, '\n',
-                                  boost::asio::bind_executor(strand_,
-                                                             boost::bind(&CommunicationManager::handle_read, this,
-                                                                         boost::asio::placeholders::error,
-                                                                         boost::asio::placeholders::bytes_transferred)));
+    auto self(shared_from_this());
+    boost::asio::post(strand_, [this, self]() {
+        boost::asio::async_read_until(*serial_port_, buffer_, '\n',
+                                      boost::asio::bind_executor(strand_,
+                                                                 std::bind(&CommunicationManager::handle_read, this,
+                                                                           std::placeholders::_1,
+                                                                           std::placeholders::_2)));
+    });
 }
 
 std::string CommunicationManager::getReadData() const {
