@@ -32,8 +32,8 @@ void CommunicationManager::openPort() {
         return;
     }
 
-    cfsetospeed(&tty, baud_rate);
-    cfsetispeed(&tty, baud_rate);
+    cfsetospeed(&tty, B57600); // Set output speed
+    cfsetispeed(&tty, B57600); // Set input speed
 
     tty.c_cflag &= ~PARENB; // No parity bit
     tty.c_cflag &= ~CSTOPB; // Only one stop bit
@@ -62,6 +62,8 @@ void CommunicationManager::openPort() {
         closePort();
         return;
     }
+
+    std::cout << "Serial port opened successfully." << std::endl;
 }
 
 void CommunicationManager::closePort() {
