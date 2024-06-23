@@ -1,11 +1,9 @@
 #include "CommunicationManager.h"
-#include <boost/bind/bind.hpp>
 
 CommunicationManager::CommunicationManager()
         : io_service_(),
           serial_port_(std::make_unique<boost::asio::serial_port>(io_service_)),
-          connected_(false),
-          strand_(io_service_) {}
+          connected_(false) {}
 
 CommunicationManager::~CommunicationManager() {
     disconnect();
@@ -34,6 +32,7 @@ CommunicationManager::Result CommunicationManager::connect(const std::string& po
     }
 
     connected_ = true;
+    std::cout << "Connected to port " << port << " with baud rate " << baud_rate << std::endl;
     return Result::Success;
 }
 
@@ -52,11 +51,18 @@ CommunicationManager::Result CommunicationManager::write(const std::string& data
     if (!connected_) {
         return Result::NotConnected;
     }
-    std::string data_with_newline = data + "\n";  // Add newline character
-    boost::asio::async_write(*serial_port_, boost::asio::buffer(data_with_newline),
-                             strand_.wrap(boost::bind(&CommunicationManager::handle_write, this,
-                                                      boost::asio::placeholders::error,
-                                                      boost::asio::placeholders::bytes_transferred)));
+
+    std::string data_with_newline = data + "\n";
+    std::cout << "Writing data: " << data_with_newline << std::endl;
+
+    boost::system::error_code ec;
+    boost::asio::write(*serial_port_, boost::asio::buffer(data_with_newline), ec);
+    if (ec) {
+        std::cerr << "Error on write: " << ec.message() << std::endl;
+        return Result::Error;
+    }
+
+    std::cout << "Successfully wrote data." << std::endl;
     return Result::Success;
 }
 
@@ -65,25 +71,24 @@ std::string CommunicationManager::read() {
         throw std::runtime_error("Not connected");
     }
 
-    boost::asio::async_read_until(*serial_port_, buffer_, '\n',
-                                  strand_.wrap(boost::bind(&CommunicationManager::handle_read, this,
-                                                           boost::asio::placeholders::error,
-                                                           boost::asio::placeholders::bytes_transferred)));
-    io_service_.run_one(); // Run one operation to process the async_read_until
-    io_service_.reset();   // Reset the io_service to allow further runs
+    boost::asio::streambuf buf;
+    boost::system::error_code ec;
+    boost::asio::read_until(*serial_port_, buf, '\n', ec);
+    if (ec) {
+        std::cerr << "Error on read: " << ec.message() << std::endl;
+        return "";
+    }
 
-    std::istream is(&buffer_);
+    std::istream is(&buf);
     std::string line;
     std::getline(is, line);
+
+    std::cout << "Read data: " << line << std::endl;
     return line;
 }
 
 bool CommunicationManager::isConnected() const {
     return connected_;
-}
-
-void CommunicationManager::run() {
-    io_service_.run();
 }
 
 bool CommunicationManager::validatePort(const std::string& port) {
@@ -93,22 +98,4 @@ bool CommunicationManager::validatePort(const std::string& port) {
     std::regex pattern("^/dev/tty(USB|S)[0-9]+$");
 #endif
     return std::regex_match(port, pattern);
-}
-
-void CommunicationManager::handle_write(const boost::system::error_code& error, std::size_t bytes_transferred) {
-    if (!error) {
-        std::cout << "Successfully wrote " << bytes_transferred << " bytes." << std::endl;
-    } else {
-        std::cerr << "Error on write: " << error.message() << std::endl;
-        connected_ = false;
-    }
-}
-
-void CommunicationManager::handle_read(const boost::system::error_code& error, std::size_t bytes_transferred) {
-    if (error) {
-        std::cerr << "Error on read: " << error.message() << std::endl;
-        connected_ = false;
-    } else {
-        std::cout << "Successfully read " << bytes_transferred << " bytes." << std::endl;
-    }
 }

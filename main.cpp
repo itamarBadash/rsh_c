@@ -70,7 +70,12 @@ int main(int argc, char** argv) {
 
     CommunicationManager cm;
     try {
-        cm.connect("/dev/ttyUSB0", 9600);
+        auto result = cm.connect("/dev/ttyUSB0", 9600);
+        if (result != CommunicationManager::Result::Success) {
+            std::cerr << "Failed to connect to serial port." << std::endl;
+            return 1;
+        }
+
         std::cout << "Connected to serial port." << std::endl;
 
         cm.write("Hello, serial port!");
@@ -82,7 +87,6 @@ int main(int argc, char** argv) {
     } catch (const std::exception& ex) {
         std::cerr << "Exception: " << ex.what() << std::endl;
     }
-
     return 0;
 }
 
