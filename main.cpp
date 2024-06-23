@@ -44,52 +44,7 @@ void usage(const std::string& bin_name) {
               << "For example, to connect to the simulator use URL: udp://:14540\n";
 }
 
-int main(int argc, char** argv) {
-    if (argc != 2) { // Ensure correct usage
-        usage(argv[0]);
-        return 1;
-    }
-/*
-    // Initialize MAVSDK
-    Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::CompanionComputer}};
-    ConnectionResult connection_result = mavsdk.add_any_connection(argv[1]);
-
-    if (connection_result != ConnectionResult::Success) {
-        std::cerr << "Connection failed: " << connection_result << '\n';
-        return 1;
-    }
-
-    // Wait for the first autopilot system to connect
-    auto maybe_system = mavsdk.first_autopilot(3.0);
-    if (!maybe_system) {
-        std::cerr << "Timed out waiting for system\n";
-        return 1;
-    }
-
-    auto system = maybe_system.value();
-
-    CommunicationManager comm;
-    std::string port = "/dev/ttyUSB0";
-
-    auto result = comm.connect(port, 9600);
-    if (result != CommunicationManager::Result::Success) {
-        std::cerr << "Failed to connect to the serial port." << std::endl;
-        return 1;
-    } else{
-        std::cout << "sucuss" << std::endl;
-    }
-
-    std::thread telemetry_thread(TelemetryManagerTest, std::ref(mavsdk));
-
-   std::this_thread::sleep_for(std::chrono::seconds(10));
-
-    CommandManager commandManager(system);
-
-
-     Wait for the telemetry thread to finish
-    telemetry_thread.join();
-*/
-
+int main() {
     CommunicationManager cm;
 
     // Connect to the serial port
@@ -115,7 +70,9 @@ int main(int argc, char** argv) {
 
     // Close the serial connection
     cm.disconnect();
-    std::cout << "Serial port closed." << std::endl;    return 0;
+    std::cout << "Serial port closed." << std::endl;
+
+    return 0;
 }
 
 int TelemetryManagerTest(Mavsdk &mavsdk) {
