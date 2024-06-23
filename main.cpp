@@ -70,7 +70,7 @@ int main(int argc, char** argv) {
 
     CommunicationManager cm;
     try {
-        auto result = cm.connect("/dev/ttyUSB0", 9600);
+        auto result = cm.connect("/dev/ttyUSB1", 9600);
         if (result != CommunicationManager::Result::Success) {
             std::cerr << "Failed to connect to serial port." << std::endl;
             return 1;
