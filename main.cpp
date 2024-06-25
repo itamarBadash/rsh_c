@@ -154,14 +154,33 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    auto system = mavsdk.systems().at(0);
-    if (!system) {
+    // Wait for system to connect
+    std::cout << "Waiting for system to connect...\n";
+    bool system_discovered = false;
+    mavsdk.subscribe_on_new_system([&]() {
+        const auto systems = mavsdk.systems();
+        if (!systems.empty()) {
+            system_discovered = true;
+        }
+    });
+
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    if (!system_discovered) {
         std::cerr << "Timed out waiting for system\n";
         return 1;
     }
 
+    auto systems = mavsdk.systems();
+    if (systems.empty()) {
+        std::cerr << "No systems found\n";
+        return 1;
+    }
+
+    auto system = systems.at(0);
+    auto current_system = std::make_shared<System>(system);
+
     CommunicationManager communication_manager("/dev/ttyUSB0", 57600);
-    std::thread telemetry_thread(TelemetryManagerTest, system);
+    std::thread telemetry_thread(TelemetryManagerTest, current_system);
 
     telemetry_thread.join();
 
