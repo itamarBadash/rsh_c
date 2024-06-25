@@ -6,7 +6,8 @@
 #include "TelemetryManager.h"
 #include "CommandManager.h"
 #include "CommunicationManager.h"
-
+int commandManagerTest(std::shared_ptr<System> system);
+int TelemetryManagerTest(std::shared_ptr<System> system);
 using namespace mavsdk;
 
 void usage(const std::string& bin_name) {
