@@ -22,6 +22,8 @@ void usage(const std::string& bin_name) {
 }
 
 int TelemetryManagerTest(std::shared_ptr<System> system) {
+    std::cout << "entered" <<std::endl;
+
     try {
         TelemetryManager telemetry_manager(system);
         telemetry_manager.start();
