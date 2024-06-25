@@ -5,6 +5,11 @@
 #include <termios.h>
 #include <cstring>
 #include <errno.h>
+#include <memory>
+#include <vector>
+#include <string>
+#include <functional>
+#include <map>
 
 CommunicationManager::CommunicationManager(const std::string &port, int baud_rate, std::shared_ptr<CommandManager> cmd_manager)
         : port_name(port), baud_rate(baud_rate), serial_port(-1), stop_flag(false), command_manager(cmd_manager) {
