@@ -6,8 +6,10 @@
 #include "TelemetryManager.h"
 #include "CommandManager.h"
 #include "CommunicationManager.h"
-int commandManagerTest(std::shared_ptr<System> system);
-int TelemetryManagerTest(std::shared_ptr<System> system);
+
+int commandManagerTest(std::shared_ptr<mavsdk::System> system);
+int TelemetryManagerTest(std::shared_ptr<mavsdk::System> system);
+
 using namespace mavsdk;
 
 void usage(const std::string& bin_name) {
@@ -54,8 +56,10 @@ int TelemetryManagerTest(std::shared_ptr<System> system) {
                       << data.velocity.north_m_s << ", "
                       << data.velocity.east_m_s << ", "
                       << data.velocity.down_m_s << std::endl;
+
             std::cout << "Altitude: "
                       << telemetry_manager.getRelativeAltitude() << std::endl;
+
             std::this_thread::sleep_for(std::chrono::seconds(5));
         }
 
@@ -150,18 +154,16 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    auto system = mavsdk.first_autopilot(3.0);
+    auto system = mavsdk.systems().at(0);
     if (!system) {
         std::cerr << "Timed out waiting for system\n";
         return 1;
     }
-    auto current_system = std::make_shared<System>(*system);
 
     CommunicationManager communication_manager("/dev/ttyUSB0", 57600);
-    std::thread telemetry_thread(TelemetryManagerTest, current_system);
+    std::thread telemetry_thread(TelemetryManagerTest, system);
 
     telemetry_thread.join();
-
 
     return 0;
 }
