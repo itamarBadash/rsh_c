@@ -6,7 +6,6 @@
 #include <atomic>
 #include <mutex>
 #include <iostream>
-#include <nlohmann/json.hpp>
 
 using namespace mavsdk;
 struct TelemetryData {
