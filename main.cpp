@@ -25,7 +25,7 @@ int TelemetryManagerTest(std::shared_ptr<System> system) {
     try {
         TelemetryManager telemetry_manager(system);
         telemetry_manager.start();
-
+/*
         while (telemetry_manager.isRunning()) {
             TelemetryData data = telemetry_manager.getTelemetryData();
 
@@ -59,7 +59,7 @@ int TelemetryManagerTest(std::shared_ptr<System> system) {
 
             std::cout << "Altitude: "
                       << telemetry_manager.getRelativeAltitude() << std::endl;
-
+*/
             std::this_thread::sleep_for(std::chrono::seconds(5));
         }
 

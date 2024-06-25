@@ -18,6 +18,7 @@ CommandManager::CommandManager(const std::shared_ptr<mavsdk::System>& system) : 
             viable = true;
     });
     initialize_command_handlers();
+
 }
 
 

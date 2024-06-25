@@ -118,7 +118,6 @@ std::string CommunicationManager::receiveMessage() {
 }
 
 void CommunicationManager::processReceivedMessage(const std::string &message) {
-    std::cout << "Received message: " << message << std::endl;
 
     // Assuming the message is in the format "command:param1,param2,..."
     size_t pos = message.find(':');
