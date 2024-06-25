@@ -16,18 +16,6 @@ struct TelemetryData {
     Telemetry::FlightMode flight_mode;
     Telemetry::Heading heading;
     Telemetry::VelocityNed velocity;
-
-        std::string print() const {
-            std::ostringstream oss;
-            oss << "Position: (lat: " << position.latitude << ", lon: " << position.longitude << ")\n";
-            oss << "Health: " << health.status << "\n";
-            oss << "Altitude: " << altitude.meters << " meters\n";
-            oss << "Euler Angles: (roll: " << euler_angle.roll << ", pitch: " << euler_angle.pitch << ", yaw: " << euler_angle.yaw << ")\n";
-            oss << "Flight Mode: " << flight_mode.mode << "\n";
-            oss << "Heading: " << heading.degrees << " degrees\n";
-            oss << "Velocity: (north: " << velocity.north << ", east: " << velocity.east << ", down: " << velocity.down << ")\n";
-            return oss.str();
-        }
 };
 
 class TelemetryManager {

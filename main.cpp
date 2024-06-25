@@ -22,7 +22,7 @@ void usage(const std::string& bin_name) {
 }
 
 int TelemetryManagerTest(std::shared_ptr<System> system) {
-    std::cout << "entered" <<std::endl;
+    CommunicationManager communication_manager("/dev/ttyUSB0", 57600);
 
     try {
         TelemetryManager telemetry_manager(system);
@@ -30,6 +30,7 @@ int TelemetryManagerTest(std::shared_ptr<System> system) {
 
         while (telemetry_manager.isRunning()) {
             TelemetryData data = telemetry_manager.getTelemetryData();
+            communication_manager.sendMessage(data);
 
             std::cout << "Position: "
                       << data.position.latitude_deg << ", "
@@ -180,7 +181,6 @@ int main(int argc, char** argv) {
 
     auto system = systems.at(0);
 
-    CommunicationManager communication_manager("/dev/ttyUSB0", 57600);
     std::thread telemetry_thread(TelemetryManagerTest, system);
 
     telemetry_thread.join();
