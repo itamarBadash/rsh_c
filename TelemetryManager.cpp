@@ -12,6 +12,8 @@ TelemetryManager::TelemetryManager(const std::shared_ptr<System>& system)
         } else
             viable = true;
     });
+
+    viable = true;
     _telemetry = std::make_unique<Telemetry>(_system);
 
         std::lock_guard<std::mutex> lock(_data_mutex);
