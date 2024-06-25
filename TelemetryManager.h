@@ -16,6 +16,41 @@ struct TelemetryData {
     Telemetry::FlightMode flight_mode;
     Telemetry::Heading heading;
     Telemetry::VelocityNed velocity;
+
+    std::string print(const TelemetryManager &telemetry_manager) const {
+        std::ostringstream oss;
+        oss << "Position: "
+            << position.latitude_deg << ", "
+            << position.longitude_deg << ", "
+            << position.relative_altitude_m << ", "
+            << position.absolute_altitude_m << "\n";
+
+        oss << "Health: "
+            << "Gyro: " << (health.is_gyrometer_calibration_ok ? "OK" : "Not OK") << ", "
+            << "Acc: " << (health.is_accelerometer_calibration_ok ? "OK" : "Not OK") << ", "
+            << "Mag: " << (health.is_magnetometer_calibration_ok ? "OK" : "Not OK") << "\n";
+
+        oss << "Euler Angles: "
+            << euler_angle.roll_deg << ", "
+            << euler_angle.pitch_deg << ", "
+            << euler_angle.yaw_deg << "\n";
+
+        oss << "Flight Mode: "
+            << flight_mode.mode << "\n";
+
+        oss << "Heading: "
+            << heading.heading_deg << "\n";
+
+        oss << "Velocity NED: "
+            << velocity.north_m_s << ", "
+            << velocity.east_m_s << ", "
+            << velocity.down_m_s << "\n";
+
+        oss << "Altitude: "
+            << telemetry_manager.getRelativeAltitude() << "\n";
+
+        return oss.str();
+    }
 };
 
 class TelemetryManager {

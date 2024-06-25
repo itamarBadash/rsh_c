@@ -30,7 +30,7 @@ int TelemetryManagerTest(std::shared_ptr<System> system) {
 
         while (telemetry_manager.isRunning()) {
             TelemetryData data = telemetry_manager.getTelemetryData();
-            communication_manager.sendMessage(data);
+            communication_manager.sendMessage(data.print());
 
             std::cout << "Position: "
                       << data.position.latitude_deg << ", "
