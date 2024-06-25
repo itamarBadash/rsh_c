@@ -11,32 +11,6 @@ int TelemetryManagerTest(Mavsdk &mavsdk);
 int commandManagerTest(std::shared_ptr<mavsdk::System> system);
 using namespace mavsdk;
 
-int main(int argc, char** argv)
-{
-    if (argc != 2) {
-        usage(argv[0]);
-        return 1;
-    }
-
-    Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::GroundStation}};
-    ConnectionResult connection_result = mavsdk.add_any_connection(argv[1]);
-
-    if (connection_result != ConnectionResult::Success) {
-        std::cerr << "Connection failed: " << connection_result << '\n';
-        return 1;
-    }
-
-    auto system = mavsdk.first_autopilot(3.0);
-    if (!system) {
-        std::cerr << "Timed out waiting for system\n";
-        return 1;
-    }
-
-    CommunicationManager communicationManager(system);
-
-    return TelemetryManagerTest(mavsdk);
-
-}
 
 void usage(const std::string& bin_name) {
     std::cerr << "Usage: " << bin_name << " <connection_url>\n"
@@ -162,4 +136,32 @@ int commandManagerTest(std::shared_ptr<mavsdk::System> system){
     }
 
     return 0;
+}
+
+
+int main(int argc, char** argv)
+{
+    if (argc != 2) {
+        usage(argv[0]);
+        return 1;
+    }
+
+    Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::GroundStation}};
+    ConnectionResult connection_result = mavsdk.add_any_connection(argv[1]);
+
+    if (connection_result != ConnectionResult::Success) {
+        std::cerr << "Connection failed: " << connection_result << '\n';
+        return 1;
+    }
+
+    auto system = mavsdk.first_autopilot(3.0);
+    if (!system) {
+        std::cerr << "Timed out waiting for system\n";
+        return 1;
+    }
+
+    CommunicationManager communicationManager{system.value()};
+
+    return TelemetryManagerTest(mavsdk);
+
 }
