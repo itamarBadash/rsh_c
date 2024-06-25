@@ -157,7 +157,7 @@ int main(int argc, char** argv) {
     auto current_system = std::make_shared<System>(*system);
 
     CommunicationManager communication_manager("/dev/ttyUSB0", 57600);
-    std::thread telemetry_thread(TelemetryManagerTest, std::ref(system));
+    std::thread telemetry_thread(TelemetryManagerTest, current_system);
 
     telemetry_thread.join();
 
