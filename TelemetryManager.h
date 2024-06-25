@@ -36,7 +36,7 @@ struct TelemetryData {
             << euler_angle.yaw_deg << "\n";
 
         oss << "Flight Mode: "
-            << flight_mode.mode << "\n";
+               << static_cast<int>(flight_mode) <<"\n";
 
         oss << "Heading: "
             << heading.heading_deg << "\n";
@@ -45,9 +45,6 @@ struct TelemetryData {
             << velocity.north_m_s << ", "
             << velocity.east_m_s << ", "
             << velocity.down_m_s << "\n";
-
-        oss << "Altitude: "
-            << telemetry_manager.getRelativeAltitude() << "\n";
 
         return oss.str();
     }
