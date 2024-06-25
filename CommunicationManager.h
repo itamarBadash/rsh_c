@@ -10,7 +10,7 @@
 class CommunicationManager {
 public:
     // Constructor
-    CommunicationManager(const std::string &port, int baud_rate);
+    CommunicationManager(const std::string &port, int baud_rate, std::shared_ptr<CommandManager> cmd_manager);
 
     // Destructor
     ~CommunicationManager();
@@ -40,6 +40,8 @@ private:
     std::atomic<bool> stop_flag;
 
     std::mutex send_mutex;
+
+    std::shared_ptr<CommandManager> command_manager;
 };
 
 #endif // COMMUNICATIONMANAGER_H

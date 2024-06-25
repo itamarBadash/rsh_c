@@ -6,8 +6,8 @@
 #include <cstring>
 #include <errno.h>
 
-CommunicationManager::CommunicationManager(const std::string &port, int baud_rate)
-        : port_name(port), baud_rate(baud_rate), serial_port(-1), stop_flag(false) {
+CommunicationManager::CommunicationManager(const std::string &port, int baud_rate, std::shared_ptr<CommandManager> cmd_manager)
+        : port_name(port), baud_rate(baud_rate), serial_port(-1), stop_flag(false), command_manager(cmd_manager) {
     openPort();
     startWorker();
 }
@@ -114,6 +114,30 @@ std::string CommunicationManager::receiveMessage() {
 
 void CommunicationManager::processReceivedMessage(const std::string &message) {
     std::cout << "Received message: " << message << std::endl;
+
+    // Assuming the message is in the format "command:param1,param2,..."
+    size_t pos = message.find(':');
+    if (pos != std::string::npos) {
+        std::string command = message.substr(0, pos);
+        std::string params_str = message.substr(pos + 1);
+        std::vector<float> params;
+        size_t start = 0;
+        size_t end;
+        while ((end = params_str.find(',', start)) != std::string::npos) {
+            params.push_back(std::stof(params_str.substr(start, end - start)));
+            start = end + 1;
+        }
+        if (start < params_str.length()) {
+            params.push_back(std::stof(params_str.substr(start)));
+        }
+
+        auto result = command_manager->handle_command(command, params);
+        if (result == CommandManager::Result::Success) {
+            std::cout << "Command " << command << " executed successfully." << std::endl;
+        } else {
+            std::cerr << "Command " << command << " failed." << std::endl;
+        }
+    }
 }
 
 void CommunicationManager::sendMessage(const std::string &message) {

@@ -30,7 +30,6 @@ int TelemetryManagerTest(std::shared_ptr<System> system) {
 
         while (telemetry_manager.isRunning()) {
             TelemetryData data = telemetry_manager.getTelemetryData();
-            communication_manager.sendMessage(data.print());
 
             std::cout << "Position: "
                       << data.position.latitude_deg << ", "
@@ -180,6 +179,11 @@ int main(int argc, char** argv) {
     }
 
     auto system = systems.at(0);
+
+
+    auto command_manager = std::make_shared<CommandManager>(system);
+
+    CommunicationManager communicationManager("/dev/ttyUSB0",57600, command_manager);
 
     std::thread telemetry_thread(TelemetryManagerTest, system);
 
