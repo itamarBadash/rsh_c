@@ -17,7 +17,7 @@ struct TelemetryData {
     Telemetry::Heading heading;
     Telemetry::VelocityNed velocity;
 
-    std::string print(const TelemetryManager &telemetry_manager) const {
+    std::string print() const {
         std::ostringstream oss;
         oss << "Position: "
             << position.latitude_deg << ", "
