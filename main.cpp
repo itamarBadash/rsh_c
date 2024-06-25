@@ -7,7 +7,7 @@
 #include "CommandManager.h"
 #include "CommunicationManager.h"
 
-int TelemetryManagerTest(Mavsdk &mavsdk);
+int TelemetryManagerTest(std::shared_ptr<System>& system);
 int commandManagerTest(std::shared_ptr<mavsdk::System> system);
 using namespace mavsdk;
 
@@ -159,9 +159,10 @@ int main(int argc, char** argv)
         std::cerr << "Timed out waiting for system\n";
         return 1;
     }
+    std::shared_ptr<System>  current_system = std::make_shared<System>(system);
 
-    CommunicationManager communicationManager(system);
+    CommunicationManager communicationManager("/dev/ttyUSB0",57600);
 
-    return TelemetryManagerTest(system);
+    return TelemetryManagerTest(current_system);
 
 }
