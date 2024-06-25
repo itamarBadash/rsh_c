@@ -163,6 +163,9 @@ int main(int argc, char** argv)
 
     CommunicationManager communicationManager("/dev/ttyUSB0",57600);
 
-    return TelemetryManagerTest(current_system);
-
+    TelemetryManagerTest(current_system);
+    while (true){
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+    return 0;
 }
