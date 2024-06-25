@@ -7,8 +7,8 @@
 #include "CommandManager.h"
 #include "CommunicationManager.h"
 
-int TelemetryManagerTest(std::shared_ptr<System>& system);
-int commandManagerTest(const std::shared_ptr<mavsdk::System> system);
+int TelemetryManagerTest( std::shared_ptr<System>& system);
+int commandManagerTest( std::shared_ptr<mavsdk::System> system);
 using namespace mavsdk;
 
 
@@ -21,7 +21,7 @@ void usage(const std::string& bin_name) {
               << "For example, to connect to the simulator use URL: udp://:14540\n";
 }
 
-int TelemetryManagerTest(const std::shared_ptr<System>& system) {
+int TelemetryManagerTest( std::shared_ptr<System>& system) {
     try {
         TelemetryManager telemetry_manager(system);
         telemetry_manager.start();
