@@ -3,6 +3,7 @@
 #include <thread>
 #include <iostream>
 
+
 TelemetryManager::TelemetryManager(const std::shared_ptr<System>& system)
         : _system(system), _running(false)  {
 
