@@ -59,10 +59,10 @@ int TelemetryManagerTest(std::shared_ptr<System> system) {
 
             std::cout << "Altitude: "
                       << telemetry_manager.getRelativeAltitude() << std::endl;
-*/
+
             std::this_thread::sleep_for(std::chrono::seconds(5));
         }
-
+*/
         telemetry_manager.stop();
     } catch (const std::runtime_error& e) {
         std::cerr << "Error: " << e.what() << std::endl;
