@@ -159,7 +159,7 @@ int main(int argc, char** argv)
         std::cerr << "Timed out waiting for system\n";
         return 1;
     }
-    std::shared_ptr<System>  current_system = std::make_shared<System>(system);
+    auto current_system = system.value();
 
     CommunicationManager communicationManager("/dev/ttyUSB0",57600);
 
