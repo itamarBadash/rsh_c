@@ -21,9 +21,9 @@ void usage(const std::string& bin_name) {
               << "For example, to connect to the simulator use URL: udp://:14540\n";
 }
 
-int TelemetryManagerTest(Mavsdk &mavsdk) {
+int TelemetryManagerTest(const std::shared_ptr<System>& system) {
     try {
-        TelemetryManager telemetry_manager(mavsdk);
+        TelemetryManager telemetry_manager(system);
         telemetry_manager.start();
 
         while (telemetry_manager.isRunning()) {
@@ -160,8 +160,8 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    CommunicationManager communicationManager{system.value()};
+    CommunicationManager communicationManager(system);
 
-    return TelemetryManagerTest(mavsdk);
+    return TelemetryManagerTest(system);
 
 }
