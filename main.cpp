@@ -7,10 +7,7 @@
 #include "CommandManager.h"
 #include "CommunicationManager.h"
 
-int TelemetryManagerTest( std::shared_ptr<System>& system);
-int commandManagerTest( std::shared_ptr<mavsdk::System> system);
 using namespace mavsdk;
-
 
 void usage(const std::string& bin_name) {
     std::cerr << "Usage: " << bin_name << " <connection_url>\n"
@@ -21,7 +18,7 @@ void usage(const std::string& bin_name) {
               << "For example, to connect to the simulator use URL: udp://:14540\n";
 }
 
-int TelemetryManagerTest( std::shared_ptr<System>& system) {
+int TelemetryManagerTest(std::shared_ptr<System> system) {
     try {
         TelemetryManager telemetry_manager(system);
         telemetry_manager.start();
@@ -39,7 +36,7 @@ int TelemetryManagerTest( std::shared_ptr<System>& system) {
                       << "Gyro: " << data.health.is_gyrometer_calibration_ok << ", "
                       << "Acc: " << data.health.is_accelerometer_calibration_ok << ", "
                       << "Mag: " << data.health.is_magnetometer_calibration_ok << ", "
-                      <<  std::endl;
+                      << std::endl;
 
             std::cout << "Euler Angles: "
                       << data.euler_angle.roll_deg << ", "
@@ -68,12 +65,12 @@ int TelemetryManagerTest( std::shared_ptr<System>& system) {
     }
     return 0;
 }
-int commandManagerTest(std::shared_ptr<mavsdk::System> system){
 
-    CommandManager commandManager(system);
+int commandManagerTest(std::shared_ptr<System> system) {
+    CommandManager command_manager(system);
 
     // Test arming the system
-    CommandManager::Result result = commandManager.arm();
+    CommandManager::Result result = command_manager.arm();
     if (result != CommandManager::Result::Success) {
         std::cerr << "Arm failed\n";
         return 1;
@@ -82,7 +79,7 @@ int commandManagerTest(std::shared_ptr<mavsdk::System> system){
     }
 
     // Test taking off
-    result = commandManager.takeoff();
+    result = command_manager.takeoff();
     if (result != CommandManager::Result::Success) {
         std::cerr << "Takeoff failed\n";
         return 1;
@@ -91,7 +88,7 @@ int commandManagerTest(std::shared_ptr<mavsdk::System> system){
     }
 
     // Test landing
-    result = commandManager.land();
+    result = command_manager.land();
     if (result != CommandManager::Result::Success) {
         std::cerr << "Land failed\n";
         return 1;
@@ -100,7 +97,7 @@ int commandManagerTest(std::shared_ptr<mavsdk::System> system){
     }
 
     // Test returning to launch
-    result = commandManager.return_to_launch();
+    result = command_manager.return_to_launch();
     if (result != CommandManager::Result::Success) {
         std::cerr << "Return to launch failed\n";
         return 1;
@@ -109,7 +106,7 @@ int commandManagerTest(std::shared_ptr<mavsdk::System> system){
     }
 
     // Test setting flight mode
-    result = commandManager.set_flight_mode(1, 2);
+    result = command_manager.set_flight_mode(1, 2);
     if (result != CommandManager::Result::Success) {
         std::cerr << "Set flight mode failed\n";
         return 1;
@@ -118,7 +115,7 @@ int commandManagerTest(std::shared_ptr<mavsdk::System> system){
     }
 
     // Test setting manual control
-    result = commandManager.set_manual_control(0.0, 0.0, 0.5, 0.0);
+    result = command_manager.set_manual_control(0.0, 0.0, 0.5, 0.0);
     if (result != CommandManager::Result::Success) {
         std::cerr << "Set manual control failed\n";
         return 1;
@@ -127,7 +124,7 @@ int commandManagerTest(std::shared_ptr<mavsdk::System> system){
     }
 
     // Test disarming the system
-    result = commandManager.disarm();
+    result = command_manager.disarm();
     if (result != CommandManager::Result::Success) {
         std::cerr << "Disarm failed\n";
         return 1;
@@ -138,9 +135,7 @@ int commandManagerTest(std::shared_ptr<mavsdk::System> system){
     return 0;
 }
 
-
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
     if (argc != 2) {
         usage(argv[0]);
         return 1;
@@ -159,13 +154,13 @@ int main(int argc, char** argv)
         std::cerr << "Timed out waiting for system\n";
         return 1;
     }
-    auto current_system = system.value();
+    auto current_system = std::make_shared<System>(*system);
 
-    CommunicationManager communicationManager("/dev/ttyUSB0",57600);
+    CommunicationManager communication_manager("/dev/ttyUSB0", 57600);
+    std::thread telemetry_thread(TelemetryManagerTest, std::ref(system));
 
-    TelemetryManagerTest(current_system);
-    while (true){
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-    }
+    telemetry_thread.join();
+
+
     return 0;
 }
