@@ -3,37 +3,17 @@
 #include <thread>
 #include <iostream>
 
-TelemetryManager::TelemetryManager(Mavsdk& mavsdk)
-        : _mavsdk(mavsdk), _running(false), viable(false) {
+TelemetryManager::TelemetryManager(const std::shared_ptr<System>& system)
+        : _system(system), _running(false)  {
 
-    std::cout << "Waiting to discover system..." << std::endl;
-    bool discovered_system = false;
-
-    _mavsdk.subscribe_on_new_system([this, &discovered_system]() {
-        const auto system = _mavsdk.systems().back();
-
-        if (system && system->has_autopilot()) {
-            _system = system;
-            discovered_system = true;
+    system->subscribe_is_connected([this](bool connected) {
+        if(!connected){
+            viable = false;
+        } else
             viable = true;
-
-            _system->subscribe_is_connected([this](bool connected) {
-                viable = connected;
-                if (!connected) {
-                    stop();
-                }
-            });
-        }
     });
-
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-    if (!discovered_system) {
-        throw std::runtime_error("No autopilot found");
-    }
-
     _telemetry = std::make_unique<Telemetry>(_system);
 
-    {
         std::lock_guard<std::mutex> lock(_data_mutex);
         _latest_telemetry_data.position = _telemetry->position();
         _latest_telemetry_data.health = _telemetry->health();
@@ -42,7 +22,6 @@ TelemetryManager::TelemetryManager(Mavsdk& mavsdk)
         _latest_telemetry_data.flight_mode = _telemetry->flight_mode();
         _latest_telemetry_data.heading = _telemetry->heading();
         _latest_telemetry_data.velocity = _telemetry->velocity_ned();
-    }
 }
 
 TelemetryManager::~TelemetryManager() {

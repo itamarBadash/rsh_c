@@ -20,7 +20,7 @@ struct TelemetryData {
 
 class TelemetryManager {
 public:
-    TelemetryManager(Mavsdk& mavsdk);
+    TelemetryManager(const std::shared_ptr<System>& system);
     ~TelemetryManager();
 
     void start();
@@ -42,7 +42,6 @@ public:
 private:
     void subscribeTelemetry();
 
-    Mavsdk& _mavsdk;
     std::shared_ptr<System> _system;
     std::unique_ptr<Telemetry> _telemetry;
 
