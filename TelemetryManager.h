@@ -17,17 +17,17 @@ struct TelemetryData {
     Telemetry::Heading heading;
     Telemetry::VelocityNed velocity;
 
-    std::string serialize() const {
-        nlohmann::json j;
-        j["position"] = {{"latitude", position.latitude}, {"longitude", position.longitude}};
-        j["health"] = {{"status", health.status}};
-        j["altitude"] = {{"meters", altitude.meters}};
-        j["euler_angle"] = {{"roll", euler_angle.roll}, {"pitch", euler_angle.pitch}, {"yaw", euler_angle.yaw}};
-        j["flight_mode"] = {{"mode", flight_mode.mode}};
-        j["heading"] = {{"degrees", heading.degrees}};
-        j["velocity"] = {{"north", velocity.north}, {"east", velocity.east}, {"down", velocity.down}};
-        return j.dump();
-    }
+        std::string print() const {
+            std::ostringstream oss;
+            oss << "Position: (lat: " << position.latitude << ", lon: " << position.longitude << ")\n";
+            oss << "Health: " << health.status << "\n";
+            oss << "Altitude: " << altitude.meters << " meters\n";
+            oss << "Euler Angles: (roll: " << euler_angle.roll << ", pitch: " << euler_angle.pitch << ", yaw: " << euler_angle.yaw << ")\n";
+            oss << "Flight Mode: " << flight_mode.mode << "\n";
+            oss << "Heading: " << heading.degrees << " degrees\n";
+            oss << "Velocity: (north: " << velocity.north << ", east: " << velocity.east << ", down: " << velocity.down << ")\n";
+            return oss.str();
+        }
 };
 
 class TelemetryManager {
