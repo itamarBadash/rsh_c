@@ -22,8 +22,6 @@ void usage(const std::string& bin_name) {
 }
 
 int TelemetryManagerTest(std::shared_ptr<System> system) {
-    CommunicationManager communication_manager("/dev/ttyUSB0", 57600);
-
     try {
         TelemetryManager telemetry_manager(system);
         telemetry_manager.start();
