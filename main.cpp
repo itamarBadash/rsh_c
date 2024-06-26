@@ -8,7 +8,7 @@
 #include "CommunicationManager.h"
 
 int commandManagerTest(std::shared_ptr<mavsdk::System> system);
-int TelemetryManagerTest(std::shared_ptr<mavsdk::System> system);
+int TelemetryManagerTest(std::shared_ptr<System> system, std::shared_ptr<CommunicationManager> comm);
 
 using namespace mavsdk;
 
@@ -150,7 +150,7 @@ int main(int argc, char** argv) {
 
     auto communicationManager = std::make_shared<CommunicationManager>("/dev/ttyUSB0",57600, command_manager);
 
-    std::thread telemetry_thread(TelemetryManagerTest, system, communicationManager);
+    std::thread telemetry_thread(TelemetryManagerTest, system, communication_manager);
 
     telemetry_thread.join();
 
