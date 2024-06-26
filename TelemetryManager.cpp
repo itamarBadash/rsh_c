@@ -4,8 +4,8 @@
 #include <iostream>
 
 
-TelemetryManager::TelemetryManager(const std::shared_ptr<System>& system)
-        : _system(system), _running(false)  {
+TelemetryManager::TelemetryManager(const std::shared_ptr<System>& system, std::shared_ptr<CommunicationManager> comm)
+        : _system(system), communication_manager(comm), _running(false)  {
 
     system->subscribe_is_connected([this](bool connected) {
         if(!connected){
@@ -46,30 +46,43 @@ void TelemetryManager::stop() {
 void TelemetryManager::subscribeTelemetry() {
     _telemetry->subscribe_position([this](Telemetry::Position position) {
         _latest_telemetry_data.position = position;
+        communication_manager->sendMessage(_latest_telemetry_data.print());
     });
 
     _telemetry->subscribe_health([this](Telemetry::Health health) {
         _latest_telemetry_data.health = health;
+        if(communication_manager)
+            communication_manager->sendMessage(_latest_telemetry_data.print());
+
     });
 
     _telemetry->subscribe_altitude([this](Telemetry::Altitude altitude) {
         _latest_telemetry_data.altitude = altitude;
-    });
+        if(communication_manager)
+            communication_manager->sendMessage(_latest_telemetry_data.print());    });
 
     _telemetry->subscribe_attitude_euler([this](Telemetry::EulerAngle eulerAngle) {
         _latest_telemetry_data.euler_angle = eulerAngle;
+        if(communication_manager)
+            communication_manager->sendMessage(_latest_telemetry_data.print());
     });
 
     _telemetry->subscribe_flight_mode([this](Telemetry::FlightMode flightMode) {
         _latest_telemetry_data.flight_mode = flightMode;
+        if(communication_manager)
+            communication_manager->sendMessage(_latest_telemetry_data.print());
     });
 
     _telemetry->subscribe_velocity_ned([this](Telemetry::VelocityNed velocityNed) {
         _latest_telemetry_data.velocity = velocityNed;
+        if(communication_manager)
+            communication_manager->sendMessage(_latest_telemetry_data.print());
     });
 
     _telemetry->subscribe_heading([this](Telemetry::Heading heading) {
         _latest_telemetry_data.heading = heading;
+        if(communication_manager)
+            communication_manager->sendMessage(_latest_telemetry_data.print());
     });
 }
 

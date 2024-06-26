@@ -21,45 +21,12 @@ void usage(const std::string& bin_name) {
               << "For example, to connect to the simulator use URL: udp://:14540\n";
 }
 
-int TelemetryManagerTest(std::shared_ptr<System> system) {
+int TelemetryManagerTest(std::shared_ptr<System> system, std::shared_ptr<CommunicationManager> comm) {
     try {
-        TelemetryManager telemetry_manager(system);
+        TelemetryManager telemetry_manager(system,comm);
         telemetry_manager.start();
 
         while (telemetry_manager.isRunning()) {
-            TelemetryData data = telemetry_manager.getTelemetryData();
-/*
-            std::cout << "Position: "
-                      << data.position.latitude_deg << ", "
-                      << data.position.longitude_deg << ", "
-                      << data.position.relative_altitude_m << ", "
-                      << data.position.absolute_altitude_m << std::endl;
-
-            std::cout << "Health: "
-                      << "Gyro: " << data.health.is_gyrometer_calibration_ok << ", "
-                      << "Acc: " << data.health.is_accelerometer_calibration_ok << ", "
-                      << "Mag: " << data.health.is_magnetometer_calibration_ok << ", "
-                      << std::endl;
-
-            std::cout << "Euler Angles: "
-                      << data.euler_angle.roll_deg << ", "
-                      << data.euler_angle.pitch_deg << ", "
-                      << data.euler_angle.yaw_deg << std::endl;
-
-            std::cout << "Flight Mode: "
-                      << static_cast<int>(data.flight_mode) << std::endl;
-
-            std::cout << "Heading: "
-                      << data.heading.heading_deg << std::endl;
-
-            std::cout << "Velocity NED: "
-                      << data.velocity.north_m_s << ", "
-                      << data.velocity.east_m_s << ", "
-                      << data.velocity.down_m_s << std::endl;
-
-            std::cout << "Altitude: "
-                      << telemetry_manager.getRelativeAltitude() << std::endl;
-*/
             std::this_thread::sleep_for(std::chrono::seconds(5));
         }
 
@@ -181,9 +148,9 @@ int main(int argc, char** argv) {
 
     auto command_manager = std::make_shared<CommandManager>(system);
 
-    CommunicationManager communicationManager("/dev/ttyUSB0",57600, command_manager);
+    auto communicationManager = std::make_shared<CommunicationManager>("/dev/ttyUSB0",57600, command_manager);
 
-    std::thread telemetry_thread(TelemetryManagerTest, system);
+    std::thread telemetry_thread(TelemetryManagerTest, system, communicationManager);
 
     telemetry_thread.join();
 
