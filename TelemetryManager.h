@@ -82,7 +82,6 @@ private:
     // Struct to store telemetry data
     TelemetryData _latest_telemetry_data;
 
-    std::mutex _data_mutex;
     bool viable;
 
 };
