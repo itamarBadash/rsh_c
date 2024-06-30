@@ -72,6 +72,7 @@ int main(int argc, char** argv) {
 }
 
 void main_thread_function(std::shared_ptr<System> system, std::shared_ptr<CommandManager> command_manager,std::shared_ptr<CommunicationManager> communications_manager, std::shared_ptr<TelemetryManager> telemetry_manager){
+    telemetry_manager->start();
     while(true){
         std::this_thread::sleep_for(std::chrono::seconds(3));
         //logic for error handling and exeptions or retry connections with modules.
