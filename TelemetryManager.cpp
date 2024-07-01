@@ -46,43 +46,43 @@ void TelemetryManager::stop() {
 void TelemetryManager::subscribeTelemetry() {
     _telemetry->subscribe_position([this](Telemetry::Position position) {
         _latest_telemetry_data.position = position;
-        CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.print());
+        CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.position);
     });
 
     _telemetry->subscribe_health([this](Telemetry::Health health) {
         _latest_telemetry_data.health = health;
         if(communication_manager)
-            CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.print());
+            CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.health);
     });
 
     _telemetry->subscribe_altitude([this](Telemetry::Altitude altitude) {
         _latest_telemetry_data.altitude = altitude;
         if(communication_manager)
-            CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.print());
+            CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.altitude);
     });
 
     _telemetry->subscribe_attitude_euler([this](Telemetry::EulerAngle eulerAngle) {
         _latest_telemetry_data.euler_angle = eulerAngle;
         if(communication_manager)
-            CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.print());
+            CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.euler_angle);
     });
 
     _telemetry->subscribe_flight_mode([this](Telemetry::FlightMode flightMode) {
         _latest_telemetry_data.flight_mode = flightMode;
         if(communication_manager)
-            CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.print());
+            CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.flight_mode);
     });
 
     _telemetry->subscribe_velocity_ned([this](Telemetry::VelocityNed velocityNed) {
         _latest_telemetry_data.velocity = velocityNed;
         if(communication_manager)
-            CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.print());
+            CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.velocity);
     });
 
     _telemetry->subscribe_heading([this](Telemetry::Heading heading) {
         _latest_telemetry_data.heading = heading;
         if(communication_manager)
-            CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.print());
+            CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.heading);
     });
 }
 
