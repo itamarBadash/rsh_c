@@ -21,6 +21,7 @@ CommandManager::CommandManager(const std::shared_ptr<mavsdk::System>& system) : 
 
 }
 
+bool CommandManager::IsViable() {return viable;}
 
 void CommandManager::initialize_command_handlers() {
     command_map = {
@@ -130,13 +131,13 @@ CommandManager::Result CommandManager::send_mavlink_command(uint8_t base_mode, u
 CommandManager::Result CommandManager::execute_action(std::function<mavsdk::Action::Result()> action_func, const std::string& action_name) {
     if (!viable) {
         std::cerr << action_name << " failed: System not viable" << std::endl;
-        return Result::Failure;
+        return Result::ConnectionError;
     }
 
     auto result = action_func();
     if (result != mavsdk::Action::Result::Success) {
         std::cerr << action_name << " failed: " << result << std::endl;
-        return Result::Failure;
+        return Result::CommandFailed;
     }
     std::cout << "command successful\n";
 

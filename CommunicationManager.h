@@ -11,6 +11,12 @@
 
 class CommunicationManager {
 public:
+    enum class Result {
+        Success,
+        Failure,
+        ConnectionError,
+        Unknown
+    };
     // Constructor
     CommunicationManager(const std::string &port, int baud_rate, std::shared_ptr<CommandManager> cmd_manager);
 
@@ -18,7 +24,7 @@ public:
     ~CommunicationManager();
 
     // Send a message via the serial port
-    void sendMessage(const std::string &message);
+    Result sendMessage(const std::string &message);
 
 private:
     // Serial port configuration and management

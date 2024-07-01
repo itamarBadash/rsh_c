@@ -38,6 +38,7 @@ public:
     Result start_manual_control();
     // Command handler
     Result handle_command(const std::string& command, const std::vector<float>& parameters);
+    bool IsViable();
 
 private:
     std::shared_ptr<mavsdk::Action> action;

@@ -144,18 +144,20 @@ void CommunicationManager::processReceivedMessage(const std::string &message) {
     }
 }
 
-void CommunicationManager::sendMessage(const std::string &message) {
+CommunicationManager::Result CommunicationManager::sendMessage(const std::string &message) {
     std::lock_guard<std::mutex> lock(send_mutex);
 
     if (serial_port < 0) {
         std::cerr << "Serial port not opened." << std::endl;
-        return;
+        return Result::ConnectionError;
     }
 
     int n = write(serial_port, message.c_str(), message.size());
     if (n < 0) {
         std::cerr << "Error writing to serial port: " << strerror(errno) << std::endl;
+        return Result::Failure;
     } else {
         std::cout << "Message sent: " << message << std::endl;
+        return Result::Success;
     }
 }
