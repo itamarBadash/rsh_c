@@ -57,6 +57,8 @@ void TelemetryManager::subscribeTelemetry() {
 
     _telemetry->subscribe_health([this](Telemetry::Health health) {
         _latest_telemetry_data.health = health;
+        std::ostringstream oss;
+
         if(communication_manager)
             CommunicationManager::Result result = communication_manager->sendMessage(oss << "Health: "
                                                                                             << "Gyro: " << (health.is_gyrometer_calibration_ok ? "OK" : "Not OK") << ", "
@@ -65,12 +67,16 @@ void TelemetryManager::subscribeTelemetry() {
     });
 
     _telemetry->subscribe_altitude([this](Telemetry::Altitude altitude) {
+        std::ostringstream oss;
+
         _latest_telemetry_data.altitude = altitude;
         if(communication_manager)
             CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.altitude);
     });
 
     _telemetry->subscribe_attitude_euler([this](Telemetry::EulerAngle eulerAngle) {
+        std::ostringstream oss;
+
         _latest_telemetry_data.euler_angle = eulerAngle;
         if(communication_manager)
             CommunicationManager::Result result = communication_manager->sendMessage(oss << "Euler Angles: "
@@ -80,6 +86,8 @@ void TelemetryManager::subscribeTelemetry() {
     });
 
     _telemetry->subscribe_flight_mode([this](Telemetry::FlightMode flightMode) {
+        std::ostringstream oss;
+
         _latest_telemetry_data.flight_mode = flightMode;
         if(communication_manager)
             CommunicationManager::Result result = communication_manager->sendMessage(    oss << "Flight Mode: "
@@ -87,6 +95,8 @@ void TelemetryManager::subscribeTelemetry() {
     });
 
     _telemetry->subscribe_velocity_ned([this](Telemetry::VelocityNed velocityNed) {
+        std::ostringstream oss;
+
         _latest_telemetry_data.velocity = velocityNed;
         if(communication_manager)
             CommunicationManager::Result result = communication_manager->sendMessage( oss << "Velocity NED: "
@@ -96,6 +106,8 @@ void TelemetryManager::subscribeTelemetry() {
     });
 
     _telemetry->subscribe_heading([this](Telemetry::Heading heading) {
+        std::ostringstream oss;
+
         _latest_telemetry_data.heading = heading;
         if(communication_manager)
             CommunicationManager::Result result = communication_manager->sendMessage( oss << "Heading: "
