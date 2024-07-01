@@ -2,7 +2,6 @@
 #include <chrono>
 #include <thread>
 #include <iostream>
-#include <atomic>
 
 
 TelemetryManager::TelemetryManager(const std::shared_ptr<System>& system, std::shared_ptr<CommunicationManager> comm)
@@ -47,71 +46,44 @@ void TelemetryManager::stop() {
 void TelemetryManager::subscribeTelemetry() {
     _telemetry->subscribe_position([this](Telemetry::Position position) {
         _latest_telemetry_data.position = position;
-        CommunicationManager::Result result = communication_manager->sendMessage(std::ostringstream oss;
-        oss << "Position: "
-            << position.latitude_deg << ", "
-            << position.longitude_deg << ", "
-            << position.relative_altitude_m << ", "
-            << position.absolute_altitude_m << "\n";);
+        CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.print());
     });
 
     _telemetry->subscribe_health([this](Telemetry::Health health) {
         _latest_telemetry_data.health = health;
-        std::ostringstream oss;
-
         if(communication_manager)
-            CommunicationManager::Result result = communication_manager->sendMessage(oss << "Health: "
-                                                                                            << "Gyro: " << (health.is_gyrometer_calibration_ok ? "OK" : "Not OK") << ", "
-                                                                                            << "Acc: " << (health.is_accelerometer_calibration_ok ? "OK" : "Not OK") << ", "
-                                                                                            << "Mag: " << (health.is_magnetometer_calibration_ok ? "OK" : "Not OK") << "\n";);
+            CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.print());
+
     });
 
     _telemetry->subscribe_altitude([this](Telemetry::Altitude altitude) {
-        std::ostringstream oss;
-
         _latest_telemetry_data.altitude = altitude;
         if(communication_manager)
-            CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.altitude);
+            CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.print());
     });
 
     _telemetry->subscribe_attitude_euler([this](Telemetry::EulerAngle eulerAngle) {
-        std::ostringstream oss;
-
         _latest_telemetry_data.euler_angle = eulerAngle;
         if(communication_manager)
-            CommunicationManager::Result result = communication_manager->sendMessage(oss << "Euler Angles: "
-                                                                                                 << euler_angle.roll_deg << ", "
-                                                                                                 << euler_angle.pitch_deg << ", "
-                                                                                                 << euler_angle.yaw_deg << "\n";);
+            CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.print());
     });
 
     _telemetry->subscribe_flight_mode([this](Telemetry::FlightMode flightMode) {
-        std::ostringstream oss;
-
         _latest_telemetry_data.flight_mode = flightMode;
         if(communication_manager)
-            CommunicationManager::Result result = communication_manager->sendMessage(    oss << "Flight Mode: "
-                                                                                             << static_cast<int>(flight_mode) <<"\n";);
+            CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.print());
     });
 
     _telemetry->subscribe_velocity_ned([this](Telemetry::VelocityNed velocityNed) {
-        std::ostringstream oss;
-
         _latest_telemetry_data.velocity = velocityNed;
         if(communication_manager)
-            CommunicationManager::Result result = communication_manager->sendMessage( oss << "Velocity NED: "
-                                                                                          << velocity.north_m_s << ", "
-                                                                                          << velocity.east_m_s << ", "
-                                                                                          << velocity.down_m_s << "\n";);
+            CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.print());
     });
 
     _telemetry->subscribe_heading([this](Telemetry::Heading heading) {
-        std::ostringstream oss;
-
         _latest_telemetry_data.heading = heading;
         if(communication_manager)
-            CommunicationManager::Result result = communication_manager->sendMessage( oss << "Heading: "
-                                                                                          << heading.heading_deg << "\n";);
+            CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.print());
     });
 }
 
