@@ -24,6 +24,7 @@ TelemetryManager::TelemetryManager(const std::shared_ptr<System>& system, std::s
     _latest_telemetry_data.flight_mode = _telemetry->flight_mode();
     _latest_telemetry_data.heading = _telemetry->heading();
     _latest_telemetry_data.velocity = _telemetry->velocity_ned();
+    communication_manager->sendMessage(_latest_telemetry_data.print());
 }
 
 TelemetryManager::~TelemetryManager() {
@@ -93,7 +94,7 @@ void TelemetryManager::subscribeTelemetry() {
 
 bool TelemetryManager::hasSignificantChange(const Telemetry::Position& new_data, const Telemetry::Position& old_data) {
     auto isDifferent = [](double a, double b) {
-        return std::abs(a - b) > 0.001;
+        return std::abs(a - b) > 0.0001;
     };
 
     return isDifferent(new_data.latitude_deg, old_data.latitude_deg) ||
@@ -110,7 +111,7 @@ bool TelemetryManager::hasSignificantChange(const Telemetry::Health& new_data, c
 
 bool TelemetryManager::hasSignificantChange(const Telemetry::EulerAngle& new_data, const Telemetry::EulerAngle& old_data) {
     auto isDifferent = [](double a, double b) {
-        return std::abs(a - b) > 0.001;
+        return std::abs(a - b) > 0.0001;
     };
 
     return isDifferent(new_data.roll_deg, old_data.roll_deg) ||
@@ -124,7 +125,7 @@ bool TelemetryManager::hasSignificantChange(const Telemetry::FlightMode& new_dat
 
 bool TelemetryManager::hasSignificantChange(const Telemetry::Heading& new_data, const Telemetry::Heading& old_data) {
     auto isDifferent = [](double a, double b) {
-        return std::abs(a - b) > 0.001;
+        return std::abs(a - b) > 0.0001;
     };
 
     return isDifferent(new_data.heading_deg, old_data.heading_deg);
@@ -132,7 +133,7 @@ bool TelemetryManager::hasSignificantChange(const Telemetry::Heading& new_data, 
 
 bool TelemetryManager::hasSignificantChange(const Telemetry::VelocityNed& new_data, const Telemetry::VelocityNed& old_data) {
     auto isDifferent = [](double a, double b) {
-        return std::abs(a - b) > 0.01;
+        return std::abs(a - b) > 0.0001;
     };
 
     return isDifferent(new_data.north_m_s, old_data.north_m_s) ||
