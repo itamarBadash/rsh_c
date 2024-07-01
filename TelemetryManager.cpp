@@ -57,10 +57,9 @@ void TelemetryManager::subscribeTelemetry() {
     });
 
     _telemetry->subscribe_altitude([this](Telemetry::Altitude altitude) {
-        if (hasSignificantChange(altitude, _latest_telemetry_data.altitude)) {
             _latest_telemetry_data.altitude = altitude;
             CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.print());
-        }
+
     });
 
     _telemetry->subscribe_attitude_euler([this](Telemetry::EulerAngle eulerAngle) {
