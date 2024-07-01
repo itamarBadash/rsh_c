@@ -82,7 +82,7 @@ void TelemetryManager::subscribeTelemetry() {
     _telemetry->subscribe_heading([this](Telemetry::Heading heading) {
         _latest_telemetry_data.heading = heading;
         if(communication_manager)
-            CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.heading);
+            CommunicationManager::Result result = communication_manager->sendMessage(_latest_telemetry_data.heading.heading_deg);
     });
 }
 
