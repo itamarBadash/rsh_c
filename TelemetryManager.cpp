@@ -114,8 +114,8 @@ bool TelemetryManager::hasSignificantChange(const Telemetry::Altitude& new_data,
         return std::abs(a - b) > 0.01;
     };
 
-    return isDifferent(new_data.relative, old_data.relative) ||
-           isDifferent(new_data.absolute, old_data.absolute);
+    return isDifferent(new_data, old_data) ||
+           isDifferent(new_data, old_data);
 }
 
 bool TelemetryManager::hasSignificantChange(const Telemetry::EulerAngle& new_data, const Telemetry::EulerAngle& old_data) {
