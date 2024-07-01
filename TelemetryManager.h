@@ -76,7 +76,6 @@ private:
     void subscribeTelemetry();
     bool hasSignificantChange(const Telemetry::Position& new_data, const Telemetry::Position& old_data);
     bool hasSignificantChange(const Telemetry::Health& new_data, const Telemetry::Health& old_data);
-    bool hasSignificantChange(const Telemetry::Altitude& new_data, const Telemetry::Altitude& old_data);
     bool hasSignificantChange(const Telemetry::EulerAngle& new_data, const Telemetry::EulerAngle& old_data);
     bool hasSignificantChange(const Telemetry::FlightMode& new_data, const Telemetry::FlightMode& old_data);
     bool hasSignificantChange(const Telemetry::Heading& new_data, const Telemetry::Heading& old_data);

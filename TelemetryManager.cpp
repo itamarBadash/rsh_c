@@ -109,15 +109,6 @@ bool TelemetryManager::hasSignificantChange(const Telemetry::Health& new_data, c
            new_data.is_magnetometer_calibration_ok != old_data.is_magnetometer_calibration_ok;
 }
 
-bool TelemetryManager::hasSignificantChange(const Telemetry::Altitude& new_data, const Telemetry::Altitude& old_data) {
-    auto isDifferent = [](double a, double b) {
-        return std::abs(a - b) > 0.01;
-    };
-
-    return isDifferent(new_data, old_data) ||
-           isDifferent(new_data, old_data);
-}
-
 bool TelemetryManager::hasSignificantChange(const Telemetry::EulerAngle& new_data, const Telemetry::EulerAngle& old_data) {
     auto isDifferent = [](double a, double b) {
         return std::abs(a - b) > 0.01;
