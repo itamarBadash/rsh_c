@@ -9,6 +9,7 @@
 #include "CommunicationManager.h"
 
 using namespace mavsdk;
+
 struct TelemetryData {
     Telemetry::Position position;
     Telemetry::Health health;
@@ -37,7 +38,7 @@ struct TelemetryData {
             << euler_angle.yaw_deg << "\n";
 
         oss << "Flight Mode: "
-               << static_cast<int>(flight_mode) <<"\n";
+            << static_cast<int>(flight_mode) <<"\n";
 
         oss << "Heading: "
             << heading.heading_deg << "\n";
@@ -71,9 +72,15 @@ public:
     Telemetry::Heading getHeading();
     Telemetry::VelocityNed getVelocity();
 
-
 private:
     void subscribeTelemetry();
+    bool hasSignificantChange(const Telemetry::Position& new_data, const Telemetry::Position& old_data);
+    bool hasSignificantChange(const Telemetry::Health& new_data, const Telemetry::Health& old_data);
+    bool hasSignificantChange(const Telemetry::Altitude& new_data, const Telemetry::Altitude& old_data);
+    bool hasSignificantChange(const Telemetry::EulerAngle& new_data, const Telemetry::EulerAngle& old_data);
+    bool hasSignificantChange(const Telemetry::FlightMode& new_data, const Telemetry::FlightMode& old_data);
+    bool hasSignificantChange(const Telemetry::Heading& new_data, const Telemetry::Heading& old_data);
+    bool hasSignificantChange(const Telemetry::VelocityNed& new_data, const Telemetry::VelocityNed& old_data);
 
     std::shared_ptr<System> _system;
     std::unique_ptr<Telemetry> _telemetry;
