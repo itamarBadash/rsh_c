@@ -17,13 +17,13 @@ TelemetryManager::TelemetryManager(const std::shared_ptr<System>& system, std::s
     viable = true;
     _telemetry = std::make_unique<Telemetry>(_system);
 
-        _latest_telemetry_data.position = _telemetry->position();
-        _latest_telemetry_data.health = _telemetry->health();
-        _latest_telemetry_data.altitude = _telemetry->altitude();
-        _latest_telemetry_data.euler_angle = _telemetry->attitude_euler();
-        _latest_telemetry_data.flight_mode = _telemetry->flight_mode();
-        _latest_telemetry_data.heading = _telemetry->heading();
-        _latest_telemetry_data.velocity = _telemetry->velocity_ned();
+    _latest_telemetry_data.position = _telemetry->position();
+    _latest_telemetry_data.health = _telemetry->health();
+    _latest_telemetry_data.altitude = _telemetry->altitude();
+    _latest_telemetry_data.euler_angle = _telemetry->attitude_euler();
+    _latest_telemetry_data.flight_mode = _telemetry->flight_mode();
+    _latest_telemetry_data.heading = _telemetry->heading();
+    _latest_telemetry_data.velocity = _telemetry->velocity_ned();
 }
 
 TelemetryManager::~TelemetryManager() {
@@ -31,51 +31,58 @@ TelemetryManager::~TelemetryManager() {
 }
 
 void TelemetryManager::start() {
-        if (_running || !viable) return;
-        _running = true;
+    if (_running || !viable) return;
+    _running = true;
     subscribeTelemetry();
 }
 
 void TelemetryManager::stop() {
+    {
         if (!_running) return;
         _running = false;
+    }
 }
 
 void TelemetryManager::subscribeTelemetry() {
     _telemetry->subscribe_position([this](Telemetry::Position position) {
         _latest_telemetry_data.position = position;
-       // communication_manager->sendMessage(_latest_telemetry_data.print());
+        communication_manager->sendMessage(_latest_telemetry_data.print());
     });
 
     _telemetry->subscribe_health([this](Telemetry::Health health) {
         _latest_telemetry_data.health = health;
-        // communication_manager->sendMessage(_latest_telemetry_data.print());
+        if(communication_manager)
+            communication_manager->sendMessage(_latest_telemetry_data.print());
 
     });
 
     _telemetry->subscribe_altitude([this](Telemetry::Altitude altitude) {
         _latest_telemetry_data.altitude = altitude;
-        //communication_manager->sendMessage(_latest_telemetry_data.print());
-        });
+        if(communication_manager)
+            communication_manager->sendMessage(_latest_telemetry_data.print());    });
 
     _telemetry->subscribe_attitude_euler([this](Telemetry::EulerAngle eulerAngle) {
         _latest_telemetry_data.euler_angle = eulerAngle;
-        //communication_manager->sendMessage(_latest_telemetry_data.print());
+        if(communication_manager)
+            communication_manager->sendMessage(_latest_telemetry_data.print());
     });
 
     _telemetry->subscribe_flight_mode([this](Telemetry::FlightMode flightMode) {
         _latest_telemetry_data.flight_mode = flightMode;
-        //communication_manager->sendMessage(_latest_telemetry_data.print());
+        if(communication_manager)
+            communication_manager->sendMessage(_latest_telemetry_data.print());
     });
 
     _telemetry->subscribe_velocity_ned([this](Telemetry::VelocityNed velocityNed) {
         _latest_telemetry_data.velocity = velocityNed;
-        // communication_manager->sendMessage(_latest_telemetry_data.print());
+        if(communication_manager)
+            communication_manager->sendMessage(_latest_telemetry_data.print());
     });
 
     _telemetry->subscribe_heading([this](Telemetry::Heading heading) {
         _latest_telemetry_data.heading = heading;
-        //communication_manager->sendMessage(_latest_telemetry_data.print());
+        if(communication_manager)
+            communication_manager->sendMessage(_latest_telemetry_data.print());
     });
 }
 
@@ -109,7 +116,4 @@ Telemetry::VelocityNed TelemetryManager::getVelocity() {
 
 TelemetryData TelemetryManager::getTelemetryData() {
     return _latest_telemetry_data;
-}
-void TelemetryManager::sendTelemetryData(){
-    communication_manager->sendMessage(_latest_telemetry_data.print());
 }

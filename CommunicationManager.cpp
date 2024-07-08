@@ -39,8 +39,8 @@ void CommunicationManager::openPort() {
         return;
     }
 
-    cfsetospeed(&tty, baud_rate); // Set output speed
-    cfsetispeed(&tty, baud_rate); // Set input speed
+    cfsetospeed(&tty, B57600); // Set output speed
+    cfsetispeed(&tty, B57600); // Set input speed
 
     tty.c_cflag &= ~PARENB; // No parity bit
     tty.c_cflag &= ~CSTOPB; // Only one stop bit

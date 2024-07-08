@@ -37,7 +37,7 @@ struct TelemetryData {
             << euler_angle.yaw_deg << "\n";
 
         oss << "Flight Mode: "
-               << static_cast<int>(flight_mode) <<"\n";
+            << static_cast<int>(flight_mode) <<"\n";
 
         oss << "Heading: "
             << heading.heading_deg << "\n";
@@ -59,7 +59,7 @@ public:
     void start();
     void stop();
     bool isRunning() { return _running; }
-    void sendTelemetryData();
+
     // Methods to get the latest telemetry data
     TelemetryData getTelemetryData();
 
