@@ -75,7 +75,10 @@ void main_thread_function(std::shared_ptr<System> system, std::shared_ptr<Comman
     telemetry_manager->start();
     while(true){
         std::this_thread::sleep_for(std::chrono::seconds(5));
-        telemetry_manager->sendTelemetryData();
+        //telemetry_manager->sendTelemetryData();
+        std::string message = u8"Hello, 世界"; // Example message with Unicode characters
+        comm.sendMessage(message);
         //logic for error handling and exeptions or retry connections with modules.
     }
+
 }
