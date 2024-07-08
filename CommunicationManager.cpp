@@ -144,7 +144,7 @@ void CommunicationManager::processReceivedMessage(const std::string &message) {
     }
 }
 
-ommunicationManager::Result CommunicationManager::sendMessage(const std::string &message) {
+CommunicationManager::Result CommunicationManager::sendMessage(const std::string &message) {
     std::lock_guard<std::mutex> lock(send_mutex);
 
     if (serial_port < 0) {
