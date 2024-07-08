@@ -152,7 +152,6 @@ CommunicationManager::Result CommunicationManager::sendMessage(const std::string
         return Result::ConnectionError;
     }
 
-    // Ensure that the message is in UTF-8 format before sending
     const char *utf8_message = message.c_str();
     size_t utf8_message_length = message.size();
 
