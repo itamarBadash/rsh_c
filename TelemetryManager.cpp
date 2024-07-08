@@ -37,10 +37,8 @@ void TelemetryManager::start() {
 }
 
 void TelemetryManager::stop() {
-    {
         if (!_running) return;
         _running = false;
-    }
 }
 
 void TelemetryManager::subscribeTelemetry() {
@@ -57,7 +55,8 @@ void TelemetryManager::subscribeTelemetry() {
 
     _telemetry->subscribe_altitude([this](Telemetry::Altitude altitude) {
         _latest_telemetry_data.altitude = altitude;
-        //communication_manager->sendMessage(_latest_telemetry_data.print());    });
+        //communication_manager->sendMessage(_latest_telemetry_data.print());
+        });
 
     _telemetry->subscribe_attitude_euler([this](Telemetry::EulerAngle eulerAngle) {
         _latest_telemetry_data.euler_angle = eulerAngle;
