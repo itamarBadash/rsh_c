@@ -75,7 +75,7 @@ void main_thread_function(std::shared_ptr<System> system, std::shared_ptr<Comman
     telemetry_manager->start();
     while(true){
         std::this_thread::sleep_for(std::chrono::seconds(5));
-        communications_manager->sendMessage(telemetry_manager->getTelemetryData()->print());
+        telemetry_manager->sendTelemetryData();
         //logic for error handling and exeptions or retry connections with modules.
     }
 }

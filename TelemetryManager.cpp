@@ -110,3 +110,6 @@ Telemetry::VelocityNed TelemetryManager::getVelocity() {
 TelemetryData TelemetryManager::getTelemetryData() {
     return _latest_telemetry_data;
 }
+void TelemetryManager::sendTelemetryData(){
+    communication_manager->sendMessage(_latest_telemetry_data.print());
+}
