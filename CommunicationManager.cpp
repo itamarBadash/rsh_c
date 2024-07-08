@@ -152,12 +152,20 @@ CommunicationManager::Result CommunicationManager::sendMessage(const std::string
         return Result::ConnectionError;
     }
 
-    int n = write(serial_port, message.c_str(), message.size());
-    if (n < 0) {
-        std::cerr << "Error writing to serial port: " << strerror(errno) << std::endl;
-        return Result::Failure;
-    } else {
-        std::cout << "Message sent: " << message << std::endl;
-        return Result::Success;
+    // Ensure that the message is in UTF-8 format before sending
+    const char *utf8_message = message.c_str();
+    size_t utf8_message_length = message.size();
+
+    ssize_t total_bytes_written = 0;
+    while (total_bytes_written < utf8_message_length) {
+        ssize_t bytes_written = write(serial_port, utf8_message + total_bytes_written, utf8_message_length - total_bytes_written);
+        if (bytes_written < 0) {
+            std::cerr << "Error writing to serial port: " << strerror(errno) << std::endl;
+            return Result::Failure;
+        }
+        total_bytes_written += bytes_written;
     }
+
+    std::cout << "Message sent: " << message << std::endl;
+    return Result::Success;
 }
