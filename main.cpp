@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
         usage(argv[0]);
         return 1;
     }
-    INIReader reader("config.ini");
+    INIReader reader("/config.ini");
     if (reader.ParseError() < 0) {
         std::cout << "Can't load 'config.ini'\n";
         return 1;
