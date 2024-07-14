@@ -13,7 +13,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 # Add MAVSDK includes
 include_directories(${CMAKE_PREFIX_PATH}/include)
 include_directories(${CMAKE_PREFIX_PATH}/include/mavsdk)
-target_include_directories(base PRIVATE ${CMAKE_PREFIX_PATH}/inih)
+include_directories(${CMAKE_PREFIX_PATH}/inih)
 
 # Add MAVSDK library paths
 #ink_directories(${CMAKE_PREFIX_PATH}/lib)
