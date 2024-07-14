@@ -24,6 +24,10 @@ add_executable(base main.cpp
         CommandManager.h
         CommunicationManager.cpp
         CommunicationManager.h
+        inih/ini.c
+        inih/ini.h
+        inih/cpp/INIReader.cpp
+        inih/cpp/INIReader.h
 )
 
 
