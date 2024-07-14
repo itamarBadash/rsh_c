@@ -1,1 +1,1 @@
-/usr/bin/c++ CMakeFiles/base.dir/main.cpp.o CMakeFiles/base.dir/TelemetryManager.cpp.o CMakeFiles/base.dir/CommandManager.cpp.o CMakeFiles/base.dir/CommunicationManager.cpp.o -o base  /usr/lib/libmavsdk.so.2.12.2 
+/usr/bin/c++ CMakeFiles/base.dir/main.cpp.o CMakeFiles/base.dir/TelemetryManager.cpp.o CMakeFiles/base.dir/CommandManager.cpp.o CMakeFiles/base.dir/CommunicationManager.cpp.o CMakeFiles/base.dir/inih/ini.c.o CMakeFiles/base.dir/inih/cpp/INIReader.cpp.o -o base  /usr/lib/libmavsdk.so.2.12.2 

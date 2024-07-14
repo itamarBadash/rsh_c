@@ -201,6 +201,54 @@ TelemetryManager.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/base.dir/build.make CMakeFiles/base.dir/TelemetryManager.cpp.s
 .PHONY : TelemetryManager.cpp.s
 
+inih/cpp/INIReader.o: inih/cpp/INIReader.cpp.o
+.PHONY : inih/cpp/INIReader.o
+
+# target to build an object file
+inih/cpp/INIReader.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/base.dir/build.make CMakeFiles/base.dir/inih/cpp/INIReader.cpp.o
+.PHONY : inih/cpp/INIReader.cpp.o
+
+inih/cpp/INIReader.i: inih/cpp/INIReader.cpp.i
+.PHONY : inih/cpp/INIReader.i
+
+# target to preprocess a source file
+inih/cpp/INIReader.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/base.dir/build.make CMakeFiles/base.dir/inih/cpp/INIReader.cpp.i
+.PHONY : inih/cpp/INIReader.cpp.i
+
+inih/cpp/INIReader.s: inih/cpp/INIReader.cpp.s
+.PHONY : inih/cpp/INIReader.s
+
+# target to generate assembly for a file
+inih/cpp/INIReader.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/base.dir/build.make CMakeFiles/base.dir/inih/cpp/INIReader.cpp.s
+.PHONY : inih/cpp/INIReader.cpp.s
+
+inih/ini.o: inih/ini.c.o
+.PHONY : inih/ini.o
+
+# target to build an object file
+inih/ini.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/base.dir/build.make CMakeFiles/base.dir/inih/ini.c.o
+.PHONY : inih/ini.c.o
+
+inih/ini.i: inih/ini.c.i
+.PHONY : inih/ini.i
+
+# target to preprocess a source file
+inih/ini.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/base.dir/build.make CMakeFiles/base.dir/inih/ini.c.i
+.PHONY : inih/ini.c.i
+
+inih/ini.s: inih/ini.c.s
+.PHONY : inih/ini.s
+
+# target to generate assembly for a file
+inih/ini.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/base.dir/build.make CMakeFiles/base.dir/inih/ini.c.s
+.PHONY : inih/ini.c.s
+
 main.o: main.cpp.o
 .PHONY : main.o
 
@@ -243,6 +291,12 @@ help:
 	@echo "... TelemetryManager.o"
 	@echo "... TelemetryManager.i"
 	@echo "... TelemetryManager.s"
+	@echo "... inih/cpp/INIReader.o"
+	@echo "... inih/cpp/INIReader.i"
+	@echo "... inih/cpp/INIReader.s"
+	@echo "... inih/ini.o"
+	@echo "... inih/ini.i"
+	@echo "... inih/ini.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
