@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
 
 
     auto command_manager = std::make_shared<CommandManager>(system);
-    auto communication_manager = std::make_shared<CommunicationManager>(reader.GetString("GroundStationSerialPort"),57600, command_manager);
+    auto communication_manager = std::make_shared<CommunicationManager>(reader.GetString("Connection","GroundStationSerialPort","UNKNOWN"),57600, command_manager);
     auto telemetry_manager = std::make_shared<TelemetryManager>(system,communication_manager);
 
     std::thread main_thread(main_thread_function, system, command_manager,communication_manager,telemetry_manager);
