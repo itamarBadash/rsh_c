@@ -114,7 +114,7 @@ CommandManager::Result CommandManager::send_mavlink_command(uint8_t base_mode, u
                 mavlink_address.component_id,
                 channel,
                 &message,
-cd                 system->get_system_id(),
+                 system->get_system_id(),
                 base_mode,
                 custom_mode
         );
