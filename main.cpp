@@ -5,6 +5,7 @@
 #include "TelemetryManager.h"
 #include "CommandManager.h"
 #include "CommunicationManager.h"
+#include "INIReader.h"
 
 
 void main_thread_function(std::shared_ptr<System> system, std::shared_ptr<CommandManager> command_manager,std::shared_ptr<CommunicationManager> communications_manager, std::shared_ptr<TelemetryManager> telemetry_manager);
@@ -24,6 +25,11 @@ void usage(const std::string& bin_name) {
 int main(int argc, char** argv) {
     if (argc != 2) {
         usage(argv[0]);
+        return 1;
+    }
+    INIReader reader("config.ini");
+    if (reader.ParseError() < 0) {
+        std::cout << "Can't load 'config.ini'\n";
         return 1;
     }
 
@@ -61,7 +67,7 @@ int main(int argc, char** argv) {
 
 
     auto command_manager = std::make_shared<CommandManager>(system);
-    auto communication_manager = std::make_shared<CommunicationManager>("/dev/ttyUSB0",57600, command_manager);
+    auto communication_manager = std::make_shared<CommunicationManager>(reader.GetString("GroundStationSerialPort"),57600, command_manager);
     auto telemetry_manager = std::make_shared<TelemetryManager>(system,communication_manager);
 
     std::thread main_thread(main_thread_function, system, command_manager,communication_manager,telemetry_manager);
@@ -79,5 +85,4 @@ void main_thread_function(std::shared_ptr<System> system, std::shared_ptr<Comman
         communications_manager->sendMessage(telemetry_manager->getTelemetryData().print());
         //logic for error handling and exeptions or retry connections with modules.
     }
-
 }
