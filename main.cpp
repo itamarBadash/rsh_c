@@ -5,7 +5,7 @@
 #include "TelemetryManager.h"
 #include "CommandManager.h"
 #include "CommunicationManager.h"
-#include "INIReader.h"
+#include "inih/cpp/INIReader.h"
 
 
 void main_thread_function(std::shared_ptr<System> system, std::shared_ptr<CommandManager> command_manager,std::shared_ptr<CommunicationManager> communications_manager, std::shared_ptr<TelemetryManager> telemetry_manager);
