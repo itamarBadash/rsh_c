@@ -26,6 +26,8 @@ public:
     // Send a message via the serial port
     Result sendMessage(const std::string &message);
 
+    speed_t convertBaudRate(int baudRate);
+
 private:
     // Serial port configuration and management
     void openPort();

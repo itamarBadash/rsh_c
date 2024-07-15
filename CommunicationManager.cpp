@@ -24,7 +24,7 @@ CommunicationManager::~CommunicationManager() {
     closePort();
 }
 
-speed_t convertBaudRate(int baudRate) {
+speed_t CommunicationManager::convertBaudRate(int baudRate) {
     switch (baudRate) {
         case 0: return B0;
         case 50: return B50;
