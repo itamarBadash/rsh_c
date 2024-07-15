@@ -2,7 +2,6 @@
 #include <iostream>
 #include <unistd.h>
 #include <fcntl.h>
-#include <termios.h>
 #include <cstring>
 #include <errno.h>
 #include <memory>
