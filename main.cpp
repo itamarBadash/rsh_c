@@ -2,8 +2,8 @@
 #include <mavsdk/plugins/telemetry/telemetry.h>
 #include <iostream>
 #include <thread>
-#include "TelemetryManager.h"
-#include "CommandManager.h"
+#include "Src/Modules/TelemetryManager.h"
+#include "Src/Modules/CommandManager.h"
 #include "CommunicationManager.h"
 #include "inih/cpp/INIReader.h"
 

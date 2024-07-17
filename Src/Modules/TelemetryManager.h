@@ -6,7 +6,7 @@
 #include <atomic>
 #include <mutex>
 #include <iostream>
-#include "CommunicationManager.h"
+#include "../../CommunicationManager.h"
 
 using namespace mavsdk;
 struct TelemetryData {

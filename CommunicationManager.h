@@ -8,7 +8,7 @@
 #include <atomic>
 #include <termios.h>
 
-#include "CommandManager.h"
+#include "Src/Modules/CommandManager.h"
 
 
 class CommunicationManager {

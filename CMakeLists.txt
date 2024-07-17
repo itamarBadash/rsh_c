@@ -19,16 +19,17 @@ include_directories(${CMAKE_PREFIX_PATH}/inih)
 #ink_directories(${CMAKE_PREFIX_PATH}/lib)
 
 add_executable(base main.cpp
-        TelemetryManager.cpp
-        TelemetryManager.h
-        CommandManager.cpp
-        CommandManager.h
+        Src/Modules/TelemetryManager.cpp
+        Src/Modules/TelemetryManager.h
+        Src/Modules/CommandManager.cpp
+        Src/Modules/CommandManager.h
         CommunicationManager.cpp
         CommunicationManager.h
         inih/ini.c
         inih/ini.h
         inih/cpp/INIReader.cpp
         inih/cpp/INIReader.h
+        Events/EventManager.h
 )
 
 
