@@ -5,7 +5,6 @@ name(new_name) {
 
 }
 
-Result BaseAddon::Activate() {
+void BaseAddon::Activate() {
     std::cout << name << "Addon activated successfully." << std::endl;
-    return Result::Success;
 }
