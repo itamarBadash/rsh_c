@@ -6,7 +6,6 @@
 #define BASE_BASEADDON_H
 
 #include <string>
-#include "EventManager.h"
 
 
 class BaseAddon {
