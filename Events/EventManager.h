@@ -1,3 +1,6 @@
+#ifndef BASE_EVENTMANAGER_H
+#define BASE_EVENTMANAGER_H
+
 #include <string>
 #include <map>
 #include <functional>
@@ -46,9 +49,9 @@ public:
     template<typename... Args>
     void createEvent(const std::string& eventName) {
         std::lock_guard<std::mutex> lock(mutex);
-        events[eventName] = std::make_any<Event<Args...>>();
+        events[eventName] = std::make_shared<Event<Args...>>();
         clearFunctions[eventName] = [this, eventName]() {
-            std::any_cast<Event<Args...>&>(events[eventName]).clear();
+            std::any_cast<std::shared_ptr<Event<Args...>>&>(events[eventName])->clear();
         };
         std::cout << "Event '" << eventName << "' created with type: " << typeid(Event<Args...>).name() << std::endl;
     }
@@ -57,7 +60,7 @@ public:
     std::shared_ptr<Event<Args...>> getEvent(const std::string& eventName) {
         std::lock_guard<std::mutex> lock(mutex);
         try {
-            auto event = std::make_shared<Event<Args...>>(std::any_cast<Event<Args...>&>(events.at(eventName)));
+            auto event = std::any_cast<std::shared_ptr<Event<Args...>>>(events.at(eventName));
             std::cout << "Event '" << eventName << "' retrieved with type: " << typeid(Event<Args...>).name() << std::endl;
             return event;
         } catch (const std::bad_any_cast& e) {
@@ -117,3 +120,5 @@ inline EventManager& GetEventManager() {
     static EventManager instance;
     return instance;
 }
+
+#endif // BASE_EVENTMANAGER_H
