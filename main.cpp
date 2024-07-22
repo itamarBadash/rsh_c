@@ -87,31 +87,34 @@ int main(int argc, char** argv) {
 
     EventManager& eventManager = GetEventManager();
 
+    std::cout << "Creating event 'TestEvent'..." << std::endl;
     eventManager.createEvent<int>("TestEvent");
 
     Listener listener;
     auto memberCallback = [&listener](int value) { listener.onEvent(value); };
+
+    std::cout << "Subscribing to 'TestEvent' with member function callback..." << std::endl;
     eventManager.subscribe<int>("TestEvent", memberCallback);
+
+    std::cout << "Subscribing to 'TestEvent' with free function callback..." << std::endl;
     eventManager.subscribe<int>("TestEvent", freeFunctionListener);
+
+    std::cout << "Subscribing to 'TestEvent' with lambda callback..." << std::endl;
     eventManager.subscribe<int>("TestEvent", [](int value) {
         std::cout << "Lambda listener received event with value: " << value << std::endl;
     });
 
-    // Invoke the event
-    std::cout << "Lambda listener received event with value: " << std::endl;
-
+    std::cout << "Invoking 'TestEvent' with value 42..." << std::endl;
     eventManager.invoke<int>("TestEvent", 42);
 
-    // Unsubscribe the member callback
+    std::cout << "Unsubscribing member function callback from 'TestEvent'..." << std::endl;
     eventManager.unsubscribe<int>("TestEvent", memberCallback);
 
-    // Invoke the event again
+    std::cout << "Invoking 'TestEvent' with value 84..." << std::endl;
     eventManager.invoke<int>("TestEvent", 84);
 
-    // Clear all events
+    std::cout << "Clearing all events..." << std::endl;
     eventManager.clearAllEvents();
-   // std::thread main_thread(main_thread_function, system, command_manager,communication_manager,telemetry_manager);
-   // main_thread.join();
 
     return 0;
 }
