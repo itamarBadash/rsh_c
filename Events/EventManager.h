@@ -67,7 +67,7 @@ public:
         if (it == events.end()) {
             auto event = std::make_shared<Event<Args...>>();
             events[eventName] = event;
-            eventTypes[eventName] = std::type_index(typeid(Event<Args...>));
+            clearFunctions[eventName] = [event]() { event->clear(); };
             return event;
         }
         auto event = std::dynamic_pointer_cast<Event<Args...>>(it->second);
@@ -95,29 +95,21 @@ public:
     void removeEvent(const std::string& eventName) {
         std::lock_guard<std::mutex> lock(mutex);
         events.erase(eventName);
-        eventTypes.erase(eventName);
+        clearFunctions.erase(eventName);
     }
 
     void clearEvent(const std::string& eventName) {
         std::lock_guard<std::mutex> lock(mutex);
-        auto it = events.find(eventName);
-        if (it != events.end()) {
-            auto eventType = eventTypes[eventName];
-            if (eventType == std::type_index(typeid(Event<void>))) {
-                std::dynamic_pointer_cast<Event<void>>(it->second)->clear();
-            }
-            // Add other types here if necessary
+        auto it = clearFunctions.find(eventName);
+        if (it != clearFunctions.end()) {
+            it->second();
         }
     }
 
     void clearAllEvents() {
         std::lock_guard<std::mutex> lock(mutex);
-        for (auto& [name, event] : events) {
-            auto eventType = eventTypes[name];
-            if (eventType == std::type_index(typeid(Event<void>))) {
-                std::dynamic_pointer_cast<Event<void>>(event)->clear();
-            }
-            // Add other types here if necessary
+        for (auto& [name, clearFunc] : clearFunctions) {
+            clearFunc();
         }
     }
 
@@ -129,7 +121,7 @@ public:
 private:
     mutable std::mutex mutex;
     std::map<std::string, std::shared_ptr<void>> events;
-    std::unordered_map<std::string, std::type_index> eventTypes;
+    std::unordered_map<std::string, std::function<void()>> clearFunctions;
 };
 
 inline EventManager& GetEventManager() {
@@ -139,8 +131,10 @@ inline EventManager& GetEventManager() {
 
 // Macros for easier use
 #define SUBSCRIBE_EVENT(eventName, ...) GetEventManager().subscribe(eventName, __VA_ARGS__)
+
 #define UNSUBSCRIBE_EVENT(eventName, ...) GetEventManager().unsubscribe(eventName, __VA_ARGS__)
 #define INVOKE_EVENT(eventName, ...) GetEventManager().invoke(eventName, __VA_ARGS__)
+
 #define REMOVE_EVENT(eventName) GetEventManager().removeEvent(eventName)
 #define CLEAR_EVENT(eventName) GetEventManager().clearEvent(eventName)
 #define CLEAR_ALL_EVENTS() GetEventManager().clearAllEvents()

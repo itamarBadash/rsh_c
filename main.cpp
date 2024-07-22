@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
     auto telemetry_manager = std::make_shared<TelemetryManager>(system,communication_manager);
     auto addon = std::make_shared<BaseAddon>("system");
 
-    SUBSCRIBE_EVENT("AddonActivate", std::bind(&BaseAddon::Activate, addon));
+    GetEventManager().subscribe<Result>("AddonActivate", std::bind(&BaseAddon::Activate, addon));
 
     std::thread main_thread(main_thread_function, system, command_manager,communication_manager,telemetry_manager);
 
