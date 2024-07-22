@@ -1,7 +1,6 @@
 #ifndef BASE_EVENTMANAGER_H
 #define BASE_EVENTMANAGER_H
 
-
 #pragma once
 
 #include <functional>
@@ -12,6 +11,9 @@
 #include <mutex>
 #include <algorithm>
 #include <stdexcept>
+#include <typeindex>
+#include <typeinfo>
+#include <unordered_map>
 
 template<typename... Args>
 class Event {
@@ -65,6 +67,7 @@ public:
         if (it == events.end()) {
             auto event = std::make_shared<Event<Args...>>();
             events[eventName] = event;
+            eventTypes[eventName] = std::type_index(typeid(Event<Args...>));
             return event;
         }
         auto event = std::dynamic_pointer_cast<Event<Args...>>(it->second);
@@ -92,20 +95,29 @@ public:
     void removeEvent(const std::string& eventName) {
         std::lock_guard<std::mutex> lock(mutex);
         events.erase(eventName);
+        eventTypes.erase(eventName);
     }
 
     void clearEvent(const std::string& eventName) {
         std::lock_guard<std::mutex> lock(mutex);
         auto it = events.find(eventName);
         if (it != events.end()) {
-            it->second->clear();
+            auto eventType = eventTypes[eventName];
+            if (eventType == std::type_index(typeid(Event<void>))) {
+                std::dynamic_pointer_cast<Event<void>>(it->second)->clear();
+            }
+            // Add other types here if necessary
         }
     }
 
     void clearAllEvents() {
         std::lock_guard<std::mutex> lock(mutex);
         for (auto& [name, event] : events) {
-            event->clear();
+            auto eventType = eventTypes[name];
+            if (eventType == std::type_index(typeid(Event<void>))) {
+                std::dynamic_pointer_cast<Event<void>>(event)->clear();
+            }
+            // Add other types here if necessary
         }
     }
 
@@ -117,6 +129,7 @@ public:
 private:
     mutable std::mutex mutex;
     std::map<std::string, std::shared_ptr<void>> events;
+    std::unordered_map<std::string, std::type_index> eventTypes;
 };
 
 inline EventManager& GetEventManager() {

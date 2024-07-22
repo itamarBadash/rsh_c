@@ -73,7 +73,8 @@ int main(int argc, char** argv) {
     auto communication_manager = std::make_shared<CommunicationManager>(reader.GetString("Connection","GroundStationSerialPort","UNKNOWN"),reader.GetInteger("Connection","GroundStationBaudRate",0),command_manager);
     auto telemetry_manager = std::make_shared<TelemetryManager>(system,communication_manager);
     auto addon = std::make_shared<BaseAddon>("system");
-    GetEventManager().subscribe<Result>("AddonActivate", std::bind(&BaseAddon::Activate, addon));
+
+    SUBSCRIBE_EVENT("AddonActivate", std::bind(&BaseAddon::Activate, addon));
 
     std::thread main_thread(main_thread_function, system, command_manager,communication_manager,telemetry_manager);
 
