@@ -85,36 +85,19 @@ int main(int argc, char** argv) {
     */
     auto addon = std::make_shared<BaseAddon>("system");
 
-    EventManager& eventManager = GetEventManager();
+    eventManager.createEvent<>("AddonActivate");
 
-    std::cout << "Creating event 'TestEvent'..." << std::endl;
-    eventManager.createEvent<int>("TestEvent");
+    // Create a shared instance of BaseAddon
+    auto addon = std::make_shared<BaseAddon>();
 
-    Listener listener;
-    auto memberCallback = [&listener](int value) { listener.onEvent(value); };
+    // Bind the Activate function of the addon to the event
+    std::cout << "Subscribing to 'AddonActivate' with BaseAddon::Activate..." << std::endl;
+    eventManager.subscribe<>("AddonActivate", std::bind(&BaseAddon::Activate, addon));
 
-    std::cout << "Subscribing to 'TestEvent' with member function callback..." << std::endl;
-    eventManager.subscribe<int>("TestEvent", memberCallback);
+    // Invoke the event to activate the addon
+    std::cout << "Invoking 'AddonActivate' event..." << std::endl;
+    eventManager.invoke<>("AddonActivate");
 
-    std::cout << "Subscribing to 'TestEvent' with free function callback..." << std::endl;
-    eventManager.subscribe<int>("TestEvent", freeFunctionListener);
-
-    std::cout << "Subscribing to 'TestEvent' with lambda callback..." << std::endl;
-    eventManager.subscribe<int>("TestEvent", [](int value) {
-        std::cout << "Lambda listener received event with value: " << value << std::endl;
-    });
-
-    std::cout << "Invoking 'TestEvent' with value 42..." << std::endl;
-    eventManager.invoke<int>("TestEvent", 42);
-
-    std::cout << "Unsubscribing member function callback from 'TestEvent'..." << std::endl;
-    eventManager.unsubscribe<int>("TestEvent", memberCallback);
-
-    std::cout << "Invoking 'TestEvent' with value 84..." << std::endl;
-    eventManager.invoke<int>("TestEvent", 84);
-
-    std::cout << "Clearing all events..." << std::endl;
-    eventManager.clearAllEvents();
 
     return 0;
 }
