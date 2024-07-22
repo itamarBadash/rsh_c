@@ -87,16 +87,17 @@ int main(int argc, char** argv) {
     EventManager& eventManager = GetEventManager();
     auto addon = std::make_shared<BaseAddon>("system");
 
-    std::cout << "Creating event 'AddonActivate'..." << std::endl;
+
+    // Create an event for activating addons
     eventManager.createEvent<>("AddonActivate");
 
+    // Create a shared instance of BaseAddon
 
-    std::cout << "Subscribing to 'AddonActivate' with BaseAddon::Activate..." << std::endl;
+    // Bind the Activate function of the addon to the event
     eventManager.subscribe<>("AddonActivate", std::bind(&BaseAddon::Activate, addon));
 
-    std::cout << "Invoking 'AddonActivate' event..." << std::endl;
+    // Invoke the event to activate the addon
     eventManager.invoke<>("AddonActivate");
-
     return 0;
 }
 
