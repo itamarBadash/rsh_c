@@ -10,8 +10,6 @@
 #include <list>
 #include <any>
 #include <unordered_map>
-#include <vector>
-#include <algorithm>
 
 template<typename... Args>
 class Event {
