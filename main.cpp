@@ -35,7 +35,7 @@ void usage(const std::string& bin_name) {
 
 
 int main(int argc, char** argv) {
-    /*
+
     if (argc != 2) {
         usage(argv[0]);
         return 1;
@@ -82,22 +82,14 @@ int main(int argc, char** argv) {
     auto command_manager = std::make_shared<CommandManager>(system);
     auto communication_manager = std::make_shared<CommunicationManager>(reader.GetString("Connection","GroundStationSerialPort","UNKNOWN"),reader.GetInteger("Connection","GroundStationBaudRate",0),command_manager);
     auto telemetry_manager = std::make_shared<TelemetryManager>(system,communication_manager);
-    */
+
 
     EventManager& eventManager = GetEventManager();
     auto addon = std::make_shared<BaseAddon>("system");
 
 
-    // Create an event for activating addons
-    eventManager.createEvent<>("AddonActivate");
 
-    // Create a shared instance of BaseAddon
 
-    // Bind the Activate function of the addon to the event
-    eventManager.subscribe<>("AddonActivate", std::bind(&BaseAddon::Activate, addon));
-
-    // Invoke the event to activate the addon
-    eventManager.invoke<>("AddonActivate");
     return 0;
 }
 
