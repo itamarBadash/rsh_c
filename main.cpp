@@ -88,8 +88,6 @@ int main(int argc, char** argv) {
     eventManager.createEvent<>("AddonActivate");
 
     // Create a shared instance of BaseAddon
-    auto addon = std::make_shared<BaseAddon>();
-
     // Bind the Activate function of the addon to the event
     std::cout << "Subscribing to 'AddonActivate' with BaseAddon::Activate..." << std::endl;
     eventManager.subscribe<>("AddonActivate", std::bind(&BaseAddon::Activate, addon));
