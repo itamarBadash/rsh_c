@@ -1,6 +1,3 @@
-#ifndef BASE_EVENTMANAGER_H
-#define BASE_EVENTMANAGER_H
-
 #include <string>
 #include <map>
 #include <functional>
@@ -18,6 +15,7 @@ public:
     using EventCallback = std::function<void(Args...)>;
 
     void subscribe(EventCallback callback) {
+        std::cout << "Subscribing a new callback of type: " << typeid(EventCallback).name() << std::endl;
         callbacks.push_back(callback);
     }
 
@@ -28,7 +26,9 @@ public:
     }
 
     void invoke(Args... args) {
+        std::cout << "Invoking event with " << callbacks.size() << " callbacks." << std::endl;
         for (auto& callback : callbacks) {
+            std::cout << "Invoking a callback..." << std::endl;
             callback(args...);
         }
     }
@@ -117,5 +117,3 @@ inline EventManager& GetEventManager() {
     static EventManager instance;
     return instance;
 }
-
-#endif // BASE_EVENTMANAGER_H
