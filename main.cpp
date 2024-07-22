@@ -107,8 +107,8 @@ int main(int argc, char** argv) {
 
     // Clear all events
     eventManager.clearAllEvents();
-    std::thread main_thread(main_thread_function, system, command_manager,communication_manager,telemetry_manager);
-    main_thread.join();
+    //std::thread main_thread(main_thread_function, system, command_manager,communication_manager,telemetry_manager);
+   // main_thread.join();
 
     return 0;
 }
