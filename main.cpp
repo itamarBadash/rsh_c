@@ -76,6 +76,8 @@ int main(int argc, char** argv) {
 
     GetEventManager().subscribe<BaseAddon::Result>("AddonActivate", std::bind(&BaseAddon::Activate, addon));
 
+    // Simulate event invocation
+    INVOKE_EVENT("AddonActivate");
     std::thread main_thread(main_thread_function, system, command_manager,communication_manager,telemetry_manager);
 
     main_thread.join();
@@ -89,7 +91,6 @@ void main_thread_function(std::shared_ptr<System> system, std::shared_ptr<Comman
         std::this_thread::sleep_for(std::chrono::seconds(3));
         //telemetry_manager->sendTelemetryData();
         communications_manager->sendMessage(telemetry_manager->getTelemetryData().print());
-        INVOKE_EVENT("AddonActivate");
         //logic for error handling and exeptions or retry connections with modules.
     }
 }

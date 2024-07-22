@@ -1,19 +1,12 @@
 #ifndef BASE_EVENTMANAGER_H
 #define BASE_EVENTMANAGER_H
 
-#pragma once
-
-#include <functional>
-#include <map>
-#include <vector>
 #include <string>
+#include <map>
+#include <functional>
 #include <memory>
 #include <mutex>
-#include <algorithm>
-#include <stdexcept>
-#include <typeindex>
-#include <typeinfo>
-#include <unordered_map>
+#include <iostream>
 
 template<typename... Args>
 class Event {
@@ -21,60 +14,42 @@ public:
     using EventCallback = std::function<void(Args...)>;
 
     void subscribe(EventCallback callback) {
-        std::lock_guard<std::mutex> lock(mutex);
         callbacks.push_back(callback);
     }
 
     void unsubscribe(EventCallback callback) {
-        std::lock_guard<std::mutex> lock(mutex);
-        callbacks.erase(std::remove_if(callbacks.begin(), callbacks.end(),
-                                       [&callback](const EventCallback& cb) {
-                                           return cb.target_type() == callback.target_type();
-                                       }), callbacks.end());
+        callbacks.remove(callback);
     }
 
     void invoke(Args... args) {
-        std::lock_guard<std::mutex> lock(mutex);
-        for (const auto& callback : callbacks) {
+        for (auto& callback : callbacks) {
             callback(args...);
         }
     }
 
     void clear() {
-        std::lock_guard<std::mutex> lock(mutex);
         callbacks.clear();
     }
 
-    size_t subscriberCount() const {
-        std::lock_guard<std::mutex> lock(mutex);
-        return callbacks.size();
-    }
-
 private:
-    mutable std::mutex mutex;
-    std::vector<EventCallback> callbacks;
+    std::list<EventCallback> callbacks;
 };
 
 class EventManager {
 public:
     template<typename... Args>
-    using EventPtr = std::shared_ptr<Event<Args...>>;
+    void createEvent(const std::string& eventName) {
+        std::lock_guard<std::mutex> lock(mutex);
+        events[eventName] = std::make_shared<Event<Args...>>();
+        clearFunctions[eventName] = [this, eventName]() {
+            this->getEvent<Args...>(eventName)->clear();
+        };
+    }
 
     template<typename... Args>
-    EventPtr<Args...> getEvent(const std::string& eventName) {
+    std::shared_ptr<Event<Args...>> getEvent(const std::string& eventName) {
         std::lock_guard<std::mutex> lock(mutex);
-        auto it = events.find(eventName);
-        if (it == events.end()) {
-            auto event = std::make_shared<Event<Args...>>();
-            events[eventName] = event;
-            clearFunctions[eventName] = [event]() { event->clear(); };
-            return event;
-        }
-        auto event = std::dynamic_pointer_cast<Event<Args...>>(it->second);
-        if (!event) {
-            throw std::runtime_error("Event exists with different signature");
-        }
-        return event;
+        return std::static_pointer_cast<Event<Args...>>(events[eventName]);
     }
 
     template<typename... Args>
@@ -131,10 +106,8 @@ inline EventManager& GetEventManager() {
 
 // Macros for easier use
 #define SUBSCRIBE_EVENT(eventName, ...) GetEventManager().subscribe(eventName, __VA_ARGS__)
-
 #define UNSUBSCRIBE_EVENT(eventName, ...) GetEventManager().unsubscribe(eventName, __VA_ARGS__)
 #define INVOKE_EVENT(eventName, ...) GetEventManager().invoke(eventName, __VA_ARGS__)
-
 #define REMOVE_EVENT(eventName) GetEventManager().removeEvent(eventName)
 #define CLEAR_EVENT(eventName) GetEventManager().clearEvent(eventName)
 #define CLEAR_ALL_EVENTS() GetEventManager().clearAllEvents()
