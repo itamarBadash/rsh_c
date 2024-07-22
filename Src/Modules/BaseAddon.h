@@ -25,7 +25,7 @@ public:
 
     std::string name;
 
-    virtual void Activate();
+    void Activate();
 
 };
 
