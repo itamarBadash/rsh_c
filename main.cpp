@@ -89,6 +89,22 @@ int main(int argc, char** argv) {
 
     eventManager.createEvent<int>("TestEvent");
 
+    Listener listener;
+    auto memberCallback = [&listener](int value) { listener.onEvent(value); };
+    eventManager.subscribe<int>("TestEvent", memberCallback);
+    eventManager.subscribe<int>("TestEvent", freeFunctionListener);
+    eventManager.subscribe<int>("TestEvent", [](int value) {
+        std::cout << "Lambda listener received event with value: " << value << std::endl;
+    });
+
+    // Invoke the event
+    eventManager.invoke<int>("TestEvent", 42);
+
+    // Unsubscribe the member callback
+    eventManager.unsubscribe<int>("TestEvent", memberCallback);
+
+    // Invoke the event again
+    eventManager.invoke<int>("TestEvent", 84);
 
     // Clear all events
     eventManager.clearAllEvents();
