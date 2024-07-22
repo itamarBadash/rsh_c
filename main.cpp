@@ -93,17 +93,19 @@ int main(int argc, char** argv) {
     eventManager.subscribe("TestEvent", freeFunctionListener);
     eventManager.subscribe("TestEvent", [](int value) {
         std::cout << "Lambda listener received event with value: " << value << std::endl;
-        });
+    });
 
+    // Invoke the event
     eventManager.invoke("TestEvent", 42);
 
+    // Unsubscribe the member callback
     eventManager.unsubscribe("TestEvent", memberCallback);
 
+    // Invoke the event again
     eventManager.invoke("TestEvent", 84);
 
+    // Clear all events
     eventManager.clearAllEvents();
-    std::thread main_thread(main_thread_function, system, command_manager,communication_manager,telemetry_manager);
-
     main_thread.join();
 
     return 0;
