@@ -8,7 +8,16 @@
 #include "inih/cpp/INIReader.h"
 #include "Src/Modules/BaseAddon.h"
 #include "Events/EventManager.h"
+class Listener {
+public:
+    void onEvent(int value) {
+        std::cout << "Listener received event with value: " << value << std::endl;
+    }
+};
 
+void freeFunctionListener(int value) {
+    std::cout << "Free function listener received event with value: " << value << std::endl;
+}
 
 
 void main_thread_function(std::shared_ptr<System> system, std::shared_ptr<CommandManager> command_manager,std::shared_ptr<CommunicationManager> communications_manager, std::shared_ptr<TelemetryManager> telemetry_manager);
@@ -74,10 +83,25 @@ int main(int argc, char** argv) {
     auto telemetry_manager = std::make_shared<TelemetryManager>(system,communication_manager);
     auto addon = std::make_shared<BaseAddon>("system");
 
-    GetEventManager().subscribe<void()>("AddonActivate", std::bind(&BaseAddon::Activate, &addon));
+    EventManager& eventManager = GetEventManager();
 
-    // Simulate event invocation
-    INVOKE_EVENT("AddonActivate");
+    eventManager.createEvent<int>("TestEvent");
+
+    Listener listener;
+    auto memberCallback = [&listener](int value) { listener.onEvent(value); };
+    eventManager.subscribe("TestEvent", memberCallback);
+    eventManager.subscribe("TestEvent", freeFunctionListener);
+    eventManager.subscribe("TestEvent", [](int value) {
+        std::cout << "Lambda listener received event with value: " << value << std::endl;
+        });
+
+    eventManager.invoke("TestEvent", 42);
+
+    eventManager.unsubscribe("TestEvent", memberCallback);
+
+    eventManager.invoke("TestEvent", 84);
+
+    eventManager.clearAllEvents();
     std::thread main_thread(main_thread_function, system, command_manager,communication_manager,telemetry_manager);
 
     main_thread.join();
