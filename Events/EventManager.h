@@ -10,6 +10,7 @@
 #include <list>
 #include <any>
 #include <unordered_map>
+#include <typeinfo>
 
 template<typename... Args>
 class Event {
@@ -49,12 +50,20 @@ public:
         clearFunctions[eventName] = [this, eventName]() {
             std::any_cast<Event<Args...>&>(events[eventName]).clear();
         };
+        std::cout << "Event '" << eventName << "' created with type: " << typeid(Event<Args...>).name() << std::endl;
     }
 
     template<typename... Args>
     std::shared_ptr<Event<Args...>> getEvent(const std::string& eventName) {
         std::lock_guard<std::mutex> lock(mutex);
-        return std::make_shared<Event<Args...>>(std::any_cast<Event<Args...>&>(events.at(eventName)));
+        try {
+            auto event = std::make_shared<Event<Args...>>(std::any_cast<Event<Args...>&>(events.at(eventName)));
+            std::cout << "Event '" << eventName << "' retrieved with type: " << typeid(Event<Args...>).name() << std::endl;
+            return event;
+        } catch (const std::bad_any_cast& e) {
+            std::cerr << "Failed to cast event '" << eventName << "' to type: " << typeid(Event<Args...>).name() << " - " << e.what() << std::endl;
+            throw;
+        }
     }
 
     template<typename... Args>
