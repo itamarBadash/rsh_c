@@ -35,6 +35,7 @@ void usage(const std::string& bin_name) {
 
 
 int main(int argc, char** argv) {
+    /*
     if (argc != 2) {
         usage(argv[0]);
         return 1;
@@ -81,34 +82,18 @@ int main(int argc, char** argv) {
     auto command_manager = std::make_shared<CommandManager>(system);
     auto communication_manager = std::make_shared<CommunicationManager>(reader.GetString("Connection","GroundStationSerialPort","UNKNOWN"),reader.GetInteger("Connection","GroundStationBaudRate",0),command_manager);
     auto telemetry_manager = std::make_shared<TelemetryManager>(system,communication_manager);
+    */
     auto addon = std::make_shared<BaseAddon>("system");
-
 
     EventManager& eventManager = GetEventManager();
 
     eventManager.createEvent<int>("TestEvent");
 
-    Listener listener;
-    auto memberCallback = [&listener](int value) { listener.onEvent(value); };
-    eventManager.subscribe<int>("TestEvent", memberCallback);
-    eventManager.subscribe<int>("TestEvent", freeFunctionListener);
-    eventManager.subscribe<int>("TestEvent", [](int value) {
-        std::cout << "Lambda listener received event with value: " << value << std::endl;
-    });
-
-    // Invoke the event
-    eventManager.invoke<int>("TestEvent", 42);
-
-    // Unsubscribe the member callback
-    eventManager.unsubscribe<int>("TestEvent", memberCallback);
-
-    // Invoke the event again
-    eventManager.invoke<int>("TestEvent", 84);
 
     // Clear all events
     eventManager.clearAllEvents();
-    //std::thread main_thread(main_thread_function, system, command_manager,communication_manager,telemetry_manager);
-   // main_thread.join();
+    std::thread main_thread(main_thread_function, system, command_manager,communication_manager,telemetry_manager);
+    main_thread.join();
 
     return 0;
 }
