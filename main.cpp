@@ -98,6 +98,8 @@ int main(int argc, char** argv) {
     });
 
     // Invoke the event
+    std::cout << "Lambda listener received event with value: " << std::endl;
+
     eventManager.invoke<int>("TestEvent", 42);
 
     // Unsubscribe the member callback
