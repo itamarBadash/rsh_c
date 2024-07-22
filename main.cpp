@@ -83,19 +83,19 @@ int main(int argc, char** argv) {
     auto communication_manager = std::make_shared<CommunicationManager>(reader.GetString("Connection","GroundStationSerialPort","UNKNOWN"),reader.GetInteger("Connection","GroundStationBaudRate",0),command_manager);
     auto telemetry_manager = std::make_shared<TelemetryManager>(system,communication_manager);
     */
+
+    EventManager& eventManager = GetEventManager();
+
+    std::cout << "Creating event 'AddonActivate'..." << std::endl;
+    eventManager.createEvent<>("AddonActivate");
     auto addon = std::make_shared<BaseAddon>("system");
 
-    eventManager.createEvent<>("AddonActivate");
 
-    // Create a shared instance of BaseAddon
-    // Bind the Activate function of the addon to the event
     std::cout << "Subscribing to 'AddonActivate' with BaseAddon::Activate..." << std::endl;
     eventManager.subscribe<>("AddonActivate", std::bind(&BaseAddon::Activate, addon));
 
-    // Invoke the event to activate the addon
     std::cout << "Invoking 'AddonActivate' event..." << std::endl;
     eventManager.invoke<>("AddonActivate");
-
 
     return 0;
 }
