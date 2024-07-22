@@ -30,6 +30,8 @@ add_executable(base main.cpp
         inih/cpp/INIReader.cpp
         inih/cpp/INIReader.h
         Events/EventManager.h
+        Src/Modules/BaseAddon.cpp
+        Src/Modules/BaseAddon.h
 )
 
 

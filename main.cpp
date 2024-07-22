@@ -6,6 +6,9 @@
 #include "Src/Modules/CommandManager.h"
 #include "CommunicationManager.h"
 #include "inih/cpp/INIReader.h"
+#include "Src/Modules/BaseAddon.h"
+#include "Events/EventManager.h"
+
 
 
 void main_thread_function(std::shared_ptr<System> system, std::shared_ptr<CommandManager> command_manager,std::shared_ptr<CommunicationManager> communications_manager, std::shared_ptr<TelemetryManager> telemetry_manager);
@@ -69,6 +72,8 @@ int main(int argc, char** argv) {
     auto command_manager = std::make_shared<CommandManager>(system);
     auto communication_manager = std::make_shared<CommunicationManager>(reader.GetString("Connection","GroundStationSerialPort","UNKNOWN"),reader.GetInteger("Connection","GroundStationBaudRate",0),command_manager);
     auto telemetry_manager = std::make_shared<TelemetryManager>(system,communication_manager);
+    auto addon = std::make_shared<BaseAddon>("system");
+    SUBSCRIBE_EVENT("AddonActivate",addon->Activate&);
 
     std::thread main_thread(main_thread_function, system, command_manager,communication_manager,telemetry_manager);
 
@@ -80,9 +85,10 @@ int main(int argc, char** argv) {
 void main_thread_function(std::shared_ptr<System> system, std::shared_ptr<CommandManager> command_manager,std::shared_ptr<CommunicationManager> communications_manager, std::shared_ptr<TelemetryManager> telemetry_manager){
     telemetry_manager->start();
     while(true){
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+        std::this_thread::sleep_for(std::chrono::seconds(3));
         //telemetry_manager->sendTelemetryData();
         communications_manager->sendMessage(telemetry_manager->getTelemetryData().print());
+        INVOKE_EVENT("AddonActivate")
         //logic for error handling and exeptions or retry connections with modules.
     }
 }

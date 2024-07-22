@@ -1,19 +1,21 @@
 "C:\Program Files\JetBrains\CLion 2024.1.1\bin\cmake\win\x64\bin\cmake.exe" -G "Visual Studio 17 2022" -S C:\Users\Badash\CLionProjects\base -B C:\Users\Badash\CLionProjects\base\cmake-build-debug-visual-studio
 -- Selecting Windows SDK version 10.0.22621.0 to target Windows 10.0.19045.
-CMake Error at C:/Program Files/JetBrains/CLion 2024.1.1/bin/cmake/win/x64/share/cmake-3.28/Modules/CMakeFindDependencyMacro.cmake:76 (find_package):
-  Could not find a package configuration file provided by "CURL" with any of
-  the following names:
+CMake Error at CMakeLists.txt:2 (project):
+  The CMAKE_C_COMPILER:
 
-    CURLConfig.cmake
-    curl-config.cmake
+    C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.39.33519/bin/Hostx64/x64/cl.exe
 
-  Add the installation prefix of "CURL" to CMAKE_PREFIX_PATH or set
-  "CURL_DIR" to a directory containing one of the above files.  If "CURL"
-  provides a separate development package or SDK, be sure it has been
-  installed.
-Call Stack (most recent call first):
-  MAVSDK/install/lib/cmake/MAVSDK/MAVSDKConfig.cmake:7 (find_dependency)
-  CMakeLists.txt:9 (find_package)
+  is not a full path to an existing compiler tool.
+
+
+
+CMake Error at CMakeLists.txt:2 (project):
+  The CMAKE_CXX_COMPILER:
+
+    C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.39.33519/bin/Hostx64/x64/cl.exe
+
+  is not a full path to an existing compiler tool.
+
 
 
 -- Configuring incomplete, errors occurred!
