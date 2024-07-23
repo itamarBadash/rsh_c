@@ -87,6 +87,9 @@ int main(int argc, char** argv) {
     EventManager& eventManager = GetEventManager();
     auto addon = std::make_shared<BaseAddon>("system");
 
+    std::thread main_thread(main_thread_function, system, command_manager,communication_manager,telemetry_manager);
+
+    main_thread.join();
 
 
 
