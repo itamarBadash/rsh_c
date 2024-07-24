@@ -90,17 +90,13 @@ int main(int argc, char** argv) {
 
     main_thread.join();
     */
-    // Create an event
-    // Create an event
-    // Create an event
+
     CREATE_EVENT("MyEvent", int, const std::string&);
 
-    // Subscribe to an event
     SUBSCRIBE_TO_EVENT("MyEvent", [](int i, const std::string& s) {
         std::cout << "Event received: " << i << ", " << s << std::endl;
     });
 
-    // Invoke an event
     INVOKE_EVENT("MyEvent", 42, std::string("Hello, World!"));
 
 

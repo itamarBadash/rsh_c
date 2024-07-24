@@ -93,7 +93,7 @@ public:
 
     template<typename... Args>
     void invokeHelper(const std::string& eventName, Args&&... args) {
-        invoke<typename std::decay<Args>::type...>(eventName, std::forward<Args>(args)...);
+        invoke<typename std::remove_reference<typename std::decay<Args>::type>::type...>(eventName, std::forward<Args>(args)...);
     }
 
     void removeEvent(const std::string& eventName) {
