@@ -92,6 +92,7 @@ int main(int argc, char** argv) {
     */
     // Create an event
     // Create an event
+    // Create an event
     CREATE_EVENT("MyEvent", int, const std::string&);
 
     // Subscribe to an event
@@ -100,8 +101,7 @@ int main(int argc, char** argv) {
     });
 
     // Invoke an event
-    INVOKE_EVENT("MyEvent", 42, std::string("Hello, World!"));
-
+    INVOKE_EVENT("MyEvent", 42, "Hello, World!");
 
 
     return 0;
