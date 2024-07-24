@@ -101,7 +101,7 @@ int main(int argc, char** argv) {
     });
 
     // Invoke an event
-    INVOKE_EVENT("MyEvent", 42, "Hello, World!");
+    INVOKE_EVENT("MyEvent", 42, std::string&("Hello, World!"));
 
 
     return 0;
