@@ -9,7 +9,7 @@
 #include "Src/Modules/BaseAddon.h"
 #include "Events/EventManager.h"
 
-using namespace mavsdk;
+//using namespace mavsdk;
 
 class Listener {
 public:

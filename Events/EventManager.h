@@ -130,12 +130,12 @@ private:
     template<typename Func, typename... Args>
     void subscribeHelperImpl(const std::string& eventName, Func callback, void (Func::*)(Args...) const) {
         subscribe<Args...>(eventName, callback);
-};
+}
 
 inline EventManager& GetEventManager() {
     static EventManager instance;
     return instance;
-}
+};
 
 #define CREATE_EVENT(eventName, ...) \
     GetEventManager().createEventHelper(eventName, static_cast<void (*)(__VA_ARGS__)>(nullptr))
