@@ -61,8 +61,13 @@ public:
     template<typename... Args>
     std::shared_ptr<Event<Args...>> getEvent(const std::string& eventName) {
         std::lock_guard<std::mutex> lock(mutex);
+        auto it = events.find(eventName);
+        if (it == events.end()) {
+            std::cerr << "Event '" << eventName << "' does not exist." << std::endl;
+            throw std::out_of_range("Event '" + eventName + "' does not exist.");
+        }
         try {
-            auto event = std::any_cast<std::shared_ptr<Event<Args...>>>(events.at(eventName));
+            auto event = std::any_cast<std::shared_ptr<Event<Args...>>>(it->second);
             std::cout << "Event '" << eventName << "' retrieved with type: " << typeid(Event<Args...>).name() << std::endl;
             return event;
         } catch (const std::bad_any_cast& e) {
