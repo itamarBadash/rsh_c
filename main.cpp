@@ -100,7 +100,7 @@ int main(int argc, char** argv) {
         addon->Activate();
     });
 
-    INVOKE_EVENT("MyEvent");
+    INVOKE_EVENT("AddonTest");
 
 
     return 0;
