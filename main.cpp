@@ -91,13 +91,14 @@ int main(int argc, char** argv) {
     main_thread.join();
     */
 
-    CREATE_EVENT("MyEvent", int, const std::string&);
+    auto addon = std::make_shared<BaseAddon>("system");
 
-    SUBSCRIBE_TO_EVENT("MyEvent", [](int i, const std::string& s) {
-        std::cout << "Event received: " << i << ", " << s << std::endl;
-    });
 
-    INVOKE_EVENT("MyEvent", 42, std::string("Hello, World!"));
+    CREATE_EVENT("AddonTest");
+
+    SUBSCRIBE_TO_EVENT("MyEvent", addon->Activate());
+
+    INVOKE_EVENT("MyEvent");
 
 
     return 0;
