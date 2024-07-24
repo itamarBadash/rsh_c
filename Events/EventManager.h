@@ -55,7 +55,7 @@ public:
 
     template<typename... Args>
     void createEventHelper(const std::string& eventName, void (*dummy)(Args...)) {
-        createEvent<Args...>(eventName);
+        createEvent<typename std::decay<Args>::type...>(eventName);
     }
 
     template<typename... Args>
@@ -87,13 +87,13 @@ public:
     }
 
     template<typename... Args>
-    void invoke(const std::string& eventName, Args... args) {
-        getEvent<Args...>(eventName)->invoke(args...);
+    void invoke(const std::string& eventName, Args&&... args) {
+        getEvent<typename std::decay<Args>::type...>(eventName)->invoke(std::forward<Args>(args)...);
     }
 
     template<typename... Args>
     void invokeHelper(const std::string& eventName, Args&&... args) {
-        invoke<typename std::remove_reference<typename std::decay<Args>::type>::type...>(eventName, std::forward<Args>(args)...);
+        invoke(eventName, std::forward<Args>(args)...);
     }
 
     void removeEvent(const std::string& eventName) {
@@ -129,7 +129,7 @@ private:
 
     template<typename Func, typename... Args>
     void subscribeHelperImpl(const std::string& eventName, Func callback, void (Func::*)(Args...) const) {
-        subscribe<Args...>(eventName, callback);
+        subscribe<typename std::decay<Args>::type...>(eventName, callback);
     }
 };
 
