@@ -50,7 +50,6 @@ public:
         clearFunctions[eventName] = [this, eventName]() {
             std::any_cast<std::shared_ptr<Event<Args...>>&>(events[eventName])->clear();
         };
-        std::cout << "Event '" << eventName << "' created with type: " << typeid(Event<Args...>).name() << std::endl;
     }
 
     template<typename... Args>
@@ -63,15 +62,12 @@ public:
         std::lock_guard<std::mutex> lock(mutex);
         auto it = events.find(eventName);
         if (it == events.end()) {
-            std::cerr << "Event '" << eventName << "' does not exist." << std::endl;
             throw std::out_of_range("Event '" + eventName + "' does not exist.");
         }
         try {
             auto event = std::any_cast<std::shared_ptr<Event<Args...>>>(it->second);
-            std::cout << "Event '" << eventName << "' retrieved with type: " << typeid(Event<Args...>).name() << std::endl;
             return event;
         } catch (const std::bad_any_cast& e) {
-            std::cerr << "Failed to cast event '" << eventName << "' to type: " << typeid(Event<Args...>).name() << " - " << e.what() << std::endl;
             throw;
         }
     }
