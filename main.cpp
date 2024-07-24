@@ -8,6 +8,9 @@
 #include "inih/cpp/INIReader.h"
 #include "Src/Modules/BaseAddon.h"
 #include "Events/EventManager.h"
+
+using namespace mavsdk;
+
 class Listener {
 public:
     void onEvent(int value) {
@@ -18,11 +21,6 @@ public:
 void freeFunctionListener(int value) {
     std::cout << "Free function listener received event with value: " << value << std::endl;
 }
-
-
-void main_thread_function(std::shared_ptr<System> system, std::shared_ptr<CommandManager> command_manager,std::shared_ptr<CommunicationManager> communications_manager, std::shared_ptr<TelemetryManager> telemetry_manager);
-
-using namespace mavsdk;
 
 void usage(const std::string& bin_name) {
     std::cerr << "Usage: " << bin_name << " <connection_url>\n"
@@ -108,7 +106,7 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-void main_thread_function(std::shared_ptr<System> system, std::shared_ptr<CommandManager> command_manager,std::shared_ptr<CommunicationManager> communications_manager, std::shared_ptr<TelemetryManager> telemetry_manager){
+void main_thread_function(std::shared_ptr<System> system, std::shared_ptr<CommandManager> command_manager,std::shared_ptr<CommunicationManager> communications_manager, std::shared_ptr<TelemetryManager> telemetry_manager) {
     telemetry_manager->start();
     while(true){
         std::this_thread::sleep_for(std::chrono::seconds(3));
