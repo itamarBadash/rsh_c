@@ -96,7 +96,9 @@ int main(int argc, char** argv) {
 
     CREATE_EVENT("AddonTest");
 
-    SUBSCRIBE_TO_EVENT("MyEvent", addon->Activate());
+    SUBSCRIBE_TO_EVENT("ActivateAddonEvent", [addon]() {
+        addon->Activate();
+    });
 
     INVOKE_EVENT("MyEvent");
 
