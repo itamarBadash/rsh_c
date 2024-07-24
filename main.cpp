@@ -45,6 +45,7 @@ int main(int argc, char** argv) {
         std::cout << "Can't load 'config.ini'\n";
         return 1;
     }
+    /*
 
     Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::GroundStation}};
     ConnectionResult connection_result = mavsdk.add_any_connection(argv[1]);
@@ -90,6 +91,17 @@ int main(int argc, char** argv) {
     std::thread main_thread(main_thread_function, system, command_manager,communication_manager,telemetry_manager);
 
     main_thread.join();
+    */
+    // Create an event
+   CREATE_EVENT("MyEvent", int, std::string);
+
+// Subscribe to an event
+    SUBSCRIBE_TO_EVENT("MyEvent", [](int i, const std::string& s) {
+        std::cout << "Event received: " << i << ", " << s << std::endl;
+    });
+
+// Invoke an event
+    INVOKE_EVENT("MyEvent", 42, "Hello, World!");
 
 
 

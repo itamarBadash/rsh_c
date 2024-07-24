@@ -18,7 +18,6 @@ public:
     using EventCallback = std::function<void(Args...)>;
 
     void subscribe(EventCallback callback) {
-        std::cout << "Subscribing a new callback of type: " << typeid(EventCallback).name() << std::endl;
         callbacks.push_back(callback);
     }
 
@@ -29,9 +28,7 @@ public:
     }
 
     void invoke(Args... args) {
-        std::cout << "Invoking event with " << callbacks.size() << " callbacks." << std::endl;
         for (auto& callback : callbacks) {
-            std::cout << "Invoking a callback..." << std::endl;
             callback(args...);
         }
     }
@@ -57,6 +54,11 @@ public:
     }
 
     template<typename... Args>
+    void createEventHelper(const std::string& eventName, void (*dummy)(Args...)) {
+        createEvent<Args...>(eventName);
+    }
+
+    template<typename... Args>
     std::shared_ptr<Event<Args...>> getEvent(const std::string& eventName) {
         std::lock_guard<std::mutex> lock(mutex);
         try {
@@ -75,6 +77,11 @@ public:
     }
 
     template<typename... Args>
+    void subscribeHelper(const std::string& eventName, void (*dummy)(Args...), std::function<void(Args...)> callback) {
+        subscribe<Args...>(eventName, callback);
+    }
+
+    template<typename... Args>
     void unsubscribe(const std::string& eventName, typename Event<Args...>::EventCallback callback) {
         getEvent<Args...>(eventName)->unsubscribe(callback);
     }
@@ -82,6 +89,11 @@ public:
     template<typename... Args>
     void invoke(const std::string& eventName, Args... args) {
         getEvent<Args...>(eventName)->invoke(args...);
+    }
+
+    template<typename... Args>
+    void invokeHelper(const std::string& eventName, Args... args) {
+        invoke<Args...>(eventName, std::forward<Args>(args)...);
     }
 
     void removeEvent(const std::string& eventName) {
@@ -120,5 +132,14 @@ inline EventManager& GetEventManager() {
     static EventManager instance;
     return instance;
 }
+
+#define CREATE_EVENT(eventName, ...) \
+    GetEventManager().createEventHelper(eventName, static_cast<void (*)(__VA_ARGS__)>(nullptr))
+
+#define SUBSCRIBE_TO_EVENT(eventName, callback) \
+    GetEventManager().subscribeHelper(eventName, nullptr, callback)
+
+#define INVOKE_EVENT(eventName, ...) \
+    GetEventManager().invokeHelper(eventName, ##__VA_ARGS__)
 
 #endif // BASE_EVENTMANAGER_H
