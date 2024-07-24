@@ -76,9 +76,9 @@ public:
         getEvent<Args...>(eventName)->subscribe(callback);
     }
 
-    template<typename... Args>
-    void subscribeHelper(const std::string& eventName, void (*dummy)(Args...), std::function<void(Args...)> callback) {
-        subscribe<Args...>(eventName, callback);
+    template<typename Func>
+    void subscribeHelper(const std::string& eventName, Func callback) {
+        subscribeHelperImpl(eventName, callback, &Func::operator());
     }
 
     template<typename... Args>
@@ -126,6 +126,10 @@ private:
     mutable std::mutex mutex;
     std::map<std::string, std::any> events;
     std::unordered_map<std::string, std::function<void()>> clearFunctions;
+
+    template<typename Func, typename... Args>
+    void subscribeHelperImpl(const std::string& eventName, Func callback, void (Func::*)(Args...) const) {
+        subscribe<Args...>(eventName, callback);
 };
 
 inline EventManager& GetEventManager() {
@@ -137,7 +141,7 @@ inline EventManager& GetEventManager() {
     GetEventManager().createEventHelper(eventName, static_cast<void (*)(__VA_ARGS__)>(nullptr))
 
 #define SUBSCRIBE_TO_EVENT(eventName, callback) \
-    GetEventManager().subscribeHelper(eventName, nullptr, callback)
+    GetEventManager().subscribeHelper(eventName, callback)
 
 #define INVOKE_EVENT(eventName, ...) \
     GetEventManager().invokeHelper(eventName, ##__VA_ARGS__)
