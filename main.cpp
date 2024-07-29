@@ -8,6 +8,7 @@
 #include "inih/cpp/INIReader.h"
 #include "Src/Modules/BaseAddon.h"
 #include "Events/EventManager.h"
+#include "Src/Communications/TCPServer.h"
 
 using namespace mavsdk;
 
@@ -89,7 +90,7 @@ int main(int argc, char** argv) {
     std::thread main_thread(main_thread_function, system, command_manager,communication_manager,telemetry_manager);
 
     main_thread.join();
-    */
+
 
     auto addon = std::make_shared<BaseAddon>("system");
 
@@ -101,6 +102,23 @@ int main(int argc, char** argv) {
     });
 
     INVOKE_EVENT("AddonTest");
+      */
+    // Port number to listen on
+    int port = 8080;
+
+    // Create the server object
+    TCPServer server(port);
+
+    // Start the server
+    if (server.start()) {
+        // Server is running
+        std::cout << "Server is running on port " << port << std::endl;
+    } else {
+        // Failed to start the server
+        std::cerr << "Failed to start the server." << std::endl;
+    }
+
+
 
 
     return 0;

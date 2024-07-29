@@ -32,6 +32,8 @@ add_executable(base main.cpp
         Events/EventManager.h
         Src/Modules/BaseAddon.cpp
         Src/Modules/BaseAddon.h
+        Src/Communications/TCPServer.cpp
+        Src/Communications/TCPServer.h
 )
 
 
