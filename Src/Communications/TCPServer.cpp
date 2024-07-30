@@ -68,6 +68,9 @@ void TCPServer::acceptConnections() {
         std::cout << "Client connected." << std::endl;
 
         handleClient(clientSocket);
+
+        close(clientSocket);
+        std::cout << "Client disconnected." << std::endl;
     }
 }
 
@@ -75,15 +78,26 @@ void TCPServer::handleClient(int clientSocket) {
     const int bufferSize = 1024;
     char buffer[bufferSize];
 
-    int bytesReceived = recv(clientSocket, buffer, bufferSize, 0);
-    if (bytesReceived < 0) {
-        std::cerr << "Error receiving data: " << strerror(errno) << std::endl;
-        return;
+    while (true) {
+        int bytesReceived = recv(clientSocket, buffer, bufferSize - 1, 0);
+        if (bytesReceived < 0) {
+            std::cerr << "Error receiving data: " << strerror(errno) << std::endl;
+            break;
+        } else if (bytesReceived == 0) {
+            std::cout << "Client disconnected." << std::endl;
+            break;
+        }
+
+        buffer[bytesReceived] = '\0';
+        std::cout << "Received: " << buffer << std::endl;
+
+        // Example response to client
+        std::string response = "Message received: ";
+        response += buffer;
+        response += "\n";
+        send(clientSocket, response.c_str(), response.length(), 0);
     }
 
-    buffer[bytesReceived] = '\0';
-    std::cout << "Received: " << buffer << std::endl;
-
-    const char* response = "Message received\n";
-    send(clientSocket, response, strlen(response), 0);
+    close(clientSocket);
 }
+
