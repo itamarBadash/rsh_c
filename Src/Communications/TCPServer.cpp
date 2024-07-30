@@ -10,6 +10,7 @@ TCPServer::TCPServer(int port) : port(port), serverSocket(-1), running(false) {
 
 TCPServer::~TCPServer() {
     stop();
+    cleanupThreads();
 }
 
 void TCPServer::setupServerAddress() {
@@ -42,7 +43,7 @@ bool TCPServer::start() {
     running = true;
     std::cout << "Server started on port " << port << std::endl;
 
-    acceptConnections();
+    std::thread(&TCPServer::acceptConnections, this).detach();
 
     return true;
 }
@@ -66,11 +67,7 @@ void TCPServer::acceptConnections() {
         }
 
         std::cout << "Client connected." << std::endl;
-
-        handleClient(clientSocket);
-
-        close(clientSocket);
-        std::cout << "Client disconnected." << std::endl;
+        clientThreads.emplace_back(&TCPServer::handleClient, this, clientSocket);
     }
 }
 
@@ -78,7 +75,7 @@ void TCPServer::handleClient(int clientSocket) {
     const int bufferSize = 1024;
     char buffer[bufferSize];
 
-    while (true) {
+    while (running) {
         int bytesReceived = recv(clientSocket, buffer, bufferSize - 1, 0);
         if (bytesReceived < 0) {
             std::cerr << "Error receiving data: " << strerror(errno) << std::endl;
@@ -91,7 +88,6 @@ void TCPServer::handleClient(int clientSocket) {
         buffer[bytesReceived] = '\0';
         std::cout << "Received: " << buffer << std::endl;
 
-        // Example response to client
         std::string response = "Message received: ";
         response += buffer;
         response += "\n";
@@ -101,3 +97,11 @@ void TCPServer::handleClient(int clientSocket) {
     close(clientSocket);
 }
 
+void TCPServer::cleanupThreads() {
+    for (auto& thread : clientThreads) {
+        if (thread.joinable()) {
+            thread.join();
+        }
+    }
+    clientThreads.clear();
+}
