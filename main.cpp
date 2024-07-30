@@ -113,13 +113,12 @@ int main(int argc, char** argv) {
     if (server.start()) {
         // Server is running
         std::cout << "Server is running on port " << port << std::endl;
-    } else {
-        // Failed to start the server
-        std::cerr << "Failed to start the server." << std::endl;
+
+        // Keep the main thread alive while the server is running
+        std::cout << "Press Enter to stop the server..." << std::endl;
+        std::cin.get();
+
     }
-
-
-
 
     return 0;
 }
