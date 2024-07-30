@@ -68,9 +68,6 @@ void TCPServer::acceptConnections() {
         std::cout << "Client connected." << std::endl;
 
         handleClient(clientSocket);
-
-        close(clientSocket);
-        std::cout << "Client disconnected." << std::endl;
     }
 }
 
