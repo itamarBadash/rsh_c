@@ -86,7 +86,7 @@ void TCPServer::handleClient(int clientSocket) {
             break;
         }
 
-        buffer[bytesReceived] = '\0'; buffer << std::endl;
+        buffer[bytesReceived] = '\0';
 
         std::string response = "Message received: ";
         response += buffer;
