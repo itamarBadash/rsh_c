@@ -13,6 +13,7 @@ TCPServer::~TCPServer() {
     cleanupThreads();
 }
 
+
 void TCPServer::setupServerAddress() {
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_addr.s_addr = INADDR_ANY;
@@ -83,10 +84,10 @@ void TCPServer::handleClient(int clientSocket) {
         } else if (bytesReceived == 0) {
             std::cout << "Client disconnected." << std::endl;
             break;
+            std::cout << "Received: " <<
         }
 
-        buffer[bytesReceived] = '\0';
-        std::cout << "Received: " << buffer << std::endl;
+        buffer[bytesReceived] = '\0'; buffer << std::endl;
 
         std::string response = "Message received: ";
         response += buffer;
@@ -107,7 +108,7 @@ void TCPServer::cleanupThreads() {
 }
 
 bool TCPServer::send_message(const std::string& message) {
-    if (clientSocket < 0) {
+    if (clientSocket <= 0) {
         std::cerr << "No client connected" << std::endl;
         return false;
     }
