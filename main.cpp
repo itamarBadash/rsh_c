@@ -80,14 +80,18 @@ int main(int argc, char** argv) {
 
 
     auto command_manager = std::make_shared<CommandManager>(system);
-    auto communication_manager = std::make_shared<CommunicationManager>(reader.GetString("Connection","GroundStationSerialPort","UNKNOWN"),reader.GetInteger("Connection","GroundStationBaudRate",0),command_manager);
+    //auto communication_manager = std::make_shared<CommunicationManager>(reader.GetString("Connection","GroundStationSerialPort","UNKNOWN"),reader.GetInteger("Connection","GroundStationBaudRate",0),command_manager);
     auto telemetry_manager = std::make_shared<TelemetryManager>(system,communication_manager);
+    int port = 8080;
+
+    // Create the server object
+    auto server = std::make_shared<TCPServer>(port);
 
 
     EventManager& eventManager = GetEventManager();
     auto addon = std::make_shared<BaseAddon>("system");
 
-    std::thread main_thread(main_thread_function, system, command_manager,communication_manager,telemetry_manager);
+    std::thread main_thread(main_thread_function, system, command_manager,server,telemetry_manager);
 
     main_thread.join();
 
@@ -106,21 +110,6 @@ int main(int argc, char** argv) {
     INVOKE_EVENT("AddonTest");
     */
     // Port number to listen on
-    int port = 8080;
-
-    // Create the server object
-    TCPServer server(port);
-
-    // Start the server
-    if (server.start()) {
-        // Server is running
-        std::cout << "Server is running on port " << port << std::endl;
-
-        // Keep the main thread alive while the server is running
-        std::cout << "Press Enter to stop the server..." << std::endl;
-        std::cin.get();
-
-    }
 
     return 0;
 }
