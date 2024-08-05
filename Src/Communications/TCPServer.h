@@ -15,7 +15,7 @@ public:
     bool start();
     void stop();
     void handleClient(int clientSocket);
-    bool sendMessage(const std::string& message);
+    bool send_message(const std::string& message);
 
 private:
     int serverSocket;
