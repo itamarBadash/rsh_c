@@ -19,6 +19,8 @@ public:
 
 private:
     int serverSocket;
+    int clientSocket;
+
     int port;
     sockaddr_in serverAddr;
     std::atomic<bool> running;
