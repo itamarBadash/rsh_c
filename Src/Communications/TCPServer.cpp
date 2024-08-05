@@ -106,6 +106,25 @@ void TCPServer::cleanupThreads() {
     clientThreads.clear();
 }
 
-void TCPServer::send_message(const std::string &message, int clientSocket) {
-    send(clientSocket, message.c_str(), message.length(), 0);
+bool TCPServer::sendMessage(const std::string& message) {
+    if (clientSocket < 0) {
+        std::cerr << "No client connected" << std::endl;
+        return false;
+    }
+
+    size_t totalBytesSent = 0;
+    size_t messageLength = message.size();
+    const char* messagePtr = message.c_str();
+
+    while (totalBytesSent < messageLength) {
+        ssize_t bytesSent = send(clientSocket, messagePtr + totalBytesSent, messageLength - totalBytesSent, 0);
+        if (bytesSent < 0) {
+            std::cerr << "Failed to send message. Error: " << strerror(errno) << std::endl;
+            return false;
+        }
+        totalBytesSent += bytesSent;
+    }
+
+    std::cout << "Message sent: " << message << std::endl;
+    return true;
 }
