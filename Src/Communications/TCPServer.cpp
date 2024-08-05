@@ -84,7 +84,7 @@ void TCPServer::handleClient(int clientSocket) {
         } else if (bytesReceived == 0) {
             std::cout << "Client disconnected." << std::endl;
             break;
-            std::cout << "Received: " <<
+            std::cout << "Received: " << std::endl;
         }
 
         buffer[bytesReceived] = '\0'; buffer << std::endl;
