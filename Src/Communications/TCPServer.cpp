@@ -106,8 +106,6 @@ void TCPServer::cleanupThreads() {
     clientThreads.clear();
 }
 
-void TCPServer::send_message(std::string& message, int clientSocket) {
-    message += buffer;
-    message += "\n";
+void TCPServer::send_message(const std::string &message, int clientSocket) {
     send(clientSocket, message.c_str(), message.length(), 0);
 }
