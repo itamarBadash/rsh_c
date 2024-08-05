@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
         std::cout << "Can't load 'config.ini'\n";
         return 1;
     }
-    /*
+
 
     Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::GroundStation}};
     ConnectionResult connection_result = mavsdk.add_any_connection(argv[1]);
@@ -91,6 +91,8 @@ int main(int argc, char** argv) {
 
     main_thread.join();
 
+    /*
+
 
     auto addon = std::make_shared<BaseAddon>("system");
 
@@ -102,7 +104,7 @@ int main(int argc, char** argv) {
     });
 
     INVOKE_EVENT("AddonTest");
-      */
+    */
     // Port number to listen on
     int port = 8080;
 
@@ -123,12 +125,12 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-void main_thread_function(std::shared_ptr<System> system, std::shared_ptr<CommandManager> command_manager,std::shared_ptr<CommunicationManager> communications_manager, std::shared_ptr<TelemetryManager> telemetry_manager) {
+void main_thread_function(std::shared_ptr<System> system, std::shared_ptr<CommandManager> command_manager,std::shared_ptr<TCPServer> tcpServer, std::shared_ptr<TelemetryManager> telemetry_manager) {
     telemetry_manager->start();
     while(true){
         std::this_thread::sleep_for(std::chrono::seconds(3));
         //telemetry_manager->sendTelemetryData();
-        communications_manager->sendMessage(telemetry_manager->getTelemetryData().print());
+        tcpServer->send_message(telemetry_manager->getTelemetryData().print(),0);
         //logic for error handling and exeptions or retry connections with modules.
     }
 }
