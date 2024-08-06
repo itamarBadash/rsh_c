@@ -83,6 +83,7 @@ void TCPServer::handleClient(int clientSocket) {
             break;
         } else if (bytesReceived == 0) {
             std::cout << "Client disconnected." << std::endl;
+            clientSocket = 0;
             break;
         }
 
@@ -116,7 +117,7 @@ bool TCPServer::send_message(const std::string& message) {
     size_t messageLength = message.size();
     const char* messagePtr = message.c_str();
 
-    while (totalBytesSent < messageLength && clientSocket > 0 ) {
+    while (totalBytesSent < messageLength) {
         ssize_t bytesSent = send(clientSocket, messagePtr + totalBytesSent, messageLength - totalBytesSent, 0);
         if (bytesSent < 0) {
             std::cerr << "Failed to send message. Error: " << strerror(errno) << std::endl;
