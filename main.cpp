@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
 
     auto command_manager = std::make_shared<CommandManager>(system);
     auto communication_manager = std::make_shared<CommunicationManager>(reader.GetString("Connection","GroundStationSerialPort","UNKNOWN"),reader.GetInteger("Connection","GroundStationBaudRate",0),command_manager);
-    auto telemetry_manager = std::make_shared<TelemetryManager>(system,communication_manager);
+    auto telemetry_manager = std::make_shared<TelemetryManager>(system);
     int port = 8080;
 
     // Create the server object
