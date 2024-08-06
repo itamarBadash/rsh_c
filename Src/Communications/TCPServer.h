@@ -6,6 +6,7 @@
 #include <thread>
 #include <atomic>
 #include <vector>
+#include <mutex>
 
 class TCPServer {
 public:
@@ -19,12 +20,12 @@ public:
 
 private:
     int serverSocket;
-    int clientSocket;
-
+    std::vector<int> clientSockets;
     int port;
     sockaddr_in serverAddr;
     std::atomic<bool> running;
     std::vector<std::thread> clientThreads;
+    std::mutex clientSocketsMutex;
 
     void setupServerAddress();
     void acceptConnections();

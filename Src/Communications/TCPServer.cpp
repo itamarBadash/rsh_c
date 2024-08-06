@@ -13,7 +13,6 @@ TCPServer::~TCPServer() {
     cleanupThreads();
 }
 
-
 void TCPServer::setupServerAddress() {
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_addr.s_addr = INADDR_ANY;
@@ -59,7 +58,7 @@ void TCPServer::stop() {
 
 void TCPServer::acceptConnections() {
     while (running) {
-        clientSocket = accept(serverSocket, nullptr, nullptr);
+        int clientSocket = accept(serverSocket, nullptr, nullptr);
         if (clientSocket < 0) {
             if (running) {
                 std::cerr << "Error accepting connection: " << strerror(errno) << std::endl;
@@ -68,6 +67,10 @@ void TCPServer::acceptConnections() {
         }
 
         std::cout << "Client connected." << std::endl;
+        {
+            std::lock_guard<std::mutex> lock(clientSocketsMutex);
+            clientSockets.push_back(clientSocket);
+        }
         clientThreads.emplace_back(&TCPServer::handleClient, this, clientSocket);
     }
 }
@@ -95,6 +98,10 @@ void TCPServer::handleClient(int clientSocket) {
     }
 
     close(clientSocket);
+    {
+        std::lock_guard<std::mutex> lock(clientSocketsMutex);
+        clientSockets.erase(std::remove(clientSockets.begin(), clientSockets.end(), clientSocket), clientSockets.end());
+    }
 }
 
 void TCPServer::cleanupThreads() {
@@ -107,8 +114,9 @@ void TCPServer::cleanupThreads() {
 }
 
 bool TCPServer::send_message(const std::string& message) {
-    if (clientSocket <= 0) {
-        std::cerr << "No client connected" << std::endl;
+    std::lock_guard<std::mutex> lock(clientSocketsMutex);
+    if (clientSockets.empty()) {
+        std::cerr << "No clients connected" << std::endl;
         return false;
     }
 
@@ -116,15 +124,18 @@ bool TCPServer::send_message(const std::string& message) {
     size_t messageLength = message.size();
     const char* messagePtr = message.c_str();
 
-    while (totalBytesSent < messageLength && clientSocket > 0) {
-        ssize_t bytesSent = send(clientSocket, messagePtr + totalBytesSent, messageLength - totalBytesSent, 0);
-        if (bytesSent < 0) {
-            std::cerr << "Failed to send message. Error: " << strerror(errno) << std::endl;
-            return false;
+    for (int clientSocket : clientSockets) {
+        totalBytesSent = 0;
+        while (totalBytesSent < messageLength) {
+            ssize_t bytesSent = send(clientSocket, messagePtr + totalBytesSent, messageLength - totalBytesSent, 0);
+            if (bytesSent < 0) {
+                std::cerr << "Failed to send message to client. Error: " << strerror(errno) << std::endl;
+                break;
+            }
+            totalBytesSent += bytesSent;
         }
-        totalBytesSent += bytesSent;
     }
 
-    std::cout << "Message sent: " << message << std::endl;
+    std::cout << "Message sent to all clients: " << message << std::endl;
     return true;
 }
