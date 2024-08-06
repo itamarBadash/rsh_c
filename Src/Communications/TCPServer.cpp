@@ -116,7 +116,7 @@ bool TCPServer::send_message(const std::string& message) {
     size_t messageLength = message.size();
     const char* messagePtr = message.c_str();
 
-    while (totalBytesSent < messageLength) {
+    while (totalBytesSent < messageLength && clientSocket > 0 ) {
         ssize_t bytesSent = send(clientSocket, messagePtr + totalBytesSent, messageLength - totalBytesSent, 0);
         if (bytesSent < 0) {
             std::cerr << "Failed to send message. Error: " << strerror(errno) << std::endl;
