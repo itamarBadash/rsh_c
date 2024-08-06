@@ -4,7 +4,7 @@
 #include <iostream>
 
 
-TelemetryManager::TelemetryManager(const std::shared_ptr<System>& system, std::shared_ptr<CommunicationManager> comm)
+TelemetryManager::TelemetryManager(const std::shared_ptr<System>& system)
         : _system(system), _running(false)  {
 
     system->subscribe_is_connected([this](bool connected) {
