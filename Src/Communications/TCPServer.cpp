@@ -13,7 +13,6 @@ TCPServer::~TCPServer() {
     cleanupThreads();
 }
 
-
 void TCPServer::setupServerAddress() {
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_addr.s_addr = INADDR_ANY;
@@ -45,6 +44,7 @@ bool TCPServer::start() {
     std::cout << "Server started on port " << port << std::endl;
 
     std::thread(&TCPServer::acceptConnections, this).detach();
+    clientThreads.emplace_back(&TCPServer::processRequests, this);
 
     return true;
 }
@@ -53,13 +53,14 @@ void TCPServer::stop() {
     if (running) {
         running = false;
         close(serverSocket);
+        queueCondition.notify_all();
         std::cout << "Server stopped." << std::endl;
     }
 }
 
 void TCPServer::acceptConnections() {
     while (running) {
-        clientSocket = accept(serverSocket, nullptr, nullptr);
+        int clientSocket = accept(serverSocket, nullptr, nullptr);
         if (clientSocket < 0) {
             if (running) {
                 std::cerr << "Error accepting connection: " << strerror(errno) << std::endl;
@@ -88,13 +89,38 @@ void TCPServer::handleClient(int clientSocket) {
 
         buffer[bytesReceived] = '\0';
 
-        std::string response = "Message received: ";
-        response += buffer;
-        response += "\n";
-        send(clientSocket, response.c_str(), response.length(), 0);
+        Request req = {clientSocket, std::string(buffer)};
+
+        {
+            std::lock_guard<std::mutex> lock(queueMutex);
+            requestQueue.push(req);
+        }
+        queueCondition.notify_one();
     }
 
     close(clientSocket);
+}
+
+void TCPServer::processRequests() {
+    while (running) {
+        Request req;
+        {
+            std::unique_lock<std::mutex> lock(queueMutex);
+            queueCondition.wait(lock, [this] { return !requestQueue.empty() || !running; });
+
+            if (!running && requestQueue.empty()) {
+                break;
+            }
+
+            req = requestQueue.front();
+            requestQueue.pop();
+        }
+
+        std::string response = "Message received: ";
+        response += req.command;
+        response += "\n";
+        send(req.clientSocket, response.c_str(), response.length(), 0);
+    }
 }
 
 void TCPServer::cleanupThreads() {
