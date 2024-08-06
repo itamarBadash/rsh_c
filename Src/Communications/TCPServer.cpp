@@ -133,7 +133,7 @@ void TCPServer::cleanupThreads() {
 }
 
 bool TCPServer::send_message(const std::string& message) {
-    if (clientSocket <= 0) {
+    if (clientSocket < 0) {
         std::cerr << "No client connected" << std::endl;
         return false;
     }
