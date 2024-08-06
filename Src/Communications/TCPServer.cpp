@@ -83,7 +83,6 @@ void TCPServer::handleClient(int clientSocket) {
             break;
         } else if (bytesReceived == 0) {
             std::cout << "Client disconnected." << std::endl;
-            clientSocket = 0;
             break;
         }
 
