@@ -53,7 +53,7 @@ struct TelemetryData {
 
 class TelemetryManager {
 public:
-    TelemetryManager(const std::shared_ptr<System>& system, std::shared_ptr<CommunicationManager> comm);
+    TelemetryManager(const std::shared_ptr<System>& system);
     ~TelemetryManager();
 
     void start();
@@ -84,7 +84,6 @@ private:
     TelemetryData _latest_telemetry_data;
 
     bool viable;
-    std::shared_ptr<CommunicationManager> communication_manager;
 };
 
 #endif // TELEMETRY_MANAGER_H
