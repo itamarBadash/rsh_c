@@ -91,6 +91,7 @@ int main(int argc, char** argv) {
 
     // Create the server object
     auto server = std::make_shared<TCPServer>(port);
+    server->setCommandManager(command_manager);
     server->start();
 
 

@@ -7,6 +7,7 @@
 
 TCPServer::TCPServer(int port) : port(port), serverSocket(-1), running(false) {
     std::memset(&serverAddr, 0, sizeof(serverAddr));
+    commandManager = nullptr;
 }
 
 TCPServer::~TCPServer() {
@@ -117,12 +118,45 @@ void TCPServer::processCommands() {
         queueCondition.wait(lock, [this] { return !commandQueue.empty() || !running; });
 
         while (!commandQueue.empty()) {
-            std::string command = commandQueue.front();
+            std::string message = commandQueue.front();
             commandQueue.pop();
             lock.unlock();
 
             // Process command here
-            std::cout << "Processing command: " << command << std::endl;
+            std::cout << "Processing command: " << message << std::endl;
+
+            if (commandManager != nullptr && commandManager->IsViable()) {
+                size_t pos = message.find(':');
+                if (pos != std::string::npos) {
+                    std::string command = message.substr(0, pos);
+                    std::string params_str = message.substr(pos + 1);
+                    std::vector<float> params;
+                    size_t start = 0;
+                    size_t end;
+                    while ((end = params_str.find(',', start)) != std::string::npos) {
+                        params.push_back(std::stof(params_str.substr(start, end - start)));
+                        start = end + 1;
+                    }
+                    if (start < params_str.length()) {
+                        params.push_back(std::stof(params_str.substr(start)));
+                    }
+
+                    if (commandManager->is_command_valid(command)) {
+                        auto result = commandManager->handle_command(command, params);
+                        if (result == CommandManager::Result::Success) {
+                            std::cout << "Command " << command << " executed successfully." << std::endl;
+                        } else {
+                            std::cerr << "Command " << command << " failed." << std::endl;
+                        }
+                    } else {
+                        std::cerr << "Invalid command: " << command << std::endl;
+                    }
+                } else {
+                    std::cerr << "Invalid message format: " << message << std::endl;
+                }
+            } else {
+                std::cerr << "Command manager not set or not viable." << std::endl;
+            }
 
             lock.lock();
         }
@@ -163,4 +197,8 @@ bool TCPServer::send_message(const std::string& message) {
 
     std::cout << "Message sent to all clients: " << message << std::endl;
     return true;
+}
+
+void TCPServer::setCommandManager(std::shared_ptr<CommandManager> command) {
+    commandManager = command;
 }

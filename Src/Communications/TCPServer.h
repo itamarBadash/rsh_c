@@ -8,7 +8,9 @@
 #include <vector>
 #include <mutex>
 #include <queue>
+#include <memory>
 #include <condition_variable>
+#include "Src/Modules/CommandManager.h"
 
 class TCPServer {
 public:
@@ -19,6 +21,7 @@ public:
     void stop();
     void handleClient(int clientSocket);
     bool send_message(const std::string& message);
+    void setCommandManager(std::shared_ptr<CommandManager> command);
 
 private:
     int serverSocket;
@@ -33,6 +36,7 @@ private:
     std::mutex queueMutex;
     std::condition_variable queueCondition;
     std::thread commandProcessorThread;
+    std::shared_ptr<CommandManager> commandManager;
 
     void setupServerAddress();
     void acceptConnections();

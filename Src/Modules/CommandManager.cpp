@@ -3,25 +3,24 @@
 #include <chrono>
 #include <thread>
 
-
 CommandManager::CommandManager(const std::shared_ptr<mavsdk::System>& system) : system(system)
 {
     action = std::make_shared<mavsdk::Action>(system);
     manual_control = std::make_shared<mavsdk::ManualControl>(system);
     mavlink_passthrough = std::make_shared<mavsdk::MavlinkPassthrough>(system);
-    viable = true;
+    viable = system->is_connected();
 
     system->subscribe_is_connected([this](bool connected) {
         if(!connected){
             viable = false;
-        } else
+        } else {
             viable = true;
+        }
     });
     initialize_command_handlers();
-
 }
 
-bool CommandManager::IsViable() {return viable;}
+bool CommandManager::IsViable() { return viable; }
 
 void CommandManager::initialize_command_handlers() {
     command_map = {
@@ -44,6 +43,10 @@ void CommandManager::initialize_command_handlers() {
             {"arm", [this](const std::vector<float>&) { return arm(); }},
             {"disarm", [this](const std::vector<float>&) { return disarm(); }},
     };
+}
+
+bool CommandManager::is_command_valid(const std::string& command) const {
+    return command_map.find(command) != command_map.end();
 }
 
 CommandManager::Result CommandManager::takeoff() {
@@ -114,7 +117,7 @@ CommandManager::Result CommandManager::send_mavlink_command(uint8_t base_mode, u
                 mavlink_address.component_id,
                 channel,
                 &message,
-                 system->get_system_id(),
+                system->get_system_id(),
                 base_mode,
                 custom_mode
         );

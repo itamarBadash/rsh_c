@@ -39,6 +39,7 @@ public:
     // Command handler
     Result handle_command(const std::string& command, const std::vector<float>& parameters);
     bool IsViable();
+    bool is_command_valid(const std::string& command) const;
 
 private:
     std::shared_ptr<mavsdk::Action> action;
@@ -58,8 +59,6 @@ private:
     // Initialize command handlers
     void initialize_command_handlers();
     CommandManager::Result execute_action(std::function<mavsdk::Action::Result()> action_func, const std::string& action_name);
-
-
 };
 
 #endif // COMMANDMANAGER_H
