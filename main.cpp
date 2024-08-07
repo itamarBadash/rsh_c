@@ -36,9 +36,7 @@ void main_thread_function(std::shared_ptr<System> system, std::shared_ptr<Comman
     telemetry_manager->start();
     while(true){
         std::this_thread::sleep_for(std::chrono::seconds(3));
-        //telemetry_manager->sendTelemetryData();
         tcpServer->send_message(telemetry_manager->getTelemetryData().print());
-        //logic for error handling and exeptions or retry connections with modules.
     }
 }
 int main(int argc, char** argv) {
@@ -102,22 +100,6 @@ int main(int argc, char** argv) {
     std::thread main_thread(main_thread_function, system, command_manager,server,telemetry_manager);
 
     main_thread.join();
-
-    /*
-
-
-    auto addon = std::make_shared<BaseAddon>("system");
-
-
-    CREATE_EVENT("AddonTest");
-
-    SUBSCRIBE_TO_EVENT("AddonTest", [addon]() {
-        addon->Activate();
-    });
-
-    INVOKE_EVENT("AddonTest");
-    */
-    // Port number to listen on
 
     return 0;
 }
