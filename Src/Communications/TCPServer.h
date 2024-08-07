@@ -10,7 +10,7 @@
 #include <queue>
 #include <memory>
 #include <condition_variable>
-#include "../Src/Modules/CommandManager.h"
+#include "../Modules/CommandManager.h"
 
 class TCPServer {
 public:
