@@ -45,6 +45,7 @@ bool TCPServer::start() {
     std::cout << "Server started on port " << port << std::endl;
 
     std::thread(&TCPServer::acceptConnections, this).detach();
+    commandProcessorThread = std::thread(&TCPServer::processCommands, this);
 
     return true;
 }
@@ -54,6 +55,10 @@ void TCPServer::stop() {
         running = false;
         close(serverSocket);
         std::cout << "Server stopped." << std::endl;
+        queueCondition.notify_all();
+        if (commandProcessorThread.joinable()) {
+            commandProcessorThread.join();
+        }
     }
 }
 
@@ -92,16 +97,35 @@ void TCPServer::handleClient(int clientSocket) {
 
         buffer[bytesReceived] = '\0';
 
-        std::string response = "Message received: ";
-        response += buffer;
-        response += "\n";
-        send(clientSocket, response.c_str(), response.length(), 0);
+        {
+            std::lock_guard<std::mutex> lock(queueMutex);
+            commandQueue.push(buffer);
+        }
+        queueCondition.notify_one();
     }
 
     close(clientSocket);
     {
         std::lock_guard<std::mutex> lock(clientSocketsMutex);
         clientSockets.erase(std::remove(clientSockets.begin(), clientSockets.end(), clientSocket), clientSockets.end());
+    }
+}
+
+void TCPServer::processCommands() {
+    while (running) {
+        std::unique_lock<std::mutex> lock(queueMutex);
+        queueCondition.wait(lock, [this] { return !commandQueue.empty() || !running; });
+
+        while (!commandQueue.empty()) {
+            std::string command = commandQueue.front();
+            commandQueue.pop();
+            lock.unlock();
+
+            // Process command here
+            std::cout << "Processing command: " << command << std::endl;
+
+            lock.lock();
+        }
     }
 }
 

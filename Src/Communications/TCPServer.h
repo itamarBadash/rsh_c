@@ -7,6 +7,8 @@
 #include <atomic>
 #include <vector>
 #include <mutex>
+#include <queue>
+#include <condition_variable>
 
 class TCPServer {
 public:
@@ -27,9 +29,15 @@ private:
     std::vector<std::thread> clientThreads;
     std::mutex clientSocketsMutex;
 
+    std::queue<std::string> commandQueue;
+    std::mutex queueMutex;
+    std::condition_variable queueCondition;
+    std::thread commandProcessorThread;
+
     void setupServerAddress();
     void acceptConnections();
     void cleanupThreads();
+    void processCommands();
 };
 
 #endif // TCPSERVER_H
