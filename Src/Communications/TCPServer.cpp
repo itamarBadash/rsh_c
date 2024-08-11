@@ -145,7 +145,7 @@ void TCPServer::processCommands() {
                         params.push_back(std::stof(params_str.substr(start)));
                     }
 
-                    if(command == "info:"){
+                    if(command == "info"){
                         INVOKE_EVENT("InfoRequest");
                         std::cout <<  " check." << std::endl;
 
