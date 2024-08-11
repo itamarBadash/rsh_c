@@ -40,6 +40,7 @@ void main_thread_function(std::shared_ptr<System> system,
 
     CREATE_EVENT("InfoRequest");
 
+    // Properly pass the lambda as the second argument
     SUBSCRIBE_TO_EVENT("InfoRequest", [telemetry_manager, tcpServer]() {
         tcpServer->send_message(telemetry_manager->getTelemetryData().print());
     });
