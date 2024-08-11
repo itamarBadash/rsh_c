@@ -147,8 +147,9 @@ void TCPServer::processCommands() {
 
                     if(command == "info:"){
                         INVOKE_EVENT("InfoRequest");
-                    }
+                        std::cout <<  " check." << std::endl;
 
+                    }
                     else if (commandManager->is_command_valid(command)) {
                         auto result = commandManager->handle_command(command, params);
                         if (result == CommandManager::Result::Success) {
