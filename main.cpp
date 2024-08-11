@@ -32,11 +32,20 @@ void usage(const std::string& bin_name) {
               << "For example, to connect to the simulator use URL: udp://:14540\n";
 }
 
-void main_thread_function(std::shared_ptr<System> system, std::shared_ptr<CommandManager> command_manager,std::shared_ptr<TCPServer> tcpServer, std::shared_ptr<TelemetryManager> telemetry_manager) {
+void main_thread_function(std::shared_ptr<System> system,
+                          std::shared_ptr<CommandManager> command_manager,
+                          std::shared_ptr<TCPServer> tcpServer,
+                          std::shared_ptr<TelemetryManager> telemetry_manager) {
     telemetry_manager->start();
-    while(true){
-        std::this_thread::sleep_for(std::chrono::seconds(3));
+
+    CREATE_EVENT("InfoRequest");
+
+    SUBSCRIBE_TO_EVENT("InfoRequest", [telemetry_manager, tcpServer]() {
         tcpServer->send_message(telemetry_manager->getTelemetryData().print());
+    });
+
+    while (true) {
+        std::this_thread::sleep_for(std::chrono::seconds(3));
     }
 }
 int main(int argc, char** argv) {

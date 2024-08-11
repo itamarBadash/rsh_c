@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <algorithm>
+#include "Events/EventManager.h"
+
 
 TCPServer::TCPServer(int port) : port(port), serverSocket(-1), running(false) {
     std::memset(&serverAddr, 0, sizeof(serverAddr));
@@ -125,6 +127,8 @@ void TCPServer::processCommands() {
             // Process command here
             std::cout << "Processing command: " << message << std::endl;
 
+
+
             if (commandManager != nullptr && commandManager->IsViable()) {
                 size_t pos = message.find(':');
                 if (pos != std::string::npos) {
@@ -141,12 +145,16 @@ void TCPServer::processCommands() {
                         params.push_back(std::stof(params_str.substr(start)));
                     }
 
+                    if(command == "info:"){
+                        INVOKE_EVENT("InfoRequest");
+                    }
+
                     if (commandManager->is_command_valid(command)) {
                         auto result = commandManager->handle_command(command, params);
                         if (result == CommandManager::Result::Success) {
                             std::cout << "Command " << command << " executed successfully." << std::endl;
                         } else {
-                            std::cerr << "Command " << command << " failed." << std::endl;
+                            std::cerr << "Command " << command << \" failed." << std::endl;
                         }
                     } else {
                         std::cerr << "Invalid command: " << command << std::endl;
