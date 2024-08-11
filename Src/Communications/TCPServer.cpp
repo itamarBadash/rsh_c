@@ -154,7 +154,7 @@ void TCPServer::processCommands() {
                         if (result == CommandManager::Result::Success) {
                             std::cout << "Command " << command << " executed successfully." << std::endl;
                         } else {
-                            std::cerr << "Command " << command << \" failed." << std::endl;
+                            std::cerr << "Command " << command << " failed." << std::endl;
                         }
                     } else {
                         std::cerr << "Invalid command: " << command << std::endl;
