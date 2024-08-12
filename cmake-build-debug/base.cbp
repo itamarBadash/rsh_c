@@ -5,106 +5,151 @@
 		<Option title="base"/>
 		<Option makefile_is_custom="1"/>
 		<Option compiler="gcc"/>
-		<Option virtualFolders="CMake Files\;"/>
+		<Option virtualFolders="CMake Files\;CMake Files\install\;CMake Files\install\lib\;CMake Files\install\lib\cmake\;CMake Files\install\lib\cmake\MAVSDK\;"/>
 		<Build>
 			<Target title="all">
-				<Option working_dir="C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug"/>
+				<Option working_dir="C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="C:/PROGRA~1/JETBRA~1/CLION2~1.1/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
-					<CompileFile command="C:/PROGRA~1/JETBRA~1/CLION2~1.1/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="C:/PROGRA~1/JETBRA~1/CLION2~1.1/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="C:/PROGRA~1/JETBRA~1/CLION2~1.1/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="C:/PROGRA~1/JETBRA~1/CLION2~1.5/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="C:/PROGRA~1/JETBRA~1/CLION2~1.5/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~1/JETBRA~1/CLION2~1.5/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~1/JETBRA~1/CLION2~1.5/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="base">
-				<Option output="C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug/base.exe" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug"/>
+				<Option output="C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug/base.exe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="C:/Users/Gadi/CLionProjects/rsh_c/MAVSDK/install/include"/>
-					<Add directory="C:/Users/Gadi/CLionProjects/rsh_c/MAVSDK/install/include/mavsdk"/>
-					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++"/>
-					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/x86_64-w64-mingw32"/>
-					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/backward"/>
-					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/include"/>
-					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/../../../../include"/>
-					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/include-fixed"/>
-					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/../../../../x86_64-w64-mingw32/include"/>
-					<Add directory="/mingw/include"/>
+					<Add directory="C:/Users/itaba/Desktop/Hoopoe/rsh_c/install/inih"/>
+					<Add directory="C:/Users/itaba/Desktop/Hoopoe/rsh_c/install/include"/>
+					<Add directory="C:/Users/itaba/Desktop/Hoopoe/rsh_c/install/include/mavsdk"/>
+					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.5/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++"/>
+					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.5/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/x86_64-w64-mingw32"/>
+					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.5/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/backward"/>
+					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.5/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/include"/>
+					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.5/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/../../../../include"/>
+					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.5/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/include-fixed"/>
+					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.5/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/../../../../x86_64-w64-mingw32/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="C:/PROGRA~1/JETBRA~1/CLION2~1.1/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 base"/>
-					<CompileFile command="C:/PROGRA~1/JETBRA~1/CLION2~1.1/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="C:/PROGRA~1/JETBRA~1/CLION2~1.1/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="C:/PROGRA~1/JETBRA~1/CLION2~1.1/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="C:/PROGRA~1/JETBRA~1/CLION2~1.5/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 base"/>
+					<CompileFile command="C:/PROGRA~1/JETBRA~1/CLION2~1.5/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~1/JETBRA~1/CLION2~1.5/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~1/JETBRA~1/CLION2~1.5/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="base/fast">
-				<Option output="C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug/base.exe" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug"/>
+				<Option output="C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug/base.exe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="C:/Users/Gadi/CLionProjects/rsh_c/MAVSDK/install/include"/>
-					<Add directory="C:/Users/Gadi/CLionProjects/rsh_c/MAVSDK/install/include/mavsdk"/>
-					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++"/>
-					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/x86_64-w64-mingw32"/>
-					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/backward"/>
-					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/include"/>
-					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/../../../../include"/>
-					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/include-fixed"/>
-					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.1/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/../../../../x86_64-w64-mingw32/include"/>
-					<Add directory="/mingw/include"/>
+					<Add directory="C:/Users/itaba/Desktop/Hoopoe/rsh_c/install/inih"/>
+					<Add directory="C:/Users/itaba/Desktop/Hoopoe/rsh_c/install/include"/>
+					<Add directory="C:/Users/itaba/Desktop/Hoopoe/rsh_c/install/include/mavsdk"/>
+					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.5/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++"/>
+					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.5/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/x86_64-w64-mingw32"/>
+					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.5/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/backward"/>
+					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.5/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/include"/>
+					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.5/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/../../../../include"/>
+					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.5/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/include-fixed"/>
+					<Add directory="C:/Program Files/JetBrains/CLion 2024.1.5/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/13.1.0/../../../../x86_64-w64-mingw32/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="C:/PROGRA~1/JETBRA~1/CLION2~1.1/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 base/fast"/>
-					<CompileFile command="C:/PROGRA~1/JETBRA~1/CLION2~1.1/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="C:/PROGRA~1/JETBRA~1/CLION2~1.1/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="C:/PROGRA~1/JETBRA~1/CLION2~1.1/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="C:/PROGRA~1/JETBRA~1/CLION2~1.5/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 base/fast"/>
+					<CompileFile command="C:/PROGRA~1/JETBRA~1/CLION2~1.5/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~1/JETBRA~1/CLION2~1.5/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~1/JETBRA~1/CLION2~1.5/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="edit_cache">
-				<Option working_dir="C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug"/>
+				<Option working_dir="C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="C:/PROGRA~1/JETBRA~1/CLION2~1.1/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
-					<CompileFile command="C:/PROGRA~1/JETBRA~1/CLION2~1.1/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="C:/PROGRA~1/JETBRA~1/CLION2~1.1/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="C:/PROGRA~1/JETBRA~1/CLION2~1.1/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="C:/PROGRA~1/JETBRA~1/CLION2~1.5/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="C:/PROGRA~1/JETBRA~1/CLION2~1.5/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~1/JETBRA~1/CLION2~1.5/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~1/JETBRA~1/CLION2~1.5/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="rebuild_cache">
-				<Option working_dir="C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug"/>
+				<Option working_dir="C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="C:/PROGRA~1/JETBRA~1/CLION2~1.1/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
-					<CompileFile command="C:/PROGRA~1/JETBRA~1/CLION2~1.1/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="C:/PROGRA~1/JETBRA~1/CLION2~1.1/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="C:/PROGRA~1/JETBRA~1/CLION2~1.1/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="C:/PROGRA~1/JETBRA~1/CLION2~1.5/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="C:/PROGRA~1/JETBRA~1/CLION2~1.5/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~1/JETBRA~1/CLION2~1.5/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~1/JETBRA~1/CLION2~1.5/bin/mingw/bin/mingw32-make.exe -f &quot;C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="C:/Users/Gadi/CLionProjects/rsh_c/CommandManager.cpp">
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/CommunicationManager.cpp">
 			<Option target="base"/>
 		</Unit>
-		<Unit filename="C:/Users/Gadi/CLionProjects/rsh_c/CommandManager.h">
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/CommunicationManager.h">
 			<Option target="base"/>
 		</Unit>
-		<Unit filename="C:/Users/Gadi/CLionProjects/rsh_c/TelemetryManager.cpp">
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Events/EventManager.h">
 			<Option target="base"/>
 		</Unit>
-		<Unit filename="C:/Users/Gadi/CLionProjects/rsh_c/TelemetryManager.h">
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Src/Communications/TCPServer.cpp">
 			<Option target="base"/>
 		</Unit>
-		<Unit filename="C:/Users/Gadi/CLionProjects/rsh_c/main.cpp">
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Src/Communications/TCPServer.h">
 			<Option target="base"/>
 		</Unit>
-		<Unit filename="C:/Users/Gadi/CLionProjects/rsh_c/CMakeLists.txt">
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Src/Modules/BaseAddon.cpp">
+			<Option target="base"/>
+		</Unit>
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Src/Modules/BaseAddon.h">
+			<Option target="base"/>
+		</Unit>
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Src/Modules/CommandManager.cpp">
+			<Option target="base"/>
+		</Unit>
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Src/Modules/CommandManager.h">
+			<Option target="base"/>
+		</Unit>
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Src/Modules/TelemetryManager.cpp">
+			<Option target="base"/>
+		</Unit>
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Src/Modules/TelemetryManager.h">
+			<Option target="base"/>
+		</Unit>
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/inih/cpp/INIReader.cpp">
+			<Option target="base"/>
+		</Unit>
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/inih/cpp/INIReader.h">
+			<Option target="base"/>
+		</Unit>
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/inih/ini.c">
+			<Option target="base"/>
+		</Unit>
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/inih/ini.h">
+			<Option target="base"/>
+		</Unit>
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/main.cpp">
+			<Option target="base"/>
+		</Unit>
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/install/lib/cmake/MAVSDK/MAVSDKConfig.cmake">
+			<Option virtualFolder="CMake Files\install\lib\cmake\MAVSDK\"/>
+		</Unit>
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/install/lib/cmake/MAVSDK/MAVSDKConfigVersion.cmake">
+			<Option virtualFolder="CMake Files\install\lib\cmake\MAVSDK\"/>
+		</Unit>
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/install/lib/cmake/MAVSDK/MAVSDKTargets-debug.cmake">
+			<Option virtualFolder="CMake Files\install\lib\cmake\MAVSDK\"/>
+		</Unit>
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/install/lib/cmake/MAVSDK/MAVSDKTargets.cmake">
+			<Option virtualFolder="CMake Files\install\lib\cmake\MAVSDK\"/>
 		</Unit>
 	</Project>
 </CodeBlocks_project_file>

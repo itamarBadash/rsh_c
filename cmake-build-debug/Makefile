@@ -47,19 +47,19 @@ cmake_force:
 SHELL = cmd.exe
 
 # The CMake executable.
-CMAKE_COMMAND = "C:\Program Files\JetBrains\CLion 2024.1.1\bin\cmake\win\x64\bin\cmake.exe"
+CMAKE_COMMAND = "C:\Program Files\JetBrains\CLion 2024.1.5\bin\cmake\win\x64\bin\cmake.exe"
 
 # The command to remove a file.
-RM = "C:\Program Files\JetBrains\CLion 2024.1.1\bin\cmake\win\x64\bin\cmake.exe" -E rm -f
+RM = "C:\Program Files\JetBrains\CLion 2024.1.5\bin\cmake\win\x64\bin\cmake.exe" -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = C:\Users\Gadi\CLionProjects\rsh_c
+CMAKE_SOURCE_DIR = C:\Users\itaba\Desktop\Hoopoe\rsh_c
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = C:\Users\Gadi\CLionProjects\rsh_c\cmake-build-debug
+CMAKE_BINARY_DIR = C:\Users\itaba\Desktop\Hoopoe\rsh_c\cmake-build-debug
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -67,7 +67,7 @@ CMAKE_BINARY_DIR = C:\Users\Gadi\CLionProjects\rsh_c\cmake-build-debug
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "No interactive CMake dialog available..."
-	"C:\Program Files\JetBrains\CLion 2024.1.1\bin\cmake\win\x64\bin\cmake.exe" -E echo "No interactive CMake dialog available."
+	"C:\Program Files\JetBrains\CLion 2024.1.5\bin\cmake\win\x64\bin\cmake.exe" -E echo "No interactive CMake dialog available."
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -77,7 +77,7 @@ edit_cache/fast: edit_cache
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Running CMake to regenerate build system..."
-	"C:\Program Files\JetBrains\CLion 2024.1.1\bin\cmake\win\x64\bin\cmake.exe" --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	"C:\Program Files\JetBrains\CLion 2024.1.5\bin\cmake\win\x64\bin\cmake.exe" --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -86,9 +86,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\Gadi\CLionProjects\rsh_c\cmake-build-debug\CMakeFiles C:\Users\Gadi\CLionProjects\rsh_c\cmake-build-debug\\CMakeFiles\progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\itaba\Desktop\Hoopoe\rsh_c\cmake-build-debug\CMakeFiles C:\Users\itaba\Desktop\Hoopoe\rsh_c\cmake-build-debug\\CMakeFiles\progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\Gadi\CLionProjects\rsh_c\cmake-build-debug\CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\itaba\Desktop\Hoopoe\rsh_c\cmake-build-debug\CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -128,53 +128,173 @@ base/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/build
 .PHONY : base/fast
 
-CommandManager.obj: CommandManager.cpp.obj
-.PHONY : CommandManager.obj
+CommunicationManager.obj: CommunicationManager.cpp.obj
+.PHONY : CommunicationManager.obj
 
 # target to build an object file
-CommandManager.cpp.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/CommandManager.cpp.obj
-.PHONY : CommandManager.cpp.obj
+CommunicationManager.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/CommunicationManager.cpp.obj
+.PHONY : CommunicationManager.cpp.obj
 
-CommandManager.i: CommandManager.cpp.i
-.PHONY : CommandManager.i
+CommunicationManager.i: CommunicationManager.cpp.i
+.PHONY : CommunicationManager.i
 
 # target to preprocess a source file
-CommandManager.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/CommandManager.cpp.i
-.PHONY : CommandManager.cpp.i
+CommunicationManager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/CommunicationManager.cpp.i
+.PHONY : CommunicationManager.cpp.i
 
-CommandManager.s: CommandManager.cpp.s
-.PHONY : CommandManager.s
+CommunicationManager.s: CommunicationManager.cpp.s
+.PHONY : CommunicationManager.s
 
 # target to generate assembly for a file
-CommandManager.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/CommandManager.cpp.s
-.PHONY : CommandManager.cpp.s
+CommunicationManager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/CommunicationManager.cpp.s
+.PHONY : CommunicationManager.cpp.s
 
-TelemetryManager.obj: TelemetryManager.cpp.obj
-.PHONY : TelemetryManager.obj
+Src/Communications/TCPServer.obj: Src/Communications/TCPServer.cpp.obj
+.PHONY : Src/Communications/TCPServer.obj
 
 # target to build an object file
-TelemetryManager.cpp.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/TelemetryManager.cpp.obj
-.PHONY : TelemetryManager.cpp.obj
+Src/Communications/TCPServer.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Communications/TCPServer.cpp.obj
+.PHONY : Src/Communications/TCPServer.cpp.obj
 
-TelemetryManager.i: TelemetryManager.cpp.i
-.PHONY : TelemetryManager.i
+Src/Communications/TCPServer.i: Src/Communications/TCPServer.cpp.i
+.PHONY : Src/Communications/TCPServer.i
 
 # target to preprocess a source file
-TelemetryManager.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/TelemetryManager.cpp.i
-.PHONY : TelemetryManager.cpp.i
+Src/Communications/TCPServer.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Communications/TCPServer.cpp.i
+.PHONY : Src/Communications/TCPServer.cpp.i
 
-TelemetryManager.s: TelemetryManager.cpp.s
-.PHONY : TelemetryManager.s
+Src/Communications/TCPServer.s: Src/Communications/TCPServer.cpp.s
+.PHONY : Src/Communications/TCPServer.s
 
 # target to generate assembly for a file
-TelemetryManager.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/TelemetryManager.cpp.s
-.PHONY : TelemetryManager.cpp.s
+Src/Communications/TCPServer.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Communications/TCPServer.cpp.s
+.PHONY : Src/Communications/TCPServer.cpp.s
+
+Src/Modules/BaseAddon.obj: Src/Modules/BaseAddon.cpp.obj
+.PHONY : Src/Modules/BaseAddon.obj
+
+# target to build an object file
+Src/Modules/BaseAddon.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Modules/BaseAddon.cpp.obj
+.PHONY : Src/Modules/BaseAddon.cpp.obj
+
+Src/Modules/BaseAddon.i: Src/Modules/BaseAddon.cpp.i
+.PHONY : Src/Modules/BaseAddon.i
+
+# target to preprocess a source file
+Src/Modules/BaseAddon.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Modules/BaseAddon.cpp.i
+.PHONY : Src/Modules/BaseAddon.cpp.i
+
+Src/Modules/BaseAddon.s: Src/Modules/BaseAddon.cpp.s
+.PHONY : Src/Modules/BaseAddon.s
+
+# target to generate assembly for a file
+Src/Modules/BaseAddon.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Modules/BaseAddon.cpp.s
+.PHONY : Src/Modules/BaseAddon.cpp.s
+
+Src/Modules/CommandManager.obj: Src/Modules/CommandManager.cpp.obj
+.PHONY : Src/Modules/CommandManager.obj
+
+# target to build an object file
+Src/Modules/CommandManager.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Modules/CommandManager.cpp.obj
+.PHONY : Src/Modules/CommandManager.cpp.obj
+
+Src/Modules/CommandManager.i: Src/Modules/CommandManager.cpp.i
+.PHONY : Src/Modules/CommandManager.i
+
+# target to preprocess a source file
+Src/Modules/CommandManager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Modules/CommandManager.cpp.i
+.PHONY : Src/Modules/CommandManager.cpp.i
+
+Src/Modules/CommandManager.s: Src/Modules/CommandManager.cpp.s
+.PHONY : Src/Modules/CommandManager.s
+
+# target to generate assembly for a file
+Src/Modules/CommandManager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Modules/CommandManager.cpp.s
+.PHONY : Src/Modules/CommandManager.cpp.s
+
+Src/Modules/TelemetryManager.obj: Src/Modules/TelemetryManager.cpp.obj
+.PHONY : Src/Modules/TelemetryManager.obj
+
+# target to build an object file
+Src/Modules/TelemetryManager.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Modules/TelemetryManager.cpp.obj
+.PHONY : Src/Modules/TelemetryManager.cpp.obj
+
+Src/Modules/TelemetryManager.i: Src/Modules/TelemetryManager.cpp.i
+.PHONY : Src/Modules/TelemetryManager.i
+
+# target to preprocess a source file
+Src/Modules/TelemetryManager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Modules/TelemetryManager.cpp.i
+.PHONY : Src/Modules/TelemetryManager.cpp.i
+
+Src/Modules/TelemetryManager.s: Src/Modules/TelemetryManager.cpp.s
+.PHONY : Src/Modules/TelemetryManager.s
+
+# target to generate assembly for a file
+Src/Modules/TelemetryManager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Modules/TelemetryManager.cpp.s
+.PHONY : Src/Modules/TelemetryManager.cpp.s
+
+inih/cpp/INIReader.obj: inih/cpp/INIReader.cpp.obj
+.PHONY : inih/cpp/INIReader.obj
+
+# target to build an object file
+inih/cpp/INIReader.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/inih/cpp/INIReader.cpp.obj
+.PHONY : inih/cpp/INIReader.cpp.obj
+
+inih/cpp/INIReader.i: inih/cpp/INIReader.cpp.i
+.PHONY : inih/cpp/INIReader.i
+
+# target to preprocess a source file
+inih/cpp/INIReader.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/inih/cpp/INIReader.cpp.i
+.PHONY : inih/cpp/INIReader.cpp.i
+
+inih/cpp/INIReader.s: inih/cpp/INIReader.cpp.s
+.PHONY : inih/cpp/INIReader.s
+
+# target to generate assembly for a file
+inih/cpp/INIReader.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/inih/cpp/INIReader.cpp.s
+.PHONY : inih/cpp/INIReader.cpp.s
+
+inih/ini.obj: inih/ini.c.obj
+.PHONY : inih/ini.obj
+
+# target to build an object file
+inih/ini.c.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/inih/ini.c.obj
+.PHONY : inih/ini.c.obj
+
+inih/ini.i: inih/ini.c.i
+.PHONY : inih/ini.i
+
+# target to preprocess a source file
+inih/ini.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/inih/ini.c.i
+.PHONY : inih/ini.c.i
+
+inih/ini.s: inih/ini.c.s
+.PHONY : inih/ini.s
+
+# target to generate assembly for a file
+inih/ini.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/inih/ini.c.s
+.PHONY : inih/ini.c.s
 
 main.obj: main.cpp.obj
 .PHONY : main.obj
@@ -209,12 +329,27 @@ help:
 	@echo ... edit_cache
 	@echo ... rebuild_cache
 	@echo ... base
-	@echo ... CommandManager.obj
-	@echo ... CommandManager.i
-	@echo ... CommandManager.s
-	@echo ... TelemetryManager.obj
-	@echo ... TelemetryManager.i
-	@echo ... TelemetryManager.s
+	@echo ... CommunicationManager.obj
+	@echo ... CommunicationManager.i
+	@echo ... CommunicationManager.s
+	@echo ... Src/Communications/TCPServer.obj
+	@echo ... Src/Communications/TCPServer.i
+	@echo ... Src/Communications/TCPServer.s
+	@echo ... Src/Modules/BaseAddon.obj
+	@echo ... Src/Modules/BaseAddon.i
+	@echo ... Src/Modules/BaseAddon.s
+	@echo ... Src/Modules/CommandManager.obj
+	@echo ... Src/Modules/CommandManager.i
+	@echo ... Src/Modules/CommandManager.s
+	@echo ... Src/Modules/TelemetryManager.obj
+	@echo ... Src/Modules/TelemetryManager.i
+	@echo ... Src/Modules/TelemetryManager.s
+	@echo ... inih/cpp/INIReader.obj
+	@echo ... inih/cpp/INIReader.i
+	@echo ... inih/cpp/INIReader.s
+	@echo ... inih/ini.obj
+	@echo ... inih/ini.i
+	@echo ... inih/ini.s
 	@echo ... main.obj
 	@echo ... main.i
 	@echo ... main.s
