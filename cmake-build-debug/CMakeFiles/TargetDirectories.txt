@@ -1,3 +1,0 @@
-C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug/CMakeFiles/base.dir
-C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/Gadi/CLionProjects/rsh_c/cmake-build-debug/CMakeFiles/rebuild_cache.dir

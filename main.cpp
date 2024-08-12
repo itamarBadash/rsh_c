@@ -17,6 +17,7 @@ public:
     void onEvent(int value) {
         std::cout << "Listener received event with value: " << value << std::endl;
     }
+
 };
 
 void freeFunctionListener(int value) {
