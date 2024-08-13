@@ -157,10 +157,24 @@ bool UDPServer::send_message(const std::string& message) {
 
     for (const auto& clientAddrStr : clientAddresses) {
         sockaddr_in clientAddr;
-        std::istringstream ss(clientAddrStr);
-        ss >> clientAddr.sin_addr.s_addr >> clientAddr.sin_port;
+        size_t colonPos = clientAddrStr.find(':');
+        if (colonPos == std::string::npos) {
+            std::cerr << "Invalid client address format: " << clientAddrStr << std::endl;
+            continue;
+        }
 
-        ssize_t bytesSent = sendto(serverSocket, message.c_str(), message.size(), 0, (struct sockaddr*)&clientAddr, sizeof(clientAddr));
+        std::string ip = clientAddrStr.substr(0, colonPos);
+        int port = std::stoi(clientAddrStr.substr(colonPos + 1));
+
+        clientAddr.sin_family = AF_INET;
+        clientAddr.sin_port = htons(port);
+        if (inet_pton(AF_INET, ip.c_str(), &clientAddr.sin_addr) <= 0) {
+            std::cerr << "Invalid IP address: " << ip << std::endl;
+            continue;
+        }
+
+        ssize_t bytesSent = sendto(serverSocket, message.c_str(), message.size(), 0,
+                                   (struct sockaddr*)&clientAddr, sizeof(clientAddr));
         if (bytesSent < 0) {
             std::cerr << "Failed to send message to client. Error: " << strerror(errno) << std::endl;
         } else {
@@ -173,7 +187,7 @@ bool UDPServer::send_message(const std::string& message) {
 void UDPServer::addClientAddress(const sockaddr_in& clientAddr) {
     std::string addrStr = clientAddrToString(clientAddr);
     std::lock_guard<std::mutex> lock(clientAddressesMutex);
-    clientAddresses.insert(addrStr); // Use unordered_set to automatically handle duplicates
+    clientAddresses.insert(addrStr); // unordered_set ensures no duplicates
 }
 
 std::string UDPServer::clientAddrToString(const sockaddr_in& clientAddr) {
