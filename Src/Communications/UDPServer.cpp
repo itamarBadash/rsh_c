@@ -58,6 +58,8 @@ void UDPServer::stop() {
 
 void UDPServer::receiveMessages() {
     while (running) {
+        std::cout << "check"<<std::endl;
+
         sockaddr_in clientAddr;
         socklen_t clientAddrLen = sizeof(clientAddr);
         const int bufferSize = 1024;
