@@ -35,7 +35,6 @@ add_executable(base main.cpp
         Src/Communications/TCPServer.h
 )
 
-
 # Link MAVSDK libraries
 target_link_libraries(base
         MAVSDK::mavsdk
