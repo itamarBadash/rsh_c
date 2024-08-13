@@ -111,7 +111,8 @@ int main(int argc, char** argv) {
     int port = 8080;
 
     // Create the server object
-    auto tcp_server = std::make_shared<TCPServer>(port);
+    //auto tcp_server = std::make_shared<TCPServer>(port);
+    auto tcp_server = std::make_shared<TCPServer>(12345);
     tcp_server->setCommandManager(command_manager);
 
     auto udp_server = std::make_shared<UDPServer>(port);

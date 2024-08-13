@@ -10,7 +10,6 @@
 #include <queue>
 #include <memory>
 #include <condition_variable>
-#include <unordered_map>
 #include <unordered_set>
 #include "../Modules/CommandManager.h"
 
@@ -30,13 +29,14 @@ private:
     sockaddr_in serverAddr;
     std::atomic<bool> running;
     std::thread commandProcessorThread;
+
     std::shared_ptr<CommandManager> commandManager;
 
     std::queue<std::pair<std::string, sockaddr_in>> commandQueue;
     std::mutex queueMutex;
     std::condition_variable queueCondition;
 
-    std::unordered_set<std::string> clientAddresses; // Store as string for simplicity
+    std::unordered_set<std::string> clientAddresses;
     std::mutex clientAddressesMutex;
 
     void setupServerAddress();
