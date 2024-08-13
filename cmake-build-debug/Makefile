@@ -176,6 +176,30 @@ Src/Communications/TCPServer.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Communications/TCPServer.cpp.s
 .PHONY : Src/Communications/TCPServer.cpp.s
 
+Src/Communications/UDPServer.obj: Src/Communications/UDPServer.cpp.obj
+.PHONY : Src/Communications/UDPServer.obj
+
+# target to build an object file
+Src/Communications/UDPServer.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Communications/UDPServer.cpp.obj
+.PHONY : Src/Communications/UDPServer.cpp.obj
+
+Src/Communications/UDPServer.i: Src/Communications/UDPServer.cpp.i
+.PHONY : Src/Communications/UDPServer.i
+
+# target to preprocess a source file
+Src/Communications/UDPServer.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Communications/UDPServer.cpp.i
+.PHONY : Src/Communications/UDPServer.cpp.i
+
+Src/Communications/UDPServer.s: Src/Communications/UDPServer.cpp.s
+.PHONY : Src/Communications/UDPServer.s
+
+# target to generate assembly for a file
+Src/Communications/UDPServer.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Communications/UDPServer.cpp.s
+.PHONY : Src/Communications/UDPServer.cpp.s
+
 Src/Modules/BaseAddon.obj: Src/Modules/BaseAddon.cpp.obj
 .PHONY : Src/Modules/BaseAddon.obj
 
@@ -335,6 +359,9 @@ help:
 	@echo ... Src/Communications/TCPServer.obj
 	@echo ... Src/Communications/TCPServer.i
 	@echo ... Src/Communications/TCPServer.s
+	@echo ... Src/Communications/UDPServer.obj
+	@echo ... Src/Communications/UDPServer.i
+	@echo ... Src/Communications/UDPServer.s
 	@echo ... Src/Modules/BaseAddon.obj
 	@echo ... Src/Modules/BaseAddon.i
 	@echo ... Src/Modules/BaseAddon.s

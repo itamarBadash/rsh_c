@@ -103,6 +103,12 @@
 		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Src/Communications/TCPServer.h">
 			<Option target="base"/>
 		</Unit>
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Src/Communications/UDPServer.cpp">
+			<Option target="base"/>
+		</Unit>
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Src/Communications/UDPServer.h">
+			<Option target="base"/>
+		</Unit>
 		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Src/Modules/BaseAddon.cpp">
 			<Option target="base"/>
 		</Unit>

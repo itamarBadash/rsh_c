@@ -9,6 +9,8 @@
 #include "Src/Modules/BaseAddon.h"
 #include "Events/EventManager.h"
 #include "Src/Communications/TCPServer.h"
+#include "Src/Communications/UDPServer.h"
+
 
 using namespace mavsdk;
 
@@ -36,14 +38,21 @@ void usage(const std::string& bin_name) {
 void main_thread_function(std::shared_ptr<System> system,
                           std::shared_ptr<CommandManager> command_manager,
                           std::shared_ptr<TCPServer> tcpServer,
-                          std::shared_ptr<TelemetryManager> telemetry_manager) {
+                          std::shared_ptr<TelemetryManager> telemetry_manager, std::shared_ptr<UDPServer> udpServer) {
     telemetry_manager->start();
 
     CREATE_EVENT("InfoRequest");
 
     // Enclose the lambda in parentheses to ensure it's treated as a single argument
+    /*
     SUBSCRIBE_TO_EVENT("InfoRequest", ([telemetry_manager, tcpServer]() {
         tcpServer->send_message(telemetry_manager->getTelemetryData().print());
+    }));
+    */
+    // Enclose the lambda in parentheses to ensure it's treated as a single argument
+
+    SUBSCRIBE_TO_EVENT("InfoRequest", ([telemetry_manager, udpServer]() {
+    udpServer->send_message(telemetry_manager->getTelemetryData().print());
     }));
 
     while (true) {
@@ -102,15 +111,19 @@ int main(int argc, char** argv) {
     int port = 8080;
 
     // Create the server object
-    auto server = std::make_shared<TCPServer>(port);
-    server->setCommandManager(command_manager);
-    server->start();
+    auto tcp_server = std::make_shared<TCPServer>(port);
+    tcp_server->setCommandManager(command_manager);
+
+    auto udp_server = std::make_shared<UDPServer>(port);
+    udp_server->setCommandManager(command_manager);
+
+    udp_server->start();
 
 
     EventManager& eventManager = GetEventManager();
     auto addon = std::make_shared<BaseAddon>("system");
 
-    std::thread main_thread(main_thread_function, system, command_manager,server,telemetry_manager);
+    std::thread main_thread(main_thread_function, system, command_manager,tcp_server,telemetry_manager,udp_server);
 
     main_thread.join();
 

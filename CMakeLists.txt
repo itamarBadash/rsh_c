@@ -33,6 +33,8 @@ add_executable(base main.cpp
         Src/Modules/BaseAddon.h
         Src/Communications/TCPServer.cpp
         Src/Communications/TCPServer.h
+        Src/Communications/UDPServer.cpp
+        Src/Communications/UDPServer.h
 )
 
 # Link MAVSDK libraries
