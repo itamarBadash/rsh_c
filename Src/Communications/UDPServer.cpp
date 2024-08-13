@@ -58,7 +58,7 @@ void UDPServer::stop() {
 
 void UDPServer::receiveMessages() {
     while (running) {
-        std::cout << "check"<<std::endl;
+        std::cout << "check" << std::endl;
 
         sockaddr_in clientAddr;
         socklen_t clientAddrLen = sizeof(clientAddr);
@@ -67,9 +67,13 @@ void UDPServer::receiveMessages() {
 
         int bytesReceived = recvfrom(serverSocket, buffer, bufferSize - 1, 0, (struct sockaddr*)&clientAddr, &clientAddrLen);
         if (bytesReceived < 0) {
-            if (running) {
+            if (errno != EWOULDBLOCK && errno != EAGAIN) {
                 std::cerr << "Error receiving data: " << strerror(errno) << std::endl;
             }
+            if (!running) {
+                break; // Exit if not running
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(10)); // Prevent tight loop on error
             continue;
         }
 
@@ -81,9 +85,11 @@ void UDPServer::receiveMessages() {
         }
         queueCondition.notify_one();
 
-        // Add the client address to the list of known clients
-        addClientAddress(clientAddr);
+        addClientAddress(clientAddr); // Ensure this function is thread-safe
     }
+
+    // Cleanup if necessary before exiting
+    close(serverSocket);
 }
 
 void UDPServer::processCommands() {
