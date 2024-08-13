@@ -3,6 +3,7 @@
 #include <cstring>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include "../../Events/EventManager.h"
 
 UDPServer::UDPServer(int port) : port(port), serverSocket(-1), running(false) {
     std::memset(&serverAddr, 0, sizeof(serverAddr));
