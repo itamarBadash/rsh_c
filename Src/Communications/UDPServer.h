@@ -11,6 +11,7 @@
 #include <memory>
 #include <condition_variable>
 #include <unordered_map>
+#include <unordered_set>
 #include "../Modules/CommandManager.h"
 
 class UDPServer {
@@ -35,13 +36,14 @@ private:
     std::mutex queueMutex;
     std::condition_variable queueCondition;
 
-    std::vector<sockaddr_in> clientAddresses;
+    std::unordered_set<std::string> clientAddresses; // Store as string for simplicity
     std::mutex clientAddressesMutex;
 
     void setupServerAddress();
     void receiveMessages();
     void processCommands();
     void addClientAddress(const sockaddr_in& clientAddr);
+    std::string clientAddrToString(const sockaddr_in& clientAddr);
 };
 
 #endif // UDPSERVER_H
