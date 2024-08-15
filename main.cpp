@@ -4,7 +4,7 @@
 #include <thread>
 #include "Src/Modules/TelemetryManager.h"
 #include "Src/Modules/CommandManager.h"
-#include "CommunicationManager.h"
+#include "Src/Communications/SerialCommunication.h"
 #include "inih/cpp/INIReader.h"
 #include "Src/Modules/BaseAddon.h"
 #include "Events/EventManager.h"

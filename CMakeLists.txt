@@ -22,8 +22,8 @@ add_executable(base main.cpp
         Src/Modules/TelemetryManager.h
         Src/Modules/CommandManager.cpp
         Src/Modules/CommandManager.h
-        CommunicationManager.cpp
-        CommunicationManager.h
+        Src/Communications/SerialCommunication.cpp
+        Src/Communications/SerialCommunication.h
         inih/ini.c
         inih/ini.h
         inih/cpp/INIReader.cpp

@@ -178,7 +178,7 @@ bool UDPServer::send_message(const std::string& message) {
         if (bytesSent < 0) {
             std::cerr << "Failed to send message to client. Error: " << strerror(errno) << std::endl;
         } else {
-            std::cout << "Message sent to client: " << message << std::endl;
+            std::cout << "Message sent to client: " << std::endl;
         }
     }
     return true;

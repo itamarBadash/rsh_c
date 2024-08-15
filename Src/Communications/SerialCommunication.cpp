@@ -1,4 +1,4 @@
-#include "CommunicationManager.h"
+#include "SerialCommunication.h"
 #include <iostream>
 #include <unistd.h>
 #include <fcntl.h>
@@ -12,18 +12,18 @@
 #include <unordered_map>
 #include <stdexcept>
 
-CommunicationManager::CommunicationManager(const std::string &port, int baud_rate, std::shared_ptr<CommandManager> cmd_manager)
+SerialCommunication::SerialCommunication(const std::string &port, int baud_rate, std::shared_ptr<CommandManager> cmd_manager)
         : port_name(port), baud_rate(baud_rate), serial_port(-1), stop_flag(false), command_manager(cmd_manager) {
     openPort();
     startWorker();
 }
 
-CommunicationManager::~CommunicationManager() {
+SerialCommunication::~SerialCommunication() {
     stopWorker();
     closePort();
 }
 
-speed_t CommunicationManager::convertBaudRate(int baudRate) {
+speed_t SerialCommunication::convertBaudRate(int baudRate) {
     switch (baudRate) {
         case 0: return B0;
         case 50: return B50;
@@ -61,7 +61,7 @@ speed_t CommunicationManager::convertBaudRate(int baudRate) {
     }
 }
 
-void CommunicationManager::openPort() {
+void SerialCommunication::openPort() {
     serial_port = open(port_name.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
 
     if (serial_port < 0) {
@@ -112,25 +112,25 @@ void CommunicationManager::openPort() {
     std::cout << "Serial port opened successfully." << std::endl;
 }
 
-void CommunicationManager::closePort() {
+void SerialCommunication::closePort() {
     if (serial_port >= 0) {
         close(serial_port);
         serial_port = -1;
     }
 }
 
-void CommunicationManager::startWorker() {
-    worker_thread = std::thread(&CommunicationManager::workerFunction, this);
+void SerialCommunication::startWorker() {
+    worker_thread = std::thread(&SerialCommunication::workerFunction, this);
 }
 
-void CommunicationManager::stopWorker() {
+void SerialCommunication::stopWorker() {
     stop_flag = true;
     if (worker_thread.joinable()) {
         worker_thread.join();
     }
 }
 
-void CommunicationManager::workerFunction() {
+void SerialCommunication::workerFunction() {
     while (!stop_flag) {
         std::string message = receiveMessage();
         if (!message.empty()) {
@@ -139,7 +139,7 @@ void CommunicationManager::workerFunction() {
     }
 }
 
-std::string CommunicationManager::receiveMessage() {
+std::string SerialCommunication::receiveMessage() {
     if (serial_port < 0) {
         std::cerr << "Serial port not opened." << std::endl;
         return "";
@@ -156,7 +156,7 @@ std::string CommunicationManager::receiveMessage() {
     }
 }
 
-void CommunicationManager::processReceivedMessage(const std::string &message) {
+void SerialCommunication::processReceivedMessage(const std::string &message) {
 
     // Assuming the message is in the format "command:param1,param2,..."
     size_t pos = message.find(':');
@@ -183,7 +183,7 @@ void CommunicationManager::processReceivedMessage(const std::string &message) {
     }
 }
 
-CommunicationManager::Result CommunicationManager::sendMessage(const std::string &message) {
+SerialCommunication::Result SerialCommunication::sendMessage(const std::string &message) {
     std::lock_guard<std::mutex> lock(send_mutex);
 
     if (serial_port < 0) {

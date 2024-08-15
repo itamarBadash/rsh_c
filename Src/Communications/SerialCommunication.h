@@ -8,10 +8,10 @@
 #include <atomic>
 #include <termios.h>
 
-#include "Src/Modules/CommandManager.h"
+#include "../Modules/CommandManager.h"
 
 
-class CommunicationManager {
+class SerialCommunication {
 public:
     enum class Result {
         Success,
@@ -20,10 +20,10 @@ public:
         Unknown
     };
     // Constructor
-    CommunicationManager(const std::string &port, int baud_rate, std::shared_ptr<CommandManager> cmd_manager);
+    SerialCommunication(const std::string &port, int baud_rate, std::shared_ptr<CommandManager> cmd_manager);
 
     // Destructor
-    ~CommunicationManager();
+    ~SerialCommunication();
 
     // Send a message via the serial port
     Result sendMessage(const std::string &message);
