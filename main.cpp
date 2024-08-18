@@ -43,15 +43,7 @@ void main_thread_function(std::shared_ptr<System> system,
 
     CREATE_EVENT("InfoRequest");
 
-    // Enclose the lambda in parentheses to ensure it's treated as a single argument
-    /*
-    SUBSCRIBE_TO_EVENT("InfoRequest", ([telemetry_manager, tcpServer]() {
-        tcpServer->send_message(telemetry_manager->getTelemetryData().print());
-    }));
-    */
-    // Enclose the lambda in parentheses to ensure it's treated as a single argument
-
-    SUBSCRIBE_TO_EVENT("InfoRequest", ([telemetry_manager, communication_manager]() {
+    SUBSCRIBE_TO_EVENT("InfoRequest", ([telemetry_mana ger, communication_manager]() {
     communication_manager->send_message(telemetry_manager->getTelemetryData().print());
     }));
 
