@@ -121,7 +121,6 @@ int main(int argc, char** argv) {
 
     udp_server->start();
 
-    CommunicationManager communication_manager = CommunicationManager(ECT_TCP);
 
 
     EventManager& eventManager = GetEventManager();
