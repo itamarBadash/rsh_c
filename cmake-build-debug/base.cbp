@@ -91,6 +91,9 @@
 		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Events/EventManager.h">
 			<Option target="base"/>
 		</Unit>
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Src/Communications/ICommunication.h">
+			<Option target="base"/>
+		</Unit>
 		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Src/Communications/SerialCommunication.cpp">
 			<Option target="base"/>
 		</Unit>

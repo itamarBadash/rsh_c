@@ -5,6 +5,10 @@
 #include "CommunicationManager.h"
 
 #include <iostream>
+#include "TelemetryManager.h"
+#include "../Communications/UDPServer.h"
+#include "../Communications/SerialCommunication.h"
+#include "../Communications/TCPServer.h"
 
 
 
@@ -14,46 +18,37 @@ CommunicationManager::CommunicationManager(CommunicationType communication): com
         std::cout << "Can't load 'config.ini'\n";
     }
 
-    switch (communication) {
-        case 0:
-            tcp_server = std::make_shared<TCPServer>(8080);
-            tcp_server->start();
-            udp_server = nullptr;
-            serial_communication = nullptr;
-            break;
 
-        case 1:
-            tcp_server = nullptr;
-            udp_server = std::make_shared<UDPServer>(8080);
-            udp_server->start();
-            serial_communication = nullptr;
-
-            break;
-
+    switch (communication_type) {
+        case ECT_TCP:
+            communication_ptr = std::make_shared<TCPServer>(8080);
+        break;
+        case ECT_UDP:
+            communication_ptr = std::make_shared<UDPServer>(8080);
+        break;
         case ECT_SERIAL:
-            tcp_server = nullptr;
-            udp_server = nullptr;
-            serial_communication =std::make_shared<SerialCommunication>(reader.GetString("Connection","GroundStationSerialPort","UNKNOWN"),reader.GetInteger("Connection","GroundStationBaudRate",0));
-            break;
+            communication_ptr = std::make_shared<SerialCommunication>(reader.GetString("Connection","GroundStationSerialPort","UNKNOWN"),reader.GetInteger("Connection","GroundStationBaudRate",0));
+        break;
+
         default:
-            tcp_server = std::make_shared<TCPServer>(8080);
-            tcp_server->start();
-            udp_server = nullptr;
-            break;
+            throw std::invalid_argument("Unsupported communication type");
     }
 }
 
 CommunicationManager::~CommunicationManager() {
-    switch (communication_type) {
-        case ECT_TCP:
-            tcp_server->stop();
-        break;
-
-        case ECT_UDP:
-            udp_server->stop();
-        break;
-
-        default:
-            tcp_server->stop();
-    }
+    communication_ptr->stop();
 }
+
+void CommunicationManager::send_message(const std::string &message) {
+    communication_ptr->send_message(message);
+}
+
+void CommunicationManager::set_command(std::shared_ptr<CommandManager> command_manager) {
+    communication_ptr->setCommandManager(command_manager);
+}
+
+void CommunicationManager::start() {
+    communication_ptr->start();
+}
+
+

@@ -7,11 +7,13 @@
 #include <condition_variable>
 #include <atomic>
 #include <termios.h>
+#include "ICommunication.h"
+
 
 #include "../Modules/CommandManager.h"
 
 
-class SerialCommunication {
+class SerialCommunication : public ICommunication {
 public:
     enum class Result {
         Success,
@@ -26,10 +28,13 @@ public:
     ~SerialCommunication();
 
     // Send a message via the serial port
-    Result sendMessage(const std::string &message);
+    bool send_message(const std::string &message) override;
+
+    bool start() override;
+    void stop() override;
 
     speed_t convertBaudRate(int baudRate);
-    void setCommandManager(std::shared_ptr<CommandManager> command);
+    void setCommandManager(std::shared_ptr<CommandManager> command) override;
 
 
 private:

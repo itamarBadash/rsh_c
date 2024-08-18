@@ -3,10 +3,10 @@
 
 
 #include "../../inih/cpp/INIReader.h"
+#include "../Communications/ICommunication.h"
 
-#include "../Communications/SerialCommunication.h"
-#include "../Communications/TCPServer.h"
-#include "../Communications/UDPServer.h"
+#include "../../Events/EventManager.h"
+#include "CommandManager.h"
 
 
 enum CommunicationType {
@@ -22,12 +22,12 @@ public:
 
     CommunicationType communication_type;
 
-
+    void send_message(const std::string &message);
+    void set_command(std::shared_ptr<CommandManager> command_manager);
+    void start();
 
 private:
-    std::shared_ptr<TCPServer> tcp_server;
-    std::shared_ptr<UDPServer> udp_server;
-    std::shared_ptr<SerialCommunication> serial_communication;
+    std::shared_ptr<ICommunication> communication_ptr;
 
     INIReader reader;
 };

@@ -12,16 +12,17 @@
 #include <condition_variable>
 #include <unordered_set>
 #include "../Modules/CommandManager.h"
+#include "ICommunication.h"
 
-class UDPServer {
+class UDPServer : public ICommunication{
 public:
     UDPServer(int port);
     ~UDPServer();
 
-    bool start();
-    void stop();
-    bool send_message(const std::string& message);
-    void setCommandManager(std::shared_ptr<CommandManager> command);
+    bool start() override;
+    void stop() override;
+    bool send_message(const std::string& message) override;
+    void setCommandManager(std::shared_ptr<CommandManager> command) override;
 
 private:
     int serverSocket;

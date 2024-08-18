@@ -16,7 +16,6 @@ SerialCommunication::SerialCommunication(const std::string &port, int baud_rate)
         : port_name(port), baud_rate(baud_rate), serial_port(-1), stop_flag(false) {
     command_manager = nullptr;
     openPort();
-    startWorker();
 }
 
 SerialCommunication::~SerialCommunication() {
@@ -190,20 +189,31 @@ void SerialCommunication::processReceivedMessage(const std::string &message) {
     }
 }
 
-SerialCommunication::Result SerialCommunication::sendMessage(const std::string &message) {
+bool SerialCommunication::send_message(const std::string &message) {
     std::lock_guard<std::mutex> lock(send_mutex);
 
     if (serial_port < 0) {
         std::cerr << "Serial port not opened." << std::endl;
-        return Result::ConnectionError;
+        return false;
     }
 
     int n = write(serial_port, message.c_str(), message.size());
     if (n < 0) {
         std::cerr << "Error writing to serial port: " << strerror(errno) << std::endl;
-        return Result::Failure;
+        return false;
     } else {
         std::cout << "Message sent: " << message << std::endl;
-        return Result::Success;
+        return true;;
     }
+}
+
+bool SerialCommunication::start() {
+    openPort();
+    startWorker();
+    return true;
+}
+
+void SerialCommunication::stop() {
+    stopWorker();
+    closePort();
 }

@@ -11,17 +11,18 @@
 #include <memory>
 #include <condition_variable>
 #include "../Modules/CommandManager.h"
+#include "ICommunication.h"
 
-class TCPServer {
+class TCPServer : public ICommunication {
 public:
     TCPServer(int port);
     ~TCPServer();
 
-    bool start();
-    void stop();
+    bool start() override;
+    void stop() override;
     void handleClient(int clientSocket);
-    bool send_message(const std::string& message);
-    void setCommandManager(std::shared_ptr<CommandManager> command);
+    bool send_message(const std::string& message) override;
+    void setCommandManager(std::shared_ptr<CommandManager> command) override;
 
 private:
     int serverSocket;
