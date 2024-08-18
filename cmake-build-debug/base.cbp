@@ -88,13 +88,13 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/CommunicationManager.cpp">
-			<Option target="base"/>
-		</Unit>
-		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/CommunicationManager.h">
-			<Option target="base"/>
-		</Unit>
 		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Events/EventManager.h">
+			<Option target="base"/>
+		</Unit>
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Src/Communications/SerialCommunication.cpp">
+			<Option target="base"/>
+		</Unit>
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Src/Communications/SerialCommunication.h">
 			<Option target="base"/>
 		</Unit>
 		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Src/Communications/TCPServer.cpp">
@@ -119,6 +119,12 @@
 			<Option target="base"/>
 		</Unit>
 		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Src/Modules/CommandManager.h">
+			<Option target="base"/>
+		</Unit>
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Src/Modules/CommunicationManager.cpp">
+			<Option target="base"/>
+		</Unit>
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Src/Modules/CommunicationManager.h">
 			<Option target="base"/>
 		</Unit>
 		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Src/Modules/TelemetryManager.cpp">

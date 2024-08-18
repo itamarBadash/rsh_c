@@ -10,6 +10,7 @@
 #include "Events/EventManager.h"
 #include "Src/Communications/TCPServer.h"
 #include "Src/Communications/UDPServer.h"
+#include "Src/Modules/CommunicationManager.h"
 
 
 using namespace mavsdk;

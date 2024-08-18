@@ -128,29 +128,29 @@ base/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/build
 .PHONY : base/fast
 
-CommunicationManager.obj: CommunicationManager.cpp.obj
-.PHONY : CommunicationManager.obj
+Src/Communications/SerialCommunication.obj: Src/Communications/SerialCommunication.cpp.obj
+.PHONY : Src/Communications/SerialCommunication.obj
 
 # target to build an object file
-CommunicationManager.cpp.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/CommunicationManager.cpp.obj
-.PHONY : CommunicationManager.cpp.obj
+Src/Communications/SerialCommunication.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Communications/SerialCommunication.cpp.obj
+.PHONY : Src/Communications/SerialCommunication.cpp.obj
 
-CommunicationManager.i: CommunicationManager.cpp.i
-.PHONY : CommunicationManager.i
+Src/Communications/SerialCommunication.i: Src/Communications/SerialCommunication.cpp.i
+.PHONY : Src/Communications/SerialCommunication.i
 
 # target to preprocess a source file
-CommunicationManager.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/CommunicationManager.cpp.i
-.PHONY : CommunicationManager.cpp.i
+Src/Communications/SerialCommunication.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Communications/SerialCommunication.cpp.i
+.PHONY : Src/Communications/SerialCommunication.cpp.i
 
-CommunicationManager.s: CommunicationManager.cpp.s
-.PHONY : CommunicationManager.s
+Src/Communications/SerialCommunication.s: Src/Communications/SerialCommunication.cpp.s
+.PHONY : Src/Communications/SerialCommunication.s
 
 # target to generate assembly for a file
-CommunicationManager.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/CommunicationManager.cpp.s
-.PHONY : CommunicationManager.cpp.s
+Src/Communications/SerialCommunication.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Communications/SerialCommunication.cpp.s
+.PHONY : Src/Communications/SerialCommunication.cpp.s
 
 Src/Communications/TCPServer.obj: Src/Communications/TCPServer.cpp.obj
 .PHONY : Src/Communications/TCPServer.obj
@@ -247,6 +247,30 @@ Src/Modules/CommandManager.s: Src/Modules/CommandManager.cpp.s
 Src/Modules/CommandManager.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Modules/CommandManager.cpp.s
 .PHONY : Src/Modules/CommandManager.cpp.s
+
+Src/Modules/CommunicationManager.obj: Src/Modules/CommunicationManager.cpp.obj
+.PHONY : Src/Modules/CommunicationManager.obj
+
+# target to build an object file
+Src/Modules/CommunicationManager.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Modules/CommunicationManager.cpp.obj
+.PHONY : Src/Modules/CommunicationManager.cpp.obj
+
+Src/Modules/CommunicationManager.i: Src/Modules/CommunicationManager.cpp.i
+.PHONY : Src/Modules/CommunicationManager.i
+
+# target to preprocess a source file
+Src/Modules/CommunicationManager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Modules/CommunicationManager.cpp.i
+.PHONY : Src/Modules/CommunicationManager.cpp.i
+
+Src/Modules/CommunicationManager.s: Src/Modules/CommunicationManager.cpp.s
+.PHONY : Src/Modules/CommunicationManager.s
+
+# target to generate assembly for a file
+Src/Modules/CommunicationManager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Modules/CommunicationManager.cpp.s
+.PHONY : Src/Modules/CommunicationManager.cpp.s
 
 Src/Modules/TelemetryManager.obj: Src/Modules/TelemetryManager.cpp.obj
 .PHONY : Src/Modules/TelemetryManager.obj
@@ -353,9 +377,9 @@ help:
 	@echo ... edit_cache
 	@echo ... rebuild_cache
 	@echo ... base
-	@echo ... CommunicationManager.obj
-	@echo ... CommunicationManager.i
-	@echo ... CommunicationManager.s
+	@echo ... Src/Communications/SerialCommunication.obj
+	@echo ... Src/Communications/SerialCommunication.i
+	@echo ... Src/Communications/SerialCommunication.s
 	@echo ... Src/Communications/TCPServer.obj
 	@echo ... Src/Communications/TCPServer.i
 	@echo ... Src/Communications/TCPServer.s
@@ -368,6 +392,9 @@ help:
 	@echo ... Src/Modules/CommandManager.obj
 	@echo ... Src/Modules/CommandManager.i
 	@echo ... Src/Modules/CommandManager.s
+	@echo ... Src/Modules/CommunicationManager.obj
+	@echo ... Src/Modules/CommunicationManager.i
+	@echo ... Src/Modules/CommunicationManager.s
 	@echo ... Src/Modules/TelemetryManager.obj
 	@echo ... Src/Modules/TelemetryManager.i
 	@echo ... Src/Modules/TelemetryManager.s

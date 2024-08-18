@@ -12,8 +12,9 @@
 #include <unordered_map>
 #include <stdexcept>
 
-SerialCommunication::SerialCommunication(const std::string &port, int baud_rate, std::shared_ptr<CommandManager> cmd_manager)
-        : port_name(port), baud_rate(baud_rate), serial_port(-1), stop_flag(false), command_manager(cmd_manager) {
+SerialCommunication::SerialCommunication(const std::string &port, int baud_rate)
+        : port_name(port), baud_rate(baud_rate), serial_port(-1), stop_flag(false) {
+    command_manager = nullptr;
     openPort();
     startWorker();
 }
@@ -59,6 +60,10 @@ speed_t SerialCommunication::convertBaudRate(int baudRate) {
         default:
             throw std::invalid_argument("Unsupported baud rate: " + std::to_string(baudRate));
     }
+}
+
+void SerialCommunication::setCommandManager(std::shared_ptr<CommandManager> command) {
+    command_manager = command;
 }
 
 void SerialCommunication::openPort() {
@@ -174,11 +179,13 @@ void SerialCommunication::processReceivedMessage(const std::string &message) {
             params.push_back(std::stof(params_str.substr(start)));
         }
 
-        auto result = command_manager->handle_command(command, params);
-        if (result == CommandManager::Result::Success) {
-            std::cout << "Command " << command << " executed successfully." << std::endl;
-        } else {
-            std::cerr << "Command " << command << " failed." << std::endl;
+        if(command_manager != nullptr) {
+            auto result = command_manager->handle_command(command, params);
+            if (result == CommandManager::Result::Success) {
+                std::cout << "Command " << command << " executed successfully." << std::endl;
+            } else {
+                std::cerr << "Command " << command << " failed." << std::endl;
+            }
         }
     }
 }

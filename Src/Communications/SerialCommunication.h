@@ -1,5 +1,5 @@
-#ifndef COMMUNICATIONMANAGER_H
-#define COMMUNICATIONMANAGER_H
+#ifndef SERIALCOMMUNICATION_H
+#define SERIALCOMMUNICATION_H
 
 #include <string>
 #include <thread>
@@ -20,7 +20,7 @@ public:
         Unknown
     };
     // Constructor
-    SerialCommunication(const std::string &port, int baud_rate, std::shared_ptr<CommandManager> cmd_manager);
+    SerialCommunication(const std::string &port, int baud_rate);
 
     // Destructor
     ~SerialCommunication();
@@ -29,6 +29,8 @@ public:
     Result sendMessage(const std::string &message);
 
     speed_t convertBaudRate(int baudRate);
+    void setCommandManager(std::shared_ptr<CommandManager> command);
+
 
 private:
     // Serial port configuration and management
@@ -56,4 +58,4 @@ private:
     std::shared_ptr<CommandManager> command_manager;
 };
 
-#endif // COMMUNICATIONMANAGER_H
+#endif // SERIALCOMMUNICATION_H
