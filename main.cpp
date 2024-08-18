@@ -41,7 +41,7 @@ void main_thread_function(std::shared_ptr<System> system,
                           std::shared_ptr<TelemetryManager> telemetry_manager, std::shared_ptr<CommunicationManager> communication_manager) {
     telemetry_manager->start();
 
-    //CREATE_EVENT("InfoRequest");
+    CREATE_EVENT("InfoRequest");
 
     // Enclose the lambda in parentheses to ensure it's treated as a single argument
     /*
