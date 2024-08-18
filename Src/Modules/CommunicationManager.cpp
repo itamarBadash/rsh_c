@@ -12,12 +12,12 @@
 
 
 
-CommunicationManager::CommunicationManager(CommunicationType communication): communication_type(communication),
-                                                                             reader("../../../../config.ini") {
+CommunicationManager::CommunicationManager(CommunicationType communication): communication_type(communication){
+
+    INIReader reader("../config.ini");
     if (reader.ParseError() < 0) {
         std::cout << "Can't load 'config.ini'\n";
     }
-
 
     switch (communication_type) {
         case ECT_TCP:

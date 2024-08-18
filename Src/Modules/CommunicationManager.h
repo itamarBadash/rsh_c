@@ -28,8 +28,6 @@ public:
 
 private:
     std::shared_ptr<ICommunication> communication_ptr;
-
-    INIReader reader;
 };
 
 #endif //COMMUNICATIONMANAGER_H

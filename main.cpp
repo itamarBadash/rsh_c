@@ -66,12 +66,6 @@ int main(int argc, char** argv) {
         usage(argv[0]);
         return 1;
     }
-    INIReader reader("../config.ini");
-    if (reader.ParseError() < 0) {
-        std::cout << "Can't load 'config.ini'\n";
-        return 1;
-    }
-
 
     Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::GroundStation}};
     ConnectionResult connection_result = mavsdk.add_any_connection(argv[1]);
