@@ -82,6 +82,7 @@ CommandManager::Result CommandManager::set_manual_control(float x, float y, floa
     auto start = std::chrono::high_resolution_clock::now();
 
     auto result = manual_control->set_manual_control_input(x, y, z, r);
+    std::cout<<"cjeck"<<std::endl;
 
     if (!viable || result != mavsdk::ManualControl::Result::Success) {
         std::cerr << "Manual control input failed: " << result << std::endl;
