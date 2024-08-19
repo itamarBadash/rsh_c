@@ -58,7 +58,7 @@ void main_thread_function(std::shared_ptr<System> system,
     // Wait for a short moment to ensure manual control is engaged
     std::this_thread::sleep_for(std::chrono::seconds(2));
 
-    float ascent_speed = -0.5f; // Negative value for ascending, range -1 to 1
+    float ascent_speed = 0.7f; // Negative value for ascending, range -1 to 1
     float duration_seconds = 5.0f; // Ascend for 5 seconds
     auto start_time = std::chrono::steady_clock::now();
 
