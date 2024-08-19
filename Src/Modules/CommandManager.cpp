@@ -2,7 +2,7 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
-
+#define COPTER_MODE_STABILIZE 0
 CommandManager::CommandManager(const std::shared_ptr<mavsdk::System>& system) : system(system)
 {
     action = std::make_shared<mavsdk::Action>(system);
@@ -201,16 +201,17 @@ CommandManager::Result CommandManager::start_manual_control() {
     auto mode_result = mavlink_passthrough->queue_message([&](MavlinkAddress mavlink_address, uint8_t channel) {
         mavlink_message_t message;
         mavlink_msg_set_mode_pack_chan(
-                mavlink_address.system_id,
-                mavlink_address.component_id,
-                channel,
-                &message,
-                system->get_system_id(),
-                MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,  // Base mode flag indicating custom mode
-                MAV_MODE_FLAG_MANUAL_INPUT_ENABLED                  // Custom mode for manual control (this should match the mode used for manual control)
+            mavlink_address.system_id,
+            mavlink_address.component_id,
+            channel,
+            &message,
+            system->get_system_id(),
+            MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, // Base mode indicating custom mode enabled
+            COPTER_MODE_STABILIZE              // Stabilize mode value
         );
         return message;
     });
+
 
     if (mode_result != mavsdk::MavlinkPassthrough::Result::Success) {
         std::cerr << "Failed to set manual flight mode" << std::endl;
@@ -250,6 +251,7 @@ CommandManager::Result CommandManager::start_manual_control() {
         std::cerr << "Failed to send manual control command" << std::endl;
         return Result::Failure;
     }
+    std::cout<<"succuss starting man"<<std::endl;
 
     return Result::Success;
 }
