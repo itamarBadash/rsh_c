@@ -43,11 +43,7 @@ void main_thread_function(std::shared_ptr<System> system,
                           std::shared_ptr<TelemetryManager> telemetry_manager, std::shared_ptr<CommunicationManager> communication_manager) {
     telemetry_manager->start();
 
-    CREATE_EVENT("InfoRequest");
 
-    SUBSCRIBE_TO_EVENT("InfoRequest", ([telemetry_manager, communication_manager]() {
-    communication_manager->send_message(telemetry_manager->getTelemetryData().print());
-    }));
 
     if (command_manager->handle_command("arm", {}) != CommandManager::Result::Success) {
         std::cerr << "Failed to arm the drone" << std::endl;
@@ -120,7 +116,11 @@ int main(int argc, char** argv) {
 
     std::this_thread::sleep_for(std::chrono::seconds(3));
 
+    CREATE_EVENT("InfoRequest");
 
+    SUBSCRIBE_TO_EVENT("InfoRequest", ([telemetry_manager, communication_manager]() {
+    communication_manager->send_message(telemetry_manager->getTelemetryData().print());
+    }));
 
     auto addon = std::make_shared<BaseAddon>("system");
 
