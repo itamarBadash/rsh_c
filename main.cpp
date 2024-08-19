@@ -49,8 +49,24 @@ void main_thread_function(std::shared_ptr<System> system,
     communication_manager->send_message(telemetry_manager->getTelemetryData().print());
     }));
 
-    while (true) {
-        std::this_thread::sleep_for(std::chrono::seconds(3));
+    if (command_manager->handle_command("arm", {}) != CommandManager::Result::Success) {
+        std::cerr << "Failed to arm the drone" << std::endl;
+    }
+
+    // Start manual control mode
+    if (command_manager->start_manual_control() != CommandManager::Result::Success) {
+        std::cerr << "Failed to start manual control" << std::endl;
+    }
+
+    // Wait for a short moment to ensure manual control is engaged
+
+    float ascent_speed = 0.7f; // Adjust this value for a reasonable ascent speed
+
+    // Ascend for a few seconds
+    std::cout << "Ascending...\n";
+    while (true) { // Adjust loop count or duration as needed
+        command_manager->provide_control_input(0.0f, 0.0f, 0.0f, ascent_speed);
+        sleep_for(milliseconds(100)); // Send input every 100 milliseconds
     }
 }
 
@@ -102,35 +118,15 @@ int main(int argc, char** argv) {
 
     communication_manager->start();
 
-    std::this_thread::sleep_for(std::chrono::seconds(5));
+    std::this_thread::sleep_for(std::chrono::seconds(3));
 
-    if (command_manager->handle_command("arm", {}) != CommandManager::Result::Success) {
-        std::cerr << "Failed to arm the drone" << std::endl;
-        return 1;
-    }
 
-    // Start manual control mode
-    if (command_manager->start_manual_control() != CommandManager::Result::Success) {
-        std::cerr << "Failed to start manual control" << std::endl;
-        return 1;
-    }
-
-    // Wait for a short moment to ensure manual control is engaged
-
-    float ascent_speed = 0.7f; // Adjust this value for a reasonable ascent speed
-
-    // Ascend for a few seconds
-    std::cout << "Ascending...\n";
-    while (true) { // Adjust loop count or duration as needed
-        command_manager->provide_control_input(0.0f, 0.0f, 0.0f, ascent_speed);
-        sleep_for(milliseconds(100)); // Send input every 100 milliseconds
-    }
 
     auto addon = std::make_shared<BaseAddon>("system");
 
-   // std::thread main_thread(main_thread_function, system, command_manager,telemetry_manager,communication_manager);
+    std::thread main_thread(main_thread_function, system, command_manager,telemetry_manager,communication_manager);
 
-   // main_thread.join();
+    main_thread.join();
 
     return 0;
 }
