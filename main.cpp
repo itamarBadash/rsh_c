@@ -122,7 +122,7 @@ int main(int argc, char** argv) {
     // Ascend for a few seconds
     std::cout << "Ascending...\n";
     while (true) { // Adjust loop count or duration as needed
-        command_manager->provide_control_input(0.0f, 0.0f, ascent_speed, 0.0f);
+        command_manager->provide_control_input(0.0f, 0.0f, 0.0f, ascent_speed);
         sleep_for(milliseconds(100)); // Send input every 100 milliseconds
     }
 
