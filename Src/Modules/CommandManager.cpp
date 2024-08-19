@@ -87,10 +87,15 @@ CommandManager::Result CommandManager::arm() {
 }
 
 CommandManager::Result CommandManager::set_manual_control(float x, float y, float z, float r) {
+    if (!viable) {
+        std::cerr << "System not viable for manual control input" << std::endl;
+        return Result::ConnectionError;
+    }
+
     auto result = manual_control->set_manual_control_input(x, y, z, r);
 
-    if (!viable || result != mavsdk::ManualControl::Result::Success) {
-        std::cerr << "Manual control input failed: " << result << std::endl;
+    if (result != mavsdk::ManualControl::Result::Success) {
+        std::cerr << "Manual control input failed with result: " << result << std::endl;
         return Result::Failure;
     }
 
@@ -151,14 +156,24 @@ CommandManager::Result CommandManager::execute_action(std::function<mavsdk::Acti
 }
 
 CommandManager::Result CommandManager::start_manual_control() {
-    set_manual_control(0.f, 0.f, 0.5f, 0.f);
+    if (!viable) {
+        std::cerr << "System not viable to start manual control" << std::endl;
+        return Result::ConnectionError;
+    }
+
+    set_manual_control(0.0f, 0.0f, 0.5f, 0.0f);
+
+    // Start position control mode
     auto manual_control_result = manual_control->start_position_control();
     if (manual_control_result != mavsdk::ManualControl::Result::Success) {
-        std::cerr << "Position control start failed: " << manual_control_result << '\n';
+        std::cerr << "Failed to start position control: " << manual_control_result << std::endl;
         return Result::Failure;
     }
+
+    std::cout << "Manual control started successfully" << std::endl;
     return Result::Success;
 }
+
 
 CommandManager::Result CommandManager::start_hold_mode() {
     if (!keep_running.load()) {
