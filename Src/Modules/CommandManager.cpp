@@ -194,6 +194,7 @@ CommandManager::Result CommandManager::set_manual_control_impl(float x, float y,
         std::cerr << "Failed to queue manual control command" << std::endl;
         return Result::Failure;
     }
+    std::cout<<"check"<< std::endl;
     return Result::Success;
 }
 CommandManager::Result CommandManager::start_manual_control() {
