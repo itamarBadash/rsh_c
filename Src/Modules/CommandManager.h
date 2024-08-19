@@ -36,7 +36,8 @@ public:
     Result disarm();
     Result set_manual_control(float x, float y, float z, float r);
     Result start_manual_control();
-    // Command handler
+
+    Result set_manual_control_impl(float x, float y, float z, float r) ;   // Command handler
     Result handle_command(const std::string& command, const std::vector<float>& parameters);
     bool IsViable();
     bool is_command_valid(const std::string& command) const;

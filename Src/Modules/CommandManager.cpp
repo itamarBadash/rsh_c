@@ -148,12 +148,108 @@ CommandManager::Result CommandManager::execute_action(std::function<mavsdk::Acti
     return Result::Success;
 }
 
-CommandManager::Result CommandManager::start_manual_control() {
-    set_manual_control(0.f, 0.f, 0.5f, 0.f);
-    auto manual_control_result = manual_control->start_position_control();
-    if (manual_control_result != mavsdk::ManualControl::Result::Success) {
-        std::cerr << "Position control start failed: " << manual_control_result << '\n';
+CommandManager::Result CommandManager::set_manual_control_impl(float x, float y, float z, float r) {
+    // Define constant values for the other parameters
+    const uint8_t target = 0;            // Example target system ID
+    const uint16_t buttons = 0;          // Default buttons bitmask
+    const uint16_t buttons2 = 0;         // Default secondary buttons bitmask
+    const uint8_t enabled_extensions = 0;// No extensions enabled
+    const int16_t s = 0;                 // Default additional control input S
+    const int16_t t = 0;                 // Default additional control input T
+    const int16_t aux1 = 0;              // Default auxiliary control 1
+    const int16_t aux2 = 0;              // Default auxiliary control 2
+    const int16_t aux3 = 0;              // Default auxiliary control 3
+    const int16_t aux4 = 0;              // Default auxiliary control 4
+    const int16_t aux5 = 0;              // Default auxiliary control 5
+    const int16_t aux6 = 0;              // Default auxiliary control 6
+
+    auto result = mavlink_passthrough->queue_message([&](MavlinkAddress mavlink_address, uint8_t channel) {
+        mavlink_message_t message;
+        mavlink_msg_manual_control_pack_chan(
+                mavlink_address.system_id,          // System ID
+                mavlink_address.component_id,       // Component ID
+                channel,                            // Channel
+                &message,                           // Message pointer
+                target,                             // Target system
+                static_cast<int16_t>(x * 1000),     // X axis control
+                static_cast<int16_t>(y * 1000),     // Y axis control
+                static_cast<int16_t>(z * 1000),     // Z axis control (throttle)
+                static_cast<int16_t>(r * 1000),     // R axis control (yaw)
+                buttons,                            // Buttons bitmask
+                buttons2,                           // Secondary buttons bitmask
+                enabled_extensions,                 // Enabled extensions
+                s,                                  // Additional control input S
+                t,                                  // Additional control input T
+                aux1,                               // Auxiliary control 1
+                aux2,                               // Auxiliary control 2
+                aux3,                               // Auxiliary control 3
+                aux4,                               // Auxiliary control 4
+                aux5,                               // Auxiliary control 5
+                aux6                                // Auxiliary control 6
+        );
+        return message;
+    });
+
+    if (result != mavsdk::MavlinkPassthrough::Result::Success) {
+        std::cerr << "Failed to queue manual control command" << std::endl;
         return Result::Failure;
     }
+    return Result::Success;
+}
+CommandManager::Result CommandManager::start_manual_control() {
+    // Set the flight mode to MANUAL (or another suitable mode)
+    auto mode_result = mavlink_passthrough->queue_message([&](MavlinkAddress mavlink_address, uint8_t channel) {
+        mavlink_message_t message;
+        mavlink_msg_set_mode_pack_chan(
+                mavlink_address.system_id,
+                mavlink_address.component_id,
+                channel,
+                &message,
+                system->get_system_id(),
+                MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,  // Base mode flag indicating custom mode
+                MAV_MODE_FLAG_MANUAL_INPUT_ENABLED                  // Custom mode for manual control (this should match the mode used for manual control)
+        );
+        return message;
+    });
+
+    if (mode_result != mavsdk::MavlinkPassthrough::Result::Success) {
+        std::cerr << "Failed to set manual flight mode" << std::endl;
+        return Result::Failure;
+    }
+
+    // After setting the manual mode, you can now send manual control commands.
+    // Example initial manual control command:
+    auto control_result = mavlink_passthrough->queue_message([&](MavlinkAddress mavlink_address, uint8_t channel) {
+        mavlink_message_t message;
+        mavlink_msg_manual_control_pack_chan(
+                mavlink_address.system_id,
+                mavlink_address.component_id,
+                channel,
+                &message,
+                system->get_system_id(),             // Target system
+                0,                                   // X axis control (neutral position)
+                0,                                   // Y axis control (neutral position)
+                500,                                 // Z axis control (neutral throttle position)
+                0,                                   // R axis control (neutral yaw)
+                0,                                   // Buttons bitmask (no buttons pressed)
+                0,                                   // Secondary buttons bitmask
+                0,                                   // No extensions enabled
+                0,                                   // Additional control input S (neutral)
+                0,                                   // Additional control input T (neutral)
+                0,                                   // Auxiliary control 1 (neutral)
+                0,                                   // Auxiliary control 2 (neutral)
+                0,                                   // Auxiliary control 3 (neutral)
+                0,                                   // Auxiliary control 4 (neutral)
+                0,                                   // Auxiliary control 5 (neutral)
+                0                                    // Auxiliary control 6 (neutral)
+        );
+        return message;
+    });
+
+    if (control_result != mavsdk::MavlinkPassthrough::Result::Success) {
+        std::cerr << "Failed to send manual control command" << std::endl;
+        return Result::Failure;
+    }
+
     return Result::Success;
 }

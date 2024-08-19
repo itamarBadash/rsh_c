@@ -43,35 +43,13 @@ void main_thread_function(std::shared_ptr<System> system,
                           std::shared_ptr<TelemetryManager> telemetry_manager,
                           std::shared_ptr<CommunicationManager> communication_manager) {
     telemetry_manager->start();
+    command_manager->arm();
+    command_manager->start_manual_control();
 
-    if (command_manager->handle_command("arm", {}) != CommandManager::Result::Success) {
-        std::cerr << "Failed to arm the drone" << std::endl;
-        return;
+
+    while (true) {
+        std::this_thread::sleep_for(std::chrono::seconds(3));
     }
-
-    // Start manual control mode
-    if (command_manager->start_manual_control() != CommandManager::Result::Success) {
-        std::cerr << "Failed to start manual control" << std::endl;
-        return;
-    }
-
-    // Wait for a short moment to ensure manual control is engaged
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-
-    float ascent_speed = 0.7f; // Negative value for ascending, range -1 to 1
-    float duration_seconds = 5.0f; // Ascend for 5 seconds
-    auto start_time = std::chrono::steady_clock::now();
-
-    // Ascend for a few seconds
-    std::cout << "Ascending...\n";
-    while (std::chrono::duration<float>(std::chrono::steady_clock::now() - start_time).count() < duration_seconds) {
-        command_manager->set_manual_control(0.0f, 0.0f, ascent_speed, 0.0f);
-        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Send input every 100 milliseconds
-    }
-
-    // Stop ascending
-    command_manager->set_manual_control(0.0f, 0.0f, 0.5f, 0.0f);
-    std::cout << "Ascent complete.\n";
 }
 
 int main(int argc, char** argv) {
