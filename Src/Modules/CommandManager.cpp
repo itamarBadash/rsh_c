@@ -192,22 +192,21 @@ void CommandManager::provide_control_input(float x, float y, float z, float r) {
 }
 
 void CommandManager::hold_mode_loop() {
-    set_manual_control(0.f, 0.f, 0.5f, 0.f); // Default hover command
+    set_manual_control(0.f, 0.f, 0.5f, 0.f); // Initial hover command
 
     while (keep_running.load()) {
         std::unique_lock<std::mutex> lock(control_input_mutex);
-        control_input_cv.wait(lock, [this] { return !keep_running.load() || current_input != std::vector<float>{0.0f, 0.0f, 0.5f, 0.0f}; });
+        control_input_cv.wait(lock, [this] { return !keep_running.load(); });
 
         if (!keep_running.load()) {
             break; // Exit loop if not running
         }
 
+        // Apply current input
         auto result = set_manual_control(current_input[0], current_input[1], current_input[2], current_input[3]);
         if (result != Result::Success) {
             std::cerr << "Error setting manual control input\n";
         }
-
-        // Reset input to hover after applying
-        current_input = {0.0f, 0.0f, 0.5f, 0.0f};
     }
 }
+

@@ -118,16 +118,20 @@ int main(int argc, char** argv) {
     // Wait for a short moment to ensure manual control is engaged
 
     float ascent_speed = 0.7f; // Adjust this value for a reasonable ascent speed
-    command_manager->provide_control_input(0.0f, 0.0f, ascent_speed, 0.0f);
 
     // Ascend for a few seconds
     std::cout << "Ascending...\n";
-    sleep_for(seconds(5));
+    for (int i = 0; i < 50; ++i) { // Adjust loop count or duration as needed
+        command_manager->provide_control_input(0.0f, 0.0f, ascent_speed, 0.0f);
+        sleep_for(milliseconds(100)); // Send input every 100 milliseconds
+    }
 
     // Stop ascent and hover
-    command_manager->provide_control_input(0.0f, 0.0f, 0.5f, 0.0f); // 0.5f typically represents hover
     std::cout << "Hovering...\n";
-    sleep_for(seconds(5));
+    for (int i = 0; i < 50; ++i) { // Adjust loop count or duration as needed
+        command_manager->provide_control_input(0.0f, 0.0f, 0.5f, 0.0f); // 0.5f typically represents hover
+        sleep_for(milliseconds(100)); // Send input every 100 milliseconds
+    }
 
     auto addon = std::make_shared<BaseAddon>("system");
 
