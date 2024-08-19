@@ -40,29 +40,46 @@ void usage(const std::string& bin_name) {
 
 void main_thread_function(std::shared_ptr<System> system,
                           std::shared_ptr<CommandManager> command_manager,
-                          std::shared_ptr<TelemetryManager> telemetry_manager, std::shared_ptr<CommunicationManager> communication_manager) {
+                          std::shared_ptr<TelemetryManager> telemetry_manager,
+                          std::shared_ptr<CommunicationManager> communication_manager) {
     telemetry_manager->start();
-
-
 
     if (command_manager->handle_command("arm", {}) != CommandManager::Result::Success) {
         std::cerr << "Failed to arm the drone" << std::endl;
+        return;
+    }
+    command_manager->start_manual_control();
+
+    // Start hold mode
+    if (command_manager->start_hold_mode() != CommandManager::Result::Success) {
+        std::cerr << "Failed to start hold mode" << std::endl;
+        return;
     }
 
-    // Start manual control mode
-    if (command_manager->start_manual_control() != CommandManager::Result::Success) {
-        std::cerr << "Failed to start manual control" << std::endl;
-    }
+    // Wait for a short moment to ensure hold mode is engaged
+    std::this_thread::sleep_for(std::chrono::seconds(2));
 
-    // Wait for a short moment to ensure manual control is engaged
-
-    float ascent_speed = 0.7f; // Adjust this value for a reasonable ascent speed
+    float ascent_speed = -0.5f; // Negative value for ascending, range -1 to 1
+    float duration_seconds = 5.0f; // Ascend for 5 seconds
+    auto start_time = std::chrono::steady_clock::now();
 
     // Ascend for a few seconds
     std::cout << "Ascending...\n";
-    while (true) { // Adjust loop count or duration as needed
-        command_manager->provide_control_input(0.0f, 0.0f, 0.0f, ascent_speed);
-        sleep_for(milliseconds(100)); // Send input every 100 milliseconds
+    while (std::chrono::duration<float>(std::chrono::steady_clock::now() - start_time).count() < duration_seconds) {
+        command_manager->provide_control_input(0.0f, 0.0f, ascent_speed, 0.0f);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Update input every 100 milliseconds
+    }
+
+    // Stop ascending and hover
+    command_manager->provide_control_input(0.0f, 0.0f, 0.0f, 0.0f);
+    std::cout << "Ascent complete. Hovering.\n";
+
+    // Keep the drone hovering for a while (e.g., 5 more seconds)
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+
+    // Land the drone (assuming you have a land command)
+    if (command_manager->handle_command("land", {}) != CommandManager::Result::Success) {
+        std::cerr << "Failed to initiate landing" << std::endl;
     }
 }
 
