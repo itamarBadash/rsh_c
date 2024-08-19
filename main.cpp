@@ -91,6 +91,7 @@ int main(int argc, char** argv) {
 
     auto system = systems.at(0);
 
+    CREATE_EVENT("InfoRequest");
 
     auto command_manager = std::make_shared<CommandManager>(system);
     auto telemetry_manager = std::make_shared<TelemetryManager>(system);
@@ -102,7 +103,6 @@ int main(int argc, char** argv) {
 
     std::this_thread::sleep_for(std::chrono::seconds(3));
 
-    CREATE_EVENT("InfoRequest");
 
     SUBSCRIBE_TO_EVENT("InfoRequest", ([telemetry_manager, communication_manager]() {
     communication_manager->send_message(telemetry_manager->getTelemetryData().print());
