@@ -48,15 +48,14 @@ void main_thread_function(std::shared_ptr<System> system,
         std::cerr << "Failed to arm the drone" << std::endl;
         return;
     }
-    command_manager->start_manual_control();
 
-    // Start hold mode
-    if (command_manager->start_hold_mode() != CommandManager::Result::Success) {
-        std::cerr << "Failed to start hold mode" << std::endl;
+    // Start manual control mode
+    if (command_manager->start_manual_control() != CommandManager::Result::Success) {
+        std::cerr << "Failed to start manual control" << std::endl;
         return;
     }
 
-    // Wait for a short moment to ensure hold mode is engaged
+    // Wait for a short moment to ensure manual control is engaged
     std::this_thread::sleep_for(std::chrono::seconds(2));
 
     float ascent_speed = -0.5f; // Negative value for ascending, range -1 to 1
@@ -66,21 +65,13 @@ void main_thread_function(std::shared_ptr<System> system,
     // Ascend for a few seconds
     std::cout << "Ascending...\n";
     while (std::chrono::duration<float>(std::chrono::steady_clock::now() - start_time).count() < duration_seconds) {
-        command_manager->provide_control_input(0.0f, 0.0f, ascent_speed, 0.0f);
-        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Update input every 100 milliseconds
+        command_manager->set_manual_control(0.0f, 0.0f, ascent_speed, 0.0f);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Send input every 100 milliseconds
     }
 
-    // Stop ascending and hover
-    command_manager->provide_control_input(0.0f, 0.0f, 0.0f, 0.0f);
-    std::cout << "Ascent complete. Hovering.\n";
-
-    // Keep the drone hovering for a while (e.g., 5 more seconds)
-    std::this_thread::sleep_for(std::chrono::seconds(5));
-
-    // Land the drone (assuming you have a land command)
-    if (command_manager->handle_command("land", {}) != CommandManager::Result::Success) {
-        std::cerr << "Failed to initiate landing" << std::endl;
-    }
+    // Stop ascending
+    command_manager->set_manual_control(0.0f, 0.0f, 0.5f, 0.0f);
+    std::cout << "Ascent complete.\n";
 }
 
 int main(int argc, char** argv) {
