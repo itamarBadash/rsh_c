@@ -47,8 +47,7 @@ void main_thread_function(std::shared_ptr<System> system,
     command_manager->arm();
     std::cout << "Attempting to ascend..." << std::endl;
     for (int i = 0; i < 50; ++i) {
-        float throttle = 0.5f + i * 0.01f; // Gradually increase throttle
-        command_manager->set_manual_control_impl(0, 0, throttle, 0);
+        command_manager->set_flight_mode(1,i);
         std::this_thread::sleep_for(std::chrono::milliseconds(100)); // 100 ms delay
     }
 
