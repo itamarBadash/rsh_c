@@ -189,8 +189,6 @@ CommandManager::Result CommandManager::set_manual_control_impl(float x, float y,
             0);
         return message;
     });
-        return message;
-    });
 
     if (result != mavsdk::MavlinkPassthrough::Result::Success) {
         std::cerr << "Failed to queue manual control command" << std::endl;
