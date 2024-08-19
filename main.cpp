@@ -43,8 +43,11 @@ void main_thread_function(std::shared_ptr<System> system,
                           std::shared_ptr<TelemetryManager> telemetry_manager,
                           std::shared_ptr<CommunicationManager> communication_manager) {
     telemetry_manager->start();
-    command_manager->arm();
-    command_manager->start_manual_control();
+    std::cout << "Attempting to ascend..." << std::endl;
+    for (int i = 0; i < 50; ++i) {
+        command_manager->set_manual_control_impl(0,0,0.7f,0);
+
+    }
 
 
     while (true) {
