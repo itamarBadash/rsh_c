@@ -150,7 +150,7 @@ CommandManager::Result CommandManager::execute_action(std::function<mavsdk::Acti
 
 CommandManager::Result CommandManager::set_manual_control_impl(float x, float y, float z, float r) {
     // Define constant values for the other parameters
-    const uint8_t target = mavlink_passthrough->get_target_sysid();            // Example target system ID
+    const uint8_t target = system->get_system_id();            // Example target system ID
     const uint16_t buttons = 0;          // Default buttons bitmask
     const uint16_t buttons2 = 0;         // Default secondary buttons bitmask
     const uint8_t enabled_extensions = 0;// No extensions enabled
