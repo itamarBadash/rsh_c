@@ -11,8 +11,10 @@
 #include "Src/Communications/TCPServer.h"
 #include "Src/Communications/UDPServer.h"
 #include "Src/Modules/CommunicationManager.h"
-
-
+#include <chrono>
+using std::chrono::seconds;
+using std::chrono::milliseconds;
+using std::this_thread::sleep_for;
 using namespace mavsdk;
 
 class Listener {
@@ -100,12 +102,12 @@ int main(int argc, char** argv) {
 
     communication_manager->start();
 
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+
     if (command_manager->handle_command("arm", {}) != CommandManager::Result::Success) {
         std::cerr << "Failed to arm the drone" << std::endl;
         return 1;
     }
-    command_manager->takeoff();
-    std::this_thread::sleep_for(std::chrono::seconds(5));
 
     // Start manual control mode
     if (command_manager->start_manual_control() != CommandManager::Result::Success) {
@@ -115,27 +117,23 @@ int main(int argc, char** argv) {
 
     // Wait for a short moment to ensure manual control is engaged
 
-
-    // Ascend the drone
-    // Assuming z-axis controls the throttle: positive values ascend, negative values descend
-    float ascent_speed = 1.0f; // Adjust as necessary for your drone's capabilities
-
+    float ascent_speed = 0.7f; // Adjust this value for a reasonable ascent speed
     command_manager->provide_control_input(0.0f, 0.0f, ascent_speed, 0.0f);
 
-    // Keep ascending for a few seconds
-    std::this_thread::sleep_for(std::chrono::seconds(5));
+    // Ascend for a few seconds
+    std::cout << "Ascending...\n";
+    sleep_for(seconds(5));
 
-    // Stop the ascent and hover
+    // Stop ascent and hover
     command_manager->provide_control_input(0.0f, 0.0f, 0.5f, 0.0f); // 0.5f typically represents hover
-
-
-
+    std::cout << "Hovering...\n";
+    sleep_for(seconds(5));
 
     auto addon = std::make_shared<BaseAddon>("system");
 
-    std::thread main_thread(main_thread_function, system, command_manager,telemetry_manager,communication_manager);
+   // std::thread main_thread(main_thread_function, system, command_manager,telemetry_manager,communication_manager);
 
-    main_thread.join();
+   // main_thread.join();
 
     return 0;
 }
