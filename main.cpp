@@ -43,7 +43,7 @@ void main_thread_function(std::shared_ptr<System> system,
 
     CREATE_EVENT("InfoRequest");
 
-    SUBSCRIBE_TO_EVENT("InfoRequest", ([telemetry_mana ger, communication_manager]() {
+    SUBSCRIBE_TO_EVENT("InfoRequest", ([telemetry_manager, communication_manager]() {
     communication_manager->send_message(telemetry_manager->getTelemetryData().print());
     }));
 
