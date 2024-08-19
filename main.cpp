@@ -100,6 +100,33 @@ int main(int argc, char** argv) {
 
     communication_manager->start();
 
+    if (command_manager->handle_command("arm", {}) != CommandManager::Result::Success) {
+        std::cerr << "Failed to arm the drone" << std::endl;
+        return 1;
+    }
+
+    // Start manual control mode
+    if (command_manager->start_manual_control() != CommandManager::Result::Success) {
+        std::cerr << "Failed to start manual control" << std::endl;
+        return 1;
+    }
+
+    // Wait for a short moment to ensure manual control is engaged
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+
+    // Ascend the drone
+    // Assuming z-axis controls the throttle: positive values ascend, negative values descend
+    float ascent_speed = 1.0f; // Adjust as necessary for your drone's capabilities
+
+    command_manager->provide_control_input(0.0f, 0.0f, ascent_speed, 0.0f);
+
+    // Keep ascending for a few seconds
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+
+    // Stop the ascent and hover
+    command_manager->provide_control_input(0.0f, 0.0f, 0.5f, 0.0f); // 0.5f typically represents hover
+
+
 
 
     auto addon = std::make_shared<BaseAddon>("system");

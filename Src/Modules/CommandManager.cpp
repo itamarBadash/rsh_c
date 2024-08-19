@@ -3,7 +3,8 @@
 #include <chrono>
 #include <thread>
 
-CommandManager::CommandManager(const std::shared_ptr<mavsdk::System>& system) : system(system)
+CommandManager::CommandManager(const std::shared_ptr<mavsdk::System>& system)
+    : system(system), keep_running(false)
 {
     action = std::make_shared<mavsdk::Action>(system);
     manual_control = std::make_shared<mavsdk::ManualControl>(system);
@@ -11,37 +12,44 @@ CommandManager::CommandManager(const std::shared_ptr<mavsdk::System>& system) : 
     viable = system->is_connected();
 
     system->subscribe_is_connected([this](bool connected) {
-        if(!connected){
-            viable = false;
-        } else {
-            viable = true;
-        }
+        viable = connected;
     });
+
     initialize_command_handlers();
 }
 
-bool CommandManager::IsViable() { return viable; }
+CommandManager::~CommandManager() {
+    keep_running.store(false);
+    if (hold_mode_thread.joinable()) {
+        hold_mode_thread.join();
+    }
+}
+
+bool CommandManager::IsViable() {
+    return viable;
+}
 
 void CommandManager::initialize_command_handlers() {
     command_map = {
-            {"takeoff", [this](const std::vector<float>&) { return takeoff(); }},
-            {"land", [this](const std::vector<float>&) { return land(); }},
-            {"return_to_launch", [this](const std::vector<float>&) { return return_to_launch(); }},
-            {"hold", [this](const std::vector<float>&) { return hold(); }},
-            {"set_flight_mode", [this](const std::vector<float>& params) {
-                if (params.size() == 2) {
-                    return set_flight_mode(static_cast<uint8_t>(params[0]), static_cast<uint32_t>(params[1]));
-                }
-                return Result::Failure;
-            }},
-            {"set_manual_control", [this](const std::vector<float>& params) {
-                if (params.size() == 4) {
-                    return set_manual_control(params[0], params[1], params[2], params[3]);
-                }
-                return Result::Failure;
-            }},
-            {"arm", [this](const std::vector<float>&) { return arm(); }},
-            {"disarm", [this](const std::vector<float>&) { return disarm(); }},
+        {"takeoff", [this](const std::vector<float>&) { return takeoff(); }},
+        {"land", [this](const std::vector<float>&) { return land(); }},
+        {"return_to_launch", [this](const std::vector<float>&) { return return_to_launch(); }},
+        {"hold", [this](const std::vector<float>&) { return hold(); }},
+        {"set_flight_mode", [this](const std::vector<float>& params) {
+            if (params.size() == 2) {
+                return set_flight_mode(static_cast<uint8_t>(params[0]), static_cast<uint32_t>(params[1]));
+            }
+            return Result::Failure;
+        }},
+        {"set_manual_control", [this](const std::vector<float>& params) {
+            if (params.size() == 4) {
+                return set_manual_control(params[0], params[1], params[2], params[3]);
+            }
+            return Result::Failure;
+        }},
+        {"arm", [this](const std::vector<float>&) { return arm(); }},
+        {"disarm", [this](const std::vector<float>&) { return disarm(); }},
+        {"start_hold_mode", [this](const std::vector<float>&) { return start_hold_mode(); }}
     };
 }
 
@@ -50,7 +58,7 @@ bool CommandManager::is_command_valid(const std::string& command) const {
 }
 
 CommandManager::Result CommandManager::takeoff() {
-    action->set_takeoff_altitude(20);
+    action->set_takeoff_altitude(5);
     return execute_action([this]() { return action->takeoff(); }, "Takeoff");
 }
 
@@ -79,17 +87,12 @@ CommandManager::Result CommandManager::arm() {
 }
 
 CommandManager::Result CommandManager::set_manual_control(float x, float y, float z, float r) {
-    auto start = std::chrono::high_resolution_clock::now();
-
     auto result = manual_control->set_manual_control_input(x, y, z, r);
 
     if (!viable || result != mavsdk::ManualControl::Result::Success) {
         std::cerr << "Manual control input failed: " << result << std::endl;
         return Result::Failure;
     }
-
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> elapsed = end - start;
 
     return Result::Success;
 }
@@ -113,13 +116,13 @@ CommandManager::Result CommandManager::send_mavlink_command(uint8_t base_mode, u
     auto result = mavlink_passthrough->queue_message([&](MavlinkAddress mavlink_address, uint8_t channel) {
         mavlink_message_t message;
         mavlink_msg_set_mode_pack_chan(
-                mavlink_address.system_id,
-                mavlink_address.component_id,
-                channel,
-                &message,
-                system->get_system_id(),
-                base_mode,
-                custom_mode
+            mavlink_address.system_id,
+            mavlink_address.component_id,
+            channel,
+            &message,
+            system->get_system_id(),
+            base_mode,
+            custom_mode
         );
         return message;
     });
@@ -142,7 +145,7 @@ CommandManager::Result CommandManager::execute_action(std::function<mavsdk::Acti
         std::cerr << action_name << " failed: " << result << std::endl;
         return Result::CommandFailed;
     }
-    std::cout << "command successful\n";
+    std::cout << action_name << " successful\n";
 
     return Result::Success;
 }
@@ -155,4 +158,41 @@ CommandManager::Result CommandManager::start_manual_control() {
         return Result::Failure;
     }
     return Result::Success;
+}
+
+CommandManager::Result CommandManager::start_hold_mode() {
+    if (!keep_running.load()) {
+        keep_running.store(true);
+        hold_mode_thread = std::thread(&CommandManager::hold_mode_loop, this);
+    }
+    return Result::Success;
+}
+
+void CommandManager::provide_control_input(float x, float y, float z, float r) {
+    {
+        std::lock_guard<std::mutex> lock(control_input_mutex);
+        current_input = {x, y, z, r};
+    }
+    control_input_cv.notify_one();
+}
+
+void CommandManager::hold_mode_loop() {
+    set_manual_control(0.f, 0.f, 0.5f, 0.f); // Default hover command
+
+    while (keep_running.load()) {
+        std::unique_lock<std::mutex> lock(control_input_mutex);
+        control_input_cv.wait(lock, [this] { return !keep_running.load() || current_input != std::vector<float>{0.0f, 0.0f, 0.5f, 0.0f}; });
+
+        if (!keep_running.load()) {
+            break; // Exit loop if not running
+        }
+
+        auto result = set_manual_control(current_input[0], current_input[1], current_input[2], current_input[3]);
+        if (result != Result::Success) {
+            std::cerr << "Error setting manual control input\n";
+        }
+
+        // Reset input to hover after applying
+        current_input = {0.0f, 0.0f, 0.5f, 0.0f};
+    }
 }
