@@ -150,7 +150,7 @@ CommandManager::Result CommandManager::execute_action(std::function<mavsdk::Acti
 
 CommandManager::Result CommandManager::set_manual_control_impl(float x, float y, float z, float r) {
     // Define constant values for the other parameters
-    const uint8_t target = 0;            // Example target system ID
+    const uint8_t target = mavlink_passthrough->get_target_sysid();            // Example target system ID
     const uint16_t buttons = 0;          // Default buttons bitmask
     const uint16_t buttons2 = 0;         // Default secondary buttons bitmask
     const uint8_t enabled_extensions = 0;// No extensions enabled
@@ -162,31 +162,33 @@ CommandManager::Result CommandManager::set_manual_control_impl(float x, float y,
     const int16_t aux4 = 0;              // Default auxiliary control 4
     const int16_t aux5 = 0;              // Default auxiliary control 5
     const int16_t aux6 = 0;              // Default auxiliary control 6
-
+    const int16_t pitch_only_axis = 0;
+    const int16_t roll_only_axis = 0;
     auto result = mavlink_passthrough->queue_message([&](MavlinkAddress mavlink_address, uint8_t channel) {
         mavlink_message_t message;
         mavlink_msg_manual_control_pack_chan(
-                mavlink_address.system_id,          // System ID
-                mavlink_address.component_id,       // Component ID
-                channel,                            // Channel
-                &message,                           // Message pointer
-                target,                             // Target system
-                static_cast<int16_t>(x * 1000),     // X axis control
-                static_cast<int16_t>(y * 1000),     // Y axis control
-                static_cast<int16_t>(z * 1000),     // Z axis control (throttle)
-                static_cast<int16_t>(r * 1000),     // R axis control (yaw)
-                buttons,                            // Buttons bitmask
-                buttons2,                           // Secondary buttons bitmask
-                enabled_extensions,                 // Enabled extensions
-                s,                                  // Additional control input S
-                t,                                  // Additional control input T
-                aux1,                               // Auxiliary control 1
-                aux2,                               // Auxiliary control 2
-                aux3,                               // Auxiliary control 3
-                aux4,                               // Auxiliary control 4
-                aux5,                               // Auxiliary control 5
-                aux6                                // Auxiliary control 6
-        );
+            mavlink_address.system_id,
+            mavlink_address.component_id,
+            channel,
+            &message,
+            target,
+            static_cast<int16_t>(x * 1000),
+            static_cast<int16_t>(y * 1000),
+            static_cast<int16_t>(z * 1000),
+            static_cast<int16_t>(r * 1000),
+            buttons,
+            buttons2,
+            enabled_extensions,
+            pitch_only_axis,
+            roll_only_axis,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0);
+        return message;
+    });
         return message;
     });
 
