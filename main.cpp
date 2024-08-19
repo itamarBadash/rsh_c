@@ -104,6 +104,8 @@ int main(int argc, char** argv) {
         std::cerr << "Failed to arm the drone" << std::endl;
         return 1;
     }
+    command_manager->takeoff();
+    std::this_thread::sleep_for(std::chrono::seconds(5));
 
     // Start manual control mode
     if (command_manager->start_manual_control() != CommandManager::Result::Success) {
@@ -112,7 +114,7 @@ int main(int argc, char** argv) {
     }
 
     // Wait for a short moment to ensure manual control is engaged
-    std::this_thread::sleep_for(std::chrono::seconds(2));
+
 
     // Ascend the drone
     // Assuming z-axis controls the throttle: positive values ascend, negative values descend
