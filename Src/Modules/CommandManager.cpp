@@ -157,3 +157,50 @@ CommandManager::Result CommandManager::start_manual_control() {
     }
     return Result::Success;
 }
+
+CommandManager::Result CommandManager::send_rc_override(uint16_t channel1, uint16_t channel2, uint16_t channel3, uint16_t channel4) {
+    uint16_t chan1_raw = UINT16_MAX;
+    uint16_t chan2_raw = UINT16_MAX;
+    uint16_t chan3_raw = UINT16_MAX;
+    uint16_t chan4_raw = UINT16_MAX;
+    uint16_t chan5_raw = UINT16_MAX;
+    uint16_t chan6_raw = UINT16_MAX;
+    uint16_t chan7_raw = UINT16_MAX;
+    uint16_t chan8_raw = UINT16_MAX;
+    uint16_t chan9_raw = UINT16_MAX;
+    uint16_t chan10_raw = UINT16_MAX;
+    uint16_t chan11_raw = UINT16_MAX;
+    uint16_t chan12_raw = UINT16_MAX;
+    uint16_t chan13_raw = UINT16_MAX;
+    uint16_t chan14_raw = UINT16_MAX;
+    uint16_t chan15_raw = UINT16_MAX;
+    uint16_t chan16_raw = UINT16_MAX;
+    uint16_t chan17_raw = UINT16_MAX;
+    uint16_t chan18_raw = UINT16_MAX;
+    auto result = mavlink_passthrough->queue_message([&](MavlinkAddress mavlink_address, uint8_t channel) {
+                mavlink_message_t message;
+                mavlink_msg_rc_channels_override_pack_chan(
+                    mavlink_address.system_id,               // System ID
+                    mavlink_address.component_id,            // Component ID
+                    channel,                                 // MAVLink channel
+                    &message,                                // Pointer to the message structure
+                    system->get_system_id(),                 // Target system ID
+                    0,                                       // Target component ID (0 for all)
+                    channel1, channel2, channel3,         // Channel 1-3 values
+                    channel4, chan5_raw, chan6_raw,         // Channel 4-6 values
+                    chan7_raw, chan8_raw, chan9_raw,         // Channel 7-9 values
+                    chan10_raw, chan11_raw, chan12_raw,      // Channel 10-12 values
+                    chan13_raw, chan14_raw, chan15_raw,      // Channel 13-15 values
+                    chan16_raw, chan17_raw, chan18_raw       // Channel 16-18 values
+                );
+                return message;
+            });
+
+            if (result != mavsdk::MavlinkPassthrough::Result::Success) {
+                std::cerr << "Failed to queue RC override command" << std::endl;
+                return Result::Failure;
+            }
+
+            std::cout << "RC override command sent successfully" << std::endl;
+            return Result::Success;
+}

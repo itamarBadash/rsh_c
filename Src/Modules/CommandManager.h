@@ -37,6 +37,8 @@ public:
     Result set_manual_control(float x, float y, float z, float r);
     Result start_manual_control();
 
+    Result send_rc_override(uint16_t channel1, uint16_t channel2, uint16_t channel3, uint16_t channel4);
+
     Result handle_command(const std::string& command, const std::vector<float>& parameters);
     bool IsViable();
     bool is_command_valid(const std::string& command) const;

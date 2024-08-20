@@ -43,6 +43,17 @@ void main_thread_function(std::shared_ptr<System> system,
                           std::shared_ptr<TelemetryManager> telemetry_manager,
                           std::shared_ptr<CommunicationManager> communication_manager) {
     telemetry_manager->start();
+    command_manager->arm();
+    command_manager->set_flight_mode(1,0);
+    for (int i = 0; i < 50; ++i) {
+        auto result = command_manager->send_rc_override(1500,1500,1700,1500);
+        if (result != CommandManager::Result::Success) {
+            std::cerr << "Command failed on iteration " << i << std::endl;
+            break;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // 100 ms delay
+    }
+
 
     while (true) {
         std::this_thread::sleep_for(std::chrono::seconds(3));
