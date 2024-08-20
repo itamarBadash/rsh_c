@@ -190,8 +190,8 @@ CommandManager::Result CommandManager::send_rc_override(uint16_t channel1, uint1
         rc_override.chan17_raw = UINT16_MAX;
         rc_override.chan18_raw = UINT16_MAX;
 
-        rc_override.target_system = mavlink_address.system_id;
-        rc_override.target_component = mavlink_address.component_id;
+        rc_override.target_system = system->get_system_id();
+        rc_override.target_component = system->component_ids()[0];
 
         // Temporary variables for copying packed struct members
         uint8_t target_system = rc_override.target_system;
