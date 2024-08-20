@@ -45,7 +45,6 @@ void main_thread_function(std::shared_ptr<System> system,
                           std::shared_ptr<CommunicationManager> communication_manager) {
     telemetry_manager->start();
     command_manager->arm();
-    command_manager->set_flight_mode(1,0);
     for (int i = 0; i < 50; ++i) {
         auto result = command_manager->send_rc_override(1500,1500,1700,1500);
         if (result != CommandManager::Result::Success) {
