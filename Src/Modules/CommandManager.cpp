@@ -173,7 +173,7 @@ CommandManager::Result CommandManager::send_rc_override(uint16_t channel1, uint1
             gcs_comp_id, // Use the appropriate component ID
             channel,
             &message,
-            mavlink_address.system_id, // Target system ID (usually the drone)
+            system->get_system_id(), // Target system ID (usually the drone)
             mavlink_address.component_id, // Target component ID
             channel1, // RC channel 1 (Throttle/Yaw/Roll/Pitch as appropriate)
             channel2, // RC channel 2
