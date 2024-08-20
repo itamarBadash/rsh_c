@@ -164,7 +164,7 @@ CommandManager::Result CommandManager::send_rc_override(uint16_t channel1, uint1
     auto result = mavlink_passthrough->queue_message([&](MavlinkAddress mavlink_address, uint8_t channel) {
         mavlink_message_t message;
 
-        mavlink_msg_rc_channels_override_pack_chan(
+        mavlink_msg_rc_channels_pack_chan(
             mavlink_address.system_id,
             mavlink_address.component_id,
             channel,
@@ -188,7 +188,8 @@ CommandManager::Result CommandManager::send_rc_override(uint16_t channel1, uint1
             UINT16_MAX, // Not overriding channel 15
             UINT16_MAX, // Not overriding channel 16
             UINT16_MAX, // Not overriding channel 17
-            UINT16_MAX  // Not overriding channel 18
+            UINT16_MAX,// Not overriding channel 18
+            UINT8_MAX
         );
 
         return message;
