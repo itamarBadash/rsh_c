@@ -161,6 +161,7 @@ CommandManager::Result CommandManager::start_manual_control() {
 }
 
 CommandManager::Result CommandManager::send_rc_override(uint16_t channel1, uint16_t channel2, uint16_t channel3, uint16_t channel4) {
+    std::cout<<"a"<<std::endl;
     auto result = mavlink_passthrough->queue_message([&](MavlinkAddress mavlink_address, uint8_t channel) {
         mavlink_message_t message;
 
