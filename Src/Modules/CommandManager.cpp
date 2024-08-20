@@ -161,17 +161,20 @@ CommandManager::Result CommandManager::start_manual_control() {
 }
 
 CommandManager::Result CommandManager::send_rc_override(uint16_t channel1, uint16_t channel2, uint16_t channel3, uint16_t channel4) {
-    std::cout<<"a"<<std::endl;
     auto result = mavlink_passthrough->queue_message([&](MavlinkAddress mavlink_address, uint8_t channel) {
         mavlink_message_t message;
 
-        mavlink_msg_rc_channels_pack_chan(
-            mavlink_address.system_id,
-            mavlink_address.component_id,
+        // Ensure we are using the GCS ID (255) for sending the message
+        uint8_t gcs_sys_id = 255;
+        uint8_t gcs_comp_id = mavlink_address.component_id; // Typically, the component ID is fine as-is
+
+        mavlink_msg_rc_channels_override_pack_chan(
+            gcs_sys_id, // Use the GCS system ID
+            gcs_comp_id, // Use the appropriate component ID
             channel,
             &message,
-            system->get_system_id(), // Use the correct system ID
-            mavlink_address.component_id, // Use the correct component ID
+            mavlink_address.system_id, // Target system ID (usually the drone)
+            mavlink_address.component_id, // Target component ID
             channel1, // RC channel 1 (Throttle/Yaw/Roll/Pitch as appropriate)
             channel2, // RC channel 2
             channel3, // RC channel 3
@@ -189,8 +192,7 @@ CommandManager::Result CommandManager::send_rc_override(uint16_t channel1, uint1
             UINT16_MAX, // Not overriding channel 15
             UINT16_MAX, // Not overriding channel 16
             UINT16_MAX, // Not overriding channel 17
-            UINT16_MAX,// Not overriding channel 18
-            UINT8_MAX
+            UINT16_MAX  // Not overriding channel 18
         );
 
         return message;
