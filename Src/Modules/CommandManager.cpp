@@ -164,58 +164,11 @@ CommandManager::Result CommandManager::send_rc_override(uint16_t channel1, uint1
     auto result = mavlink_passthrough->queue_message([&](MavlinkAddress mavlink_address, uint8_t channel) {
         mavlink_message_t message;
 
-        // Create and populate the RC override message
-        mavlink_rc_channels_override_t rc_override;
-        memset(&rc_override, 0, sizeof(rc_override));
+        // We will use the system ID directly from the system object, similar to the working function.
+        uint8_t target_system = system->get_system_id();
+        uint8_t target_component = mavlink_address.component_id; // Assuming component_id from address is correct
 
-        // Set the provided channels
-        rc_override.chan1_raw = channel1;
-        rc_override.chan2_raw = channel2;
-        rc_override.chan3_raw = channel3;
-        rc_override.chan4_raw = channel4;
-
-        // Set the other channels to not override
-        rc_override.chan5_raw = UINT16_MAX;
-        rc_override.chan6_raw = UINT16_MAX;
-        rc_override.chan7_raw = UINT16_MAX;
-        rc_override.chan8_raw = UINT16_MAX;
-        rc_override.chan9_raw = UINT16_MAX;
-        rc_override.chan10_raw = UINT16_MAX;
-        rc_override.chan11_raw = UINT16_MAX;
-        rc_override.chan12_raw = UINT16_MAX;
-        rc_override.chan13_raw = UINT16_MAX;
-        rc_override.chan14_raw = UINT16_MAX;
-        rc_override.chan15_raw = UINT16_MAX;
-        rc_override.chan16_raw = UINT16_MAX;
-        rc_override.chan17_raw = UINT16_MAX;
-        rc_override.chan18_raw = UINT16_MAX;
-
-        rc_override.target_system = system->get_system_id();
-        rc_override.target_component = system->component_ids()[0];
-
-        // Temporary variables for copying packed struct members
-        uint8_t target_system = rc_override.target_system;
-        uint8_t target_component = rc_override.target_component;
-        uint16_t chan1_raw = rc_override.chan1_raw;
-        uint16_t chan2_raw = rc_override.chan2_raw;
-        uint16_t chan3_raw = rc_override.chan3_raw;
-        uint16_t chan4_raw = rc_override.chan4_raw;
-        uint16_t chan5_raw = rc_override.chan5_raw;
-        uint16_t chan6_raw = rc_override.chan6_raw;
-        uint16_t chan7_raw = rc_override.chan7_raw;
-        uint16_t chan8_raw = rc_override.chan8_raw;
-        uint16_t chan9_raw = rc_override.chan9_raw;
-        uint16_t chan10_raw = rc_override.chan10_raw;
-        uint16_t chan11_raw = rc_override.chan11_raw;
-        uint16_t chan12_raw = rc_override.chan12_raw;
-        uint16_t chan13_raw = rc_override.chan13_raw;
-        uint16_t chan14_raw = rc_override.chan14_raw;
-        uint16_t chan15_raw = rc_override.chan15_raw;
-        uint16_t chan16_raw = rc_override.chan16_raw;
-        uint16_t chan17_raw = rc_override.chan17_raw;
-        uint16_t chan18_raw = rc_override.chan18_raw;
-
-        // Pack the message into the MAVLink message structure
+        // Pack the message directly with all channels, similar to the working function's pattern
         mavlink_msg_rc_channels_override_pack_chan(
             mavlink_address.system_id,
             mavlink_address.component_id,
@@ -223,24 +176,24 @@ CommandManager::Result CommandManager::send_rc_override(uint16_t channel1, uint1
             &message,
             target_system,
             target_component,
-            chan1_raw,
-            chan2_raw,
-            chan3_raw,
-            chan4_raw,
-            chan5_raw,
-            chan6_raw,
-            chan7_raw,
-            chan8_raw,
-            chan9_raw,
-            chan10_raw,
-            chan11_raw,
-            chan12_raw,
-            chan13_raw,
-            chan14_raw,
-            chan15_raw,
-            chan16_raw,
-            chan17_raw,
-            chan18_raw
+            channel1,
+            channel2,
+            channel3,
+            channel4,
+            UINT16_MAX, // chan5_raw
+            UINT16_MAX, // chan6_raw
+            UINT16_MAX, // chan7_raw
+            UINT16_MAX, // chan8_raw
+            UINT16_MAX, // chan9_raw
+            UINT16_MAX, // chan10_raw
+            UINT16_MAX, // chan11_raw
+            UINT16_MAX, // chan12_raw
+            UINT16_MAX, // chan13_raw
+            UINT16_MAX, // chan14_raw
+            UINT16_MAX, // chan15_raw
+            UINT16_MAX, // chan16_raw
+            UINT16_MAX, // chan17_raw
+            UINT16_MAX  // chan18_raw
         );
 
         return message;
@@ -250,6 +203,5 @@ CommandManager::Result CommandManager::send_rc_override(uint16_t channel1, uint1
         std::cerr << "Failed to send RC override message" << std::endl;
         return Result::Failure;
     }
-
     return Result::Success;
 }
