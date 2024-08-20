@@ -164,36 +164,31 @@ CommandManager::Result CommandManager::send_rc_override(uint16_t channel1, uint1
     auto result = mavlink_passthrough->queue_message([&](MavlinkAddress mavlink_address, uint8_t channel) {
         mavlink_message_t message;
 
-        // We will use the system ID directly from the system object, similar to the working function.
-        uint8_t target_system = system->get_system_id();
-        uint8_t target_component = mavlink_address.component_id; // Assuming component_id from address is correct
-
-        // Pack the message directly with all channels, similar to the working function's pattern
         mavlink_msg_rc_channels_override_pack_chan(
             mavlink_address.system_id,
             mavlink_address.component_id,
             channel,
             &message,
-            target_system,
-            target_component,
-            channel1,
-            channel2,
-            channel3,
-            channel4,
-            UINT16_MAX, // chan5_raw
-            UINT16_MAX, // chan6_raw
-            UINT16_MAX, // chan7_raw
-            UINT16_MAX, // chan8_raw
-            UINT16_MAX, // chan9_raw
-            UINT16_MAX, // chan10_raw
-            UINT16_MAX, // chan11_raw
-            UINT16_MAX, // chan12_raw
-            UINT16_MAX, // chan13_raw
-            UINT16_MAX, // chan14_raw
-            UINT16_MAX, // chan15_raw
-            UINT16_MAX, // chan16_raw
-            UINT16_MAX, // chan17_raw
-            UINT16_MAX  // chan18_raw
+            system->get_system_id(), // Use the correct system ID
+            mavlink_address.component_id, // Use the correct component ID
+            channel1, // RC channel 1 (Throttle/Yaw/Roll/Pitch as appropriate)
+            channel2, // RC channel 2
+            channel3, // RC channel 3
+            channel4, // RC channel 4
+            UINT16_MAX, // Not overriding channel 5
+            UINT16_MAX, // Not overriding channel 6
+            UINT16_MAX, // Not overriding channel 7
+            UINT16_MAX, // Not overriding channel 8
+            UINT16_MAX, // Not overriding channel 9
+            UINT16_MAX, // Not overriding channel 10
+            UINT16_MAX, // Not overriding channel 11
+            UINT16_MAX, // Not overriding channel 12
+            UINT16_MAX, // Not overriding channel 13
+            UINT16_MAX, // Not overriding channel 14
+            UINT16_MAX, // Not overriding channel 15
+            UINT16_MAX, // Not overriding channel 16
+            UINT16_MAX, // Not overriding channel 17
+            UINT16_MAX  // Not overriding channel 18
         );
 
         return message;
