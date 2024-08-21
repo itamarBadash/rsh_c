@@ -38,7 +38,13 @@ void CommandManager::initialize_command_handlers() {
             }},
             {"set_manual_control", [this](const std::vector<float>& params) {
                 if (params.size() == 4) {
-                    return send_manual_control(params[0], params[1], params[2], params[3]);
+                    std::vector<uint16_t> args = {
+                        static_cast<uint16_t>(params[0]),
+                        static_cast<uint16_t>(params[1]),
+                        static_cast<uint16_t>(params[2]),
+                        static_cast<uint16_t>(params[3])
+                    };
+                    return send_rc_override(args);
                 }
                 return Result::Failure;
             }},
