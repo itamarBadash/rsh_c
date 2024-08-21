@@ -80,23 +80,6 @@ CommandManager::Result CommandManager::arm() {
     return execute_action([this]() { return action->arm(); }, "Arm");
 }
 
-CommandManager::Result CommandManager::set_manual_control(float x, float y, float z, float r) {
-    auto start = std::chrono::high_resolution_clock::now();
-
-    auto result = manual_control->set_manual_control_input(x, y, z, r);
-    std::cout<<"cjeck"<<std::endl;
-
-    if (!viable || result != mavsdk::ManualControl::Result::Success) {
-        std::cerr << "Manual control input failed: " << result << std::endl;
-        return Result::Failure;
-    }
-
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> elapsed = end - start;
-
-    return Result::Success;
-}
-
 CommandManager::Result CommandManager::handle_command(const std::string& command, const std::vector<float>& parameters) {
     auto it = command_map.find(command);
     if (it != command_map.end()) {
@@ -150,24 +133,22 @@ CommandManager::Result CommandManager::execute_action(std::function<mavsdk::Acti
     return Result::Success;
 }
 
-CommandManager::Result CommandManager::start_manual_control() {
-    set_manual_control(0.f, 0.f, 0.5f, 0.f);
-    auto manual_control_result = manual_control->start_position_control();
-    if (manual_control_result != mavsdk::ManualControl::Result::Success) {
-        std::cerr << "Position control start failed: " << manual_control_result << '\n';
-        return Result::Failure;
-    }
-    return Result::Success;
-}
-
-CommandManager::Result CommandManager::send_rc_override(uint16_t channel1, uint16_t channel2, uint16_t channel3, uint16_t channel4) {
+CommandManager::Result CommandManager::send_rc_override(const std::vector<uint16_t>& channels) {
     auto result = mavlink_passthrough->queue_message([&](MavlinkAddress mavlink_address, uint8_t channel) {
         mavlink_message_t message;
 
         // Ensure we are using the GCS ID (255) for sending the message
         uint8_t gcs_sys_id = 255;
         uint8_t gcs_comp_id = mavlink_address.component_id; // Typically, the component ID is fine as-is
-/*
+
+        // Create an array of 18 channels initialized to UINT16_MAX
+        uint16_t channel_values[18];
+        std::fill_n(channel_values, 18, UINT16_MAX);
+
+        // Copy the provided channel values into the beginning of the array
+        std::copy(channels.begin(), channels.end(), channel_values);
+
+        // Pack the RC channels override message
         mavlink_msg_rc_channels_override_pack_chan(
             gcs_sys_id, // Use the GCS system ID
             gcs_comp_id, // Use the appropriate component ID
@@ -175,50 +156,68 @@ CommandManager::Result CommandManager::send_rc_override(uint16_t channel1, uint1
             &message,
             system->get_system_id(), // Target system ID (usually the drone)
             mavlink_address.component_id, // Target component ID
-            channel1, // RC channel 1 (Throttle/Yaw/Roll/Pitch as appropriate)
-            channel2, // RC channel 2
-            channel3, // RC channel 3
-            channel4, // RC channel 4
-            UINT16_MAX, // Not overriding channel 5
-            UINT16_MAX, // Not overriding channel 6
-            UINT16_MAX, // Not overriding channel 7
-            UINT16_MAX, // Not overriding channel 8
-            UINT16_MAX, // Not overriding channel 9
-            UINT16_MAX, // Not overriding channel 10
-            UINT16_MAX, // Not overriding channel 11
-            UINT16_MAX, // Not overriding channel 12
-            UINT16_MAX, // Not overriding channel 13
-            UINT16_MAX, // Not overriding channel 14
-            UINT16_MAX, // Not overriding channel 15
-            UINT16_MAX, // Not overriding channel 16
-            UINT16_MAX, // Not overriding channel 17
-            UINT16_MAX  // Not overriding channel 18
+            channel_values[0], // RC channel 1 (Throttle/Yaw/Roll/Pitch as appropriate)
+            channel_values[1], // RC channel 2
+            channel_values[2], // RC channel 3
+            channel_values[3], // RC channel 4
+            channel_values[4], // RC channel 5
+            channel_values[5], // RC channel 6
+            channel_values[6], // RC channel 7
+            channel_values[7], // RC channel 8
+            channel_values[8], // RC channel 9
+            channel_values[9], // RC channel 10
+            channel_values[10], // RC channel 11
+            channel_values[11], // RC channel 12
+            channel_values[12], // RC channel 13
+            channel_values[13], // RC channel 14
+            channel_values[14], // RC channel 15
+            channel_values[15], // RC channel 16
+            channel_values[16], // RC channel 17
+            channel_values[17]  // RC channel 18
         );
-*/
-        mavlink_msg_manual_control_pack_chan(
-                   gcs_sys_id,
-                  gcs_comp_id,
-                   channel,
-                   &message,
-                   system->get_system_id(),         // Target system
-                   channel1,                               // X axis control (neutral)
-                   channel2,                               // Y axis control (neutral)
-                   channel3,                             // Z axis control (neutral throttle)
-                   channel4,                               // R axis control (neutral yaw)
-                   0,                               // Buttons bitmask (no buttons pressed)
-                   0,                               // Secondary buttons bitmask
-                   0,                               // No extensions enabled
-                   0,                               // Additional control input S (neutral)
-                   0,                               // Additional control input T (neutral)
-                   0,                               // Auxiliary control 1 (neutral)
-                   0,                               // Auxiliary control 2 (neutral)
-                   0,                               // Auxiliary control 3 (neutral)
-                   0,                               // Auxiliary control 4 (neutral)
-                   0,                               // Auxiliary control 5 (neutral)
-                   0                                // Auxiliary control 6 (neutral)
-               );
-               return message;
-           });
+
+        return message;
+    });
+
+    if (result != mavsdk::MavlinkPassthrough::Result::Success) {
+        std::cerr << "Failed to send RC override message" << std::endl;
+        return Result::Failure;
+    }
+    return Result::Success;
+}
+
+CommandManager::Result CommandManager::seend_manual_control(uint16_t pitch, uint16_t roll, uint16_t throttle, uint16_t yaw) {
+    auto result = mavlink_passthrough->queue_message([&](MavlinkAddress mavlink_address, uint8_t channel) {
+         mavlink_message_t message;
+
+         // Ensure we are using the GCS ID (255) for sending the message
+        uint8_t gcs_sys_id = 255;
+        uint8_t gcs_comp_id = mavlink_address.component_id; // Typically, the component ID is fine as-is
+    mavlink_msg_manual_control_pack_chan(
+             gcs_sys_id,
+            gcs_comp_id,
+             channel,
+             &message,
+             system->get_system_id(),         // Target system
+             pitch,                               // X axis control (neutral)
+             roll,                               // Y axis control (neutral)
+             throttle,                             // Z axis control (neutral throttle)
+             yaw,                               // R axis control (neutral yaw)
+             0,                               // Buttons bitmask (no buttons pressed)
+             0,                               // Secondary buttons bitmask
+             0,                               // No extensions enabled
+             0,                               // Additional control input S (neutral)
+             0,                               // Additional control input T (neutral)
+             0,                               // Auxiliary control 1 (neutral)
+             0,                               // Auxiliary control 2 (neutral)
+             0,                               // Auxiliary control 3 (neutral)
+             0,                               // Auxiliary control 4 (neutral)
+             0,                               // Auxiliary control 5 (neutral)
+             0                                // Auxiliary control 6 (neutral)
+         );
+        return message;
+
+    });
 
 
     if (result != mavsdk::MavlinkPassthrough::Result::Success) {

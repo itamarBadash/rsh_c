@@ -34,10 +34,9 @@ public:
     Result set_flight_mode(uint8_t base_mode, uint32_t custom_mode);
     Result arm();
     Result disarm();
-    Result set_manual_control(float x, float y, float z, float r);
-    Result start_manual_control();
 
-    Result send_rc_override(uint16_t channel1, uint16_t channel2, uint16_t channel3, uint16_t channel4);
+    Result CommandManager::send_rc_override(const std::vector<uint16_t>& channels);
+    Result seend_manual_control(uint16_t pitch, uint16_t roll, uint16_t throttle, uint16_t yaw);
 
     Result handle_command(const std::string& command, const std::vector<float>& parameters);
     bool IsViable();
