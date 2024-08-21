@@ -167,7 +167,7 @@ CommandManager::Result CommandManager::send_rc_override(uint16_t channel1, uint1
         // Ensure we are using the GCS ID (255) for sending the message
         uint8_t gcs_sys_id = 255;
         uint8_t gcs_comp_id = mavlink_address.component_id; // Typically, the component ID is fine as-is
-
+/*
         mavlink_msg_rc_channels_override_pack_chan(
             gcs_sys_id, // Use the GCS system ID
             gcs_comp_id, // Use the appropriate component ID
@@ -194,9 +194,32 @@ CommandManager::Result CommandManager::send_rc_override(uint16_t channel1, uint1
             UINT16_MAX, // Not overriding channel 17
             UINT16_MAX  // Not overriding channel 18
         );
+*/
+        mavlink_msg_manual_control_pack_chan(
+                   gcs_sys_id,
+                  gcs_comp_id,
+                   channel,
+                   &message,
+                   system->get_system_id(),         // Target system
+                   channel1,                               // X axis control (neutral)
+                   channel2,                               // Y axis control (neutral)
+                   channel3,                             // Z axis control (neutral throttle)
+                   channel4,                               // R axis control (neutral yaw)
+                   0,                               // Buttons bitmask (no buttons pressed)
+                   0,                               // Secondary buttons bitmask
+                   0,                               // No extensions enabled
+                   0,                               // Additional control input S (neutral)
+                   0,                               // Additional control input T (neutral)
+                   0,                               // Auxiliary control 1 (neutral)
+                   0,                               // Auxiliary control 2 (neutral)
+                   0,                               // Auxiliary control 3 (neutral)
+                   0,                               // Auxiliary control 4 (neutral)
+                   0,                               // Auxiliary control 5 (neutral)
+                   0                                // Auxiliary control 6 (neutral)
+               );
+               return message;
+           });
 
-        return message;
-    });
 
     if (result != mavsdk::MavlinkPassthrough::Result::Success) {
         std::cerr << "Failed to send RC override message" << std::endl;
