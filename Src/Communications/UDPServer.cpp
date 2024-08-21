@@ -98,8 +98,6 @@ void UDPServer::processCommands() {
             commandQueue.pop();
             lock.unlock();
 
-            std::cout << "Processing command: " << message << std::endl;
-
             if (commandManager != nullptr && commandManager->IsViable()) {
                 size_t pos = message.find(':');
                 if (pos != std::string::npos) {
@@ -177,8 +175,6 @@ bool UDPServer::send_message(const std::string& message) {
                                    (struct sockaddr*)&clientAddr, sizeof(clientAddr));
         if (bytesSent < 0) {
             std::cerr << "Failed to send message to client. Error: " << strerror(errno) << std::endl;
-        } else {
-            std::cout << "Message sent to client: " << std::endl;
         }
     }
     return true;

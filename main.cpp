@@ -44,7 +44,6 @@ void main_thread_function(std::shared_ptr<System> system,
                           std::shared_ptr<TelemetryManager> telemetry_manager,
                           std::shared_ptr<CommunicationManager> communication_manager) {
     telemetry_manager->start();
-    command_manager->arm();
 
     while (true) {
         std::this_thread::sleep_for(std::chrono::seconds(3));
