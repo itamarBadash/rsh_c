@@ -43,17 +43,8 @@ void main_thread_function(std::shared_ptr<System> system,
                           std::shared_ptr<CommandManager> command_manager,
                           std::shared_ptr<TelemetryManager> telemetry_manager,
                           std::shared_ptr<CommunicationManager> communication_manager) {
-    std::vector<uint16_t> channels = {1500,1500,1700,1500};
     telemetry_manager->start();
     command_manager->arm();
-    std::cout << "Attempting to ascend..." << std::endl;
-    for (int i = 0; i < 50; ++i) {
-        auto control_result = command_manager->send_rc_override(channels);
-        if (control_result != CommandManager::Result::Success) {
-            std::cerr << "Failed to provide control input." << std::endl;
-        }
-        sleep_for(milliseconds(100));
-    }
 
     while (true) {
         std::this_thread::sleep_for(std::chrono::seconds(3));
