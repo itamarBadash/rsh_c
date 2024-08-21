@@ -35,8 +35,8 @@ public:
     Result arm();
     Result disarm();
 
-    Result CommandManager::send_rc_override(const std::vector<uint16_t>& channels);
-    Result seend_manual_control(uint16_t pitch, uint16_t roll, uint16_t throttle, uint16_t yaw);
+    Result send_rc_override(const std::vector<uint16_t>& channels);
+    Result send_manual_control(uint16_t pitch, uint16_t roll, uint16_t throttle, uint16_t yaw);
 
     Result handle_command(const std::string& command, const std::vector<float>& parameters);
     bool IsViable();

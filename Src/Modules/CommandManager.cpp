@@ -186,7 +186,7 @@ CommandManager::Result CommandManager::send_rc_override(const std::vector<uint16
     return Result::Success;
 }
 
-CommandManager::Result CommandManager::seend_manual_control(uint16_t pitch, uint16_t roll, uint16_t throttle, uint16_t yaw) {
+CommandManager::Result CommandManager::send_manual_control(uint16_t pitch, uint16_t roll, uint16_t throttle, uint16_t yaw) {
     auto result = mavlink_passthrough->queue_message([&](MavlinkAddress mavlink_address, uint8_t channel) {
          mavlink_message_t message;
 
