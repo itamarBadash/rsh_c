@@ -96,6 +96,8 @@ CommandManager::Result CommandManager::manual_control_loop() {
     const std::chrono::milliseconds interval(100);  // 0.1 seconds interval
 
     while (manual_continue_loop) {
+        std::cout << "xxx"<<std::endl;
+
         // Example RC values to override, these should be replaced with your actual data
 
         Result result = send_rc_override(manual_channels);
@@ -127,7 +129,6 @@ CommandManager::Result CommandManager::start_manual_control() {
 
     // Start the manual control loop in a new background thread
     manual_control_thread = std::thread([this]() {
-        std::lock_guard<std::mutex> lock(manual_control_mutex);  // Ensure thread safety
         manual_control_loop();
     });
 
@@ -147,10 +148,11 @@ CommandManager::Result CommandManager::stop_manual_control() {
 
 CommandManager::Result CommandManager::update_manual_control(const std::vector<uint16_t> &channels) {
     if (channels.size() != manual_channels.size()) {
+        std::cout << "nnn"<<std::endl;
         std::cerr << "Invalid channel size. Expected " << manual_channels.size() << " channels." << std::endl;
         return Result::Failure;
     }
-
+    std::cout << "zzz"<<std::endl;
     std::lock_guard<std::mutex> lock(manual_control_mutex);
     manual_channels = channels;
 
