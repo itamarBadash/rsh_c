@@ -22,6 +22,10 @@ CommandManager::CommandManager(const std::shared_ptr<mavsdk::System>& system) : 
     initialize_command_handlers();
 }
 
+CommandManager::~CommandManager() {
+    stop_manual_control();
+}
+
 bool CommandManager::IsViable() { return viable; }
 
 void CommandManager::initialize_command_handlers() {

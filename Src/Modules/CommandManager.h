@@ -28,6 +28,7 @@ public:
     };
 
     CommandManager(const std::shared_ptr<mavsdk::System>& system);
+    ~CommandManager();
 
     // Big commands
     Result takeoff();
