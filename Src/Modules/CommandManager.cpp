@@ -36,6 +36,7 @@ void CommandManager::initialize_command_handlers() {
                 }
                 return Result::Failure;
             }},
+            {"start_manual_control", [this](const std::vector<float>&) { return start_manual_control(); }},
             {"set_manual_control", [this](const std::vector<float>& params) {
                 if (params.size() == 4) {
                     std::vector<uint16_t> args = {
@@ -44,7 +45,7 @@ void CommandManager::initialize_command_handlers() {
                         static_cast<uint16_t>(params[2]),
                         static_cast<uint16_t>(params[3])
                     };
-                    return send_rc_override(args);
+                    return update_manual_control(args);
                 }
                 return Result::Failure;
             }},
@@ -80,6 +81,77 @@ CommandManager::Result CommandManager::set_flight_mode(uint8_t base_mode, uint32
 
 CommandManager::Result CommandManager::disarm() {
     return execute_action([this]() { return action->disarm(); }, "Disarm");
+}
+
+CommandManager::Result CommandManager::manual_control_loop() {
+    if (!viable) {
+        std::cerr << "System not viable for manual control loop" << std::endl;
+        return Result::ConnectionError;
+    }
+
+    const std::chrono::milliseconds interval(100);  // 0.1 seconds interval
+
+    while (manual_continue_loop) {
+        // Example RC values to override, these should be replaced with your actual data
+
+        Result result = send_rc_override(manual_channels);
+        if (result != Result::Success) {
+            std::cerr << "Failed to send RC override in manual control loop" << std::endl;
+            return result;
+        }
+        std::this_thread::sleep_for(interval);
+
+
+    }
+
+    return Result::Success;
+
+}
+
+CommandManager::Result CommandManager::start_manual_control() {
+    if (!viable) {
+        std::cerr << "System not viable for manual control loop" << std::endl;
+        return Result::ConnectionError;
+    }
+
+    // Ensure previous manual control loop is not running
+    if (manual_control_thread.joinable()) {
+        stop_manual_control();  // Stop any existing loop before starting a new one
+    }
+
+    manual_continue_loop = true;
+
+    // Start the manual control loop in a new background thread
+    manual_control_thread = std::thread([this]() {
+        std::lock_guard<std::mutex> lock(manual_control_mutex);  // Ensure thread safety
+        manual_control_loop();
+    });
+
+    return Result::Success;
+}
+
+CommandManager::Result CommandManager::stop_manual_control() {
+    manual_continue_loop = false;
+
+    // Wait for the background thread to finish
+    if (manual_control_thread.joinable()) {
+        manual_control_thread.join();
+    }
+
+    return Result::Success;
+}
+
+CommandManager::Result CommandManager::update_manual_control(const std::vector<uint16_t> &channels) {
+    if (channels.size() != manual_channels.size()) {
+        std::cerr << "Invalid channel size. Expected " << manual_channels.size() << " channels." << std::endl;
+        return Result::Failure;
+    }
+
+    std::lock_guard<std::mutex> lock(manual_control_mutex);
+    manual_channels = channels;
+
+
+    return Result::Success;
 }
 
 CommandManager::Result CommandManager::arm() {
