@@ -34,6 +34,7 @@ void CommandManager::initialize_command_handlers() {
             {"land", [this](const std::vector<float>&) { return land(); }},
             {"return_to_launch", [this](const std::vector<float>&) { return return_to_launch(); }},
             {"hold", [this](const std::vector<float>&) { return hold(); }},
+            {"stop_manual_control", [this](const std::vector<float>&) { return stop_manual_control(); }},
             {"set_flight_mode", [this](const std::vector<float>& params) {
                 if (params.size() == 2) {
                     return set_flight_mode(static_cast<uint8_t>(params[0]), static_cast<uint32_t>(params[1]));
@@ -104,8 +105,6 @@ CommandManager::Result CommandManager::manual_control_loop() {
             return result;
         }
         std::this_thread::sleep_for(interval);
-
-
     }
 
     return Result::Success;
@@ -124,6 +123,7 @@ CommandManager::Result CommandManager::start_manual_control() {
     }
 
     manual_continue_loop = true;
+    set_flight_mode(1,5);
 
     // Start the manual control loop in a new background thread
     manual_control_thread = std::thread([this]() {
