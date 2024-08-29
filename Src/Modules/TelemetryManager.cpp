@@ -75,34 +75,34 @@ void TelemetryManager::subscribeTelemetry() {
     });
 }
 
-Telemetry::Position TelemetryManager::getLatestPosition() {
+Telemetry::Position TelemetryManager::getLatestPosition() const {
     return _latest_telemetry_data.position;
 }
 
-Telemetry::Health TelemetryManager::getLatestHealth() {
+Telemetry::Health TelemetryManager::getLatestHealth() const {
     return _latest_telemetry_data.health;
 }
 
-float TelemetryManager::getRelativeAltitude() {
+float TelemetryManager::getRelativeAltitude() const {
     return _latest_telemetry_data.position.relative_altitude_m;
 }
 
-Telemetry::EulerAngle TelemetryManager::getEulerAngle() {
+Telemetry::EulerAngle TelemetryManager::getEulerAngle() const {
     return _latest_telemetry_data.euler_angle;
 }
 
-Telemetry::FlightMode TelemetryManager::getFlightMode() {
+Telemetry::FlightMode TelemetryManager::getFlightMode() const {
     return _latest_telemetry_data.flight_mode;
 }
 
-Telemetry::Heading TelemetryManager::getHeading() {
+Telemetry::Heading TelemetryManager::getHeading() const {
     return _latest_telemetry_data.heading;
 }
 
-Telemetry::VelocityNed TelemetryManager::getVelocity() {
+Telemetry::VelocityNed TelemetryManager::getVelocity() const {
     return _latest_telemetry_data.velocity;
 }
 
-TelemetryData TelemetryManager::getTelemetryData() {
+TelemetryData TelemetryManager::getTelemetryData() const {
     return _latest_telemetry_data;
 }

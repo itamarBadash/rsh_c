@@ -61,15 +61,15 @@ public:
     bool isRunning() { return _running; }
 
     // Methods to get the latest telemetry data
-    TelemetryData getTelemetryData();
+    TelemetryData getTelemetryData() const;
 
-    Telemetry::Position getLatestPosition();
-    Telemetry::Health getLatestHealth();
-    float getRelativeAltitude();
-    Telemetry::EulerAngle getEulerAngle();
-    Telemetry::FlightMode getFlightMode();
-    Telemetry::Heading getHeading();
-    Telemetry::VelocityNed getVelocity();
+    Telemetry::Position getLatestPosition() const;
+    Telemetry::Health getLatestHealth() const;
+    float getRelativeAltitude() const;
+    Telemetry::EulerAngle getEulerAngle() const;
+    Telemetry::FlightMode getFlightMode() const;
+    Telemetry::Heading getHeading() const;
+    Telemetry::VelocityNed getVelocity() const;
 
 
 private:
