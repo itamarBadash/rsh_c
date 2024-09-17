@@ -93,7 +93,7 @@ int main(int argc, char** argv) {
 
     auto command_manager = std::make_shared<CommandManager>(system);
     auto telemetry_manager = std::make_shared<TelemetryManager>(system);
-    auto communication_manager = std::make_shared<CommunicationManager>(ECT_UDP);
+    auto communication_manager = std::make_shared<CommunicationManager>(ECT_UDP,8080);
 
     communication_manager->set_command(command_manager);
 
