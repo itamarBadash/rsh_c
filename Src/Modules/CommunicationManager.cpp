@@ -45,10 +45,17 @@ void CommunicationManager::add_communication(CommunicationType communication_typ
     communication_ptrs.push_back(communication_ptr);
 }
 
-void CommunicationManager::send_message(const std::string &message) {
+void CommunicationManager::send_message_all(const std::string &message) {
     for (auto& communication : communication_ptrs) {
         communication->send_message(message);
     }
+}
+
+void CommunicationManager::send_message_by_index(int index,const std::string &message) {
+    if (index < 0 || index >= communication_ptrs.size()) {
+        throw std::out_of_range("Invalid communication index");
+    }
+    communication_ptrs[index]->send_message(message);
 }
 
 void CommunicationManager::set_command(std::shared_ptr<CommandManager> command_manager) {

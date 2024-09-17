@@ -18,7 +18,8 @@ public:
     CommunicationManager(CommunicationType communication, int port);
     ~CommunicationManager();
 
-    void send_message(const std::string &message);
+    void send_message_all(const std::string &message);
+    void send_message_by_index(int index,const std::string &message);
     void set_command(std::shared_ptr<CommandManager> command_manager);
     void start();
     void replace_communication_type(int index, CommunicationType new_communication, int port);

@@ -103,7 +103,7 @@ int main(int argc, char** argv) {
 
 
     SUBSCRIBE_TO_EVENT("InfoRequest", ([telemetry_manager, communication_manager]() {
-    communication_manager->send_message(telemetry_manager->getTelemetryData().print());
+    communication_manager->send_message_all(telemetry_manager->getTelemetryData().print());
     }));
 
     auto addon = std::make_shared<BaseAddon>("system");
