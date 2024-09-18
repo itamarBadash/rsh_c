@@ -224,6 +224,30 @@ Src/Modules/BaseAddon.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Modules/BaseAddon.cpp.s
 .PHONY : Src/Modules/BaseAddon.cpp.s
 
+Src/Modules/BaseCamera.obj: Src/Modules/BaseCamera.cpp.obj
+.PHONY : Src/Modules/BaseCamera.obj
+
+# target to build an object file
+Src/Modules/BaseCamera.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Modules/BaseCamera.cpp.obj
+.PHONY : Src/Modules/BaseCamera.cpp.obj
+
+Src/Modules/BaseCamera.i: Src/Modules/BaseCamera.cpp.i
+.PHONY : Src/Modules/BaseCamera.i
+
+# target to preprocess a source file
+Src/Modules/BaseCamera.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Modules/BaseCamera.cpp.i
+.PHONY : Src/Modules/BaseCamera.cpp.i
+
+Src/Modules/BaseCamera.s: Src/Modules/BaseCamera.cpp.s
+.PHONY : Src/Modules/BaseCamera.s
+
+# target to generate assembly for a file
+Src/Modules/BaseCamera.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\base.dir\build.make CMakeFiles/base.dir/Src/Modules/BaseCamera.cpp.s
+.PHONY : Src/Modules/BaseCamera.cpp.s
+
 Src/Modules/CommandManager.obj: Src/Modules/CommandManager.cpp.obj
 .PHONY : Src/Modules/CommandManager.obj
 
@@ -389,6 +413,9 @@ help:
 	@echo ... Src/Modules/BaseAddon.obj
 	@echo ... Src/Modules/BaseAddon.i
 	@echo ... Src/Modules/BaseAddon.s
+	@echo ... Src/Modules/BaseCamera.obj
+	@echo ... Src/Modules/BaseCamera.i
+	@echo ... Src/Modules/BaseCamera.s
 	@echo ... Src/Modules/CommandManager.obj
 	@echo ... Src/Modules/CommandManager.i
 	@echo ... Src/Modules/CommandManager.s
