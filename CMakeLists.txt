@@ -35,21 +35,15 @@ if(WIN32)
     # Windows specific OpenCV settings
     message(STATUS "Using manually specified OpenCV for Windows")
 
-    set(OpenCV_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/opencv/build/include")
-    set(OpenCV_LIBS_DIR "${CMAKE_SOURCE_DIR}/opencv/build/x64/vc16/lib")
-    set(OpenCV_DLL_DIR "${CMAKE_SOURCE_DIR}/opencv/build/x64/vc16/bin")
-
     # Link the required OpenCV libraries (adjust for your setup)
-    set(OpenCV_LIBS
-            ${OpenCV_LIBS_DIR}/opencv_core480.lib
-            ${OpenCV_LIBS_DIR}/opencv_imgproc480.lib
-            ${OpenCV_LIBS_DIR}/opencv_highgui480.lib
-            ${OpenCV_LIBS_DIR}/opencv_videoio480.lib
-    )
+    set(OpenCV_DIR "${CMAKE_SOURCE_DIR}/opencv/build")
+
+    find_package(OpenCV REQUIRED)
 
     # Add OpenCV include and library directories for Windows
     include_directories(${OpenCV_INCLUDE_DIRS})
     link_directories(${OpenCV_LIBS_DIR})
+    target_link_libraries(base ${OpenCV_LIBS})
 
     # Post-build step: Copy OpenCV DLLs to the output directory (Windows only)
     add_custom_command(TARGET base POST_BUILD
@@ -76,7 +70,6 @@ find_package(MAVSDK REQUIRED)
 if(WIN32)
     target_link_libraries(base
             MAVSDK::mavsdk  # Link MAVSDK on Windows
-            ${OpenCV_LIBS}  # Manually link OpenCV on Windows
     )
 elseif(UNIX)
     target_link_libraries(base

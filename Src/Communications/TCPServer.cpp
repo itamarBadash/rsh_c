@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <algorithm>
+#include <opencv2/imgcodecs.hpp>
+
 #include "../../Events/EventManager.h"
 
 
@@ -209,4 +211,32 @@ bool TCPServer::send_message(const std::string& message) {
 
 void TCPServer::setCommandManager(std::shared_ptr<CommandManager> command) {
     commandManager = command;
+}
+
+bool TCPServer::send_frame(const cv::Mat& frame) {
+    std::vector<uchar> encodedFrame;
+    // Encode frame as JPEG
+    if (!cv::imencode(".jpg", frame, encodedFrame)) {
+        std::cerr << "Failed to encode frame" << std::endl;
+        return false;
+    }
+
+    int frameSize = encodedFrame.size();
+    std::lock_guard<std::mutex> lock(clientSocketsMutex);
+
+    for (int clientSocket : clientSockets) {
+        // First send the frame size
+        if (send(clientSocket, &frameSize, sizeof(frameSize), 0) < 0) {
+            std::cerr << "Failed to send frame size" << std::endl;
+            return false;
+        }
+
+        // Then send the actual frame data
+        if (send(clientSocket, encodedFrame.data(), frameSize, 0) < 0) {
+            std::cerr << "Failed to send frame data" << std::endl;
+            return false;
+        }
+    }
+
+    return true;
 }

@@ -3,6 +3,9 @@
 #include <cstring>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/core/mat.hpp>
+
 #include "../../Events/EventManager.h"
 
 UDPServer::UDPServer(int port) : port(port), serverSocket(-1), running(false) {
@@ -194,4 +197,38 @@ std::string UDPServer::clientAddrToString(const sockaddr_in& clientAddr) {
 
 void UDPServer::setCommandManager(std::shared_ptr<CommandManager> command) {
     commandManager = command;
+}
+
+bool UDPServer::send_frame(const cv::Mat& frame) {
+    std::vector<uchar> encodedFrame;
+    if (!cv::imencode(".jpg", frame, encodedFrame)) {
+        std::cerr << "Failed to encode frame" << std::endl;
+        return false;
+    }
+
+    int frameSize = encodedFrame.size();
+    std::lock_guard<std::mutex> lock(clientAddressesMutex);
+
+    for (const auto& clientAddrStr : clientAddresses) {
+        sockaddr_in clientAddr;
+        size_t colonPos = clientAddrStr.find(':');
+        std::string ip = clientAddrStr.substr(0, colonPos);
+        int port = std::stoi(clientAddrStr.substr(colonPos + 1));
+
+        clientAddr.sin_family = AF_INET;
+        clientAddr.sin_port = htons(port);
+        inet_pton(AF_INET, ip.c_str(), &clientAddr.sin_addr);
+
+        // Fragment the frame if it's too large
+        const int maxPacketSize = 65507; // Maximum size of UDP packet data
+        int totalBytesSent = 0;
+
+        while (totalBytesSent < frameSize) {
+            int chunkSize = std::min(maxPacketSize, frameSize - totalBytesSent);
+            sendto(serverSocket, encodedFrame.data() + totalBytesSent, chunkSize, 0, (struct sockaddr*)&clientAddr, sizeof(clientAddr));
+            totalBytesSent += chunkSize;
+        }
+    }
+
+    return true;
 }
