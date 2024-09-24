@@ -114,6 +114,9 @@ int main(int argc, char** argv) {
     std::thread main_thread(main_thread_function, system, command_manager,telemetry_manager,communication_manager);
 */
 
+    std::cout << "OpenCV version: " << CV_VERSION << std::endl;
+
+
     VideoCapture cap(0);
     if (!cap.isOpened()) {
         std::cerr << "Error: Could not open the camera" << std::endl;
