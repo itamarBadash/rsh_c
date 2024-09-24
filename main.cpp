@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
         usage(argv[0]);
         return 1;
     }
-
+/*
     Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::GroundStation}};
     ConnectionResult connection_result = mavsdk.add_any_connection(argv[1]);
 
@@ -112,9 +112,9 @@ int main(int argc, char** argv) {
     auto addon = std::make_shared<BaseAddon>("system");
 
     std::thread main_thread(main_thread_function, system, command_manager,telemetry_manager,communication_manager);
+*/
 
-
-    cv::VideoCapture cap(0);
+    VideoCapture cap(0);
     if (!cap.isOpened()) {
         std::cerr << "Error: Could not open the camera" << std::endl;
         return -1;
@@ -135,7 +135,7 @@ int main(int argc, char** argv) {
         if (waitKey(1) >= 0) break;  // Add an exit condition
     }
 
-    main_thread.join();
+    //main_thread.join();
 
     return 0;
 }
