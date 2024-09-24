@@ -12,6 +12,7 @@
 #include "Src/Communications/UDPServer.h"
 #include "Src/Modules/CommunicationManager.h"
 #include <chrono>
+#include <opencv2/highgui.hpp>
 #include <opencv2/videoio.hpp>
 
 using std::chrono::seconds;
@@ -113,14 +114,21 @@ int main(int argc, char** argv) {
     std::thread main_thread(main_thread_function, system, command_manager,telemetry_manager,communication_manager);
 */
 
+    // Print OpenCV version
     std::cout << "OpenCV version: " << CV_VERSION << std::endl;
 
-
-    VideoCapture cap(0);
+    // Attempt to open the default camera (index 0)
+    int camera_index = 0;
+    VideoCapture cap(camera_index);
     if (!cap.isOpened()) {
-        std::cerr << "Error: Could not open the camera" << std::endl;
+        std::cerr << "Error: Could not open the camera at index " << camera_index << std::endl;
         return -1;
     }
+
+    // Check and print camera resolution (width and height)
+    std::cout << "Camera opened successfully." << std::endl;
+    std::cout << "Resolution: " << cap.get(CAP_PROP_FRAME_WIDTH)
+              << "x" << cap.get(CAP_PROP_FRAME_HEIGHT) << std::endl;
 
     cv::Mat img;
     int frame_count = 0;
@@ -137,11 +145,23 @@ int main(int argc, char** argv) {
             break;
         }
 
-        // Print frame information to confirm the camera feed is working
-        std::cout << "Frame " << std::endl;
+        // Show the captured frame
+        imshow("Camera Feed", img);
 
-        // Add an exit condition
+        // Add frame count and dimensions for debugging
+        std::cout << "Frame count: " << ++frame_count << ", Size: "
+                  << img.cols << "x" << img.rows << std::endl;
+
+        // Press 'q' to exit the loop
+        if (cv::waitKey(30) == 'q') {
+            std::cout << "Exiting camera feed..." << std::endl;
+            break;
+        }
     }
+
+    // Release the camera
+    cap.release();
+    cv::destroyAllWindows();
     //main_thread.join();
 
     return 0;
