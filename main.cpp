@@ -12,12 +12,15 @@
 #include "Src/Communications/UDPServer.h"
 #include "Src/Modules/CommunicationManager.h"
 #include <chrono>
+#include <opencv2/highgui.hpp>
+#include <opencv2/videoio.hpp>
 
 using std::chrono::seconds;
 using std::chrono::milliseconds;
 using std::this_thread::sleep_for;
 using namespace mavsdk;
-
+using namespace cv;
+using namespace std;
 class Listener {
 public:
     void onEvent(int value) {
@@ -109,6 +112,28 @@ int main(int argc, char** argv) {
     auto addon = std::make_shared<BaseAddon>("system");
 
     std::thread main_thread(main_thread_function, system, command_manager,telemetry_manager,communication_manager);
+
+
+    cv::VideoCapture cap(0);
+    if (!cap.isOpened()) {
+        std::cerr << "Error: Could not open the camera" << std::endl;
+        return -1;
+    }
+    cv::Mat img;
+
+    while (true) {
+        if (!cap.read(img)) {
+            std::cerr << "Error: Could not read the frame" << std::endl;
+            break;
+        }
+        if (img.empty()) {
+            cerr << "Error: Captured frame is empty" << endl;
+            break;
+        }
+
+        imshow("Image", img);
+        if (waitKey(1) >= 0) break;  // Add an exit condition
+    }
 
     main_thread.join();
 
