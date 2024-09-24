@@ -139,8 +139,7 @@ int main(int argc, char** argv) {
         }
 
         // Print frame information to confirm the camera feed is working
-        std::cout << "Frame " << ++frame_count << " captured. Size: "
-                  << img.cols << "x" << img.rows << std::endl;
+        std::cout << "Frame " << std::endl;
 
         // Add an exit condition
         if (waitKey(1) >= 0) break;
