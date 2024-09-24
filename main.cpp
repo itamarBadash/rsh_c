@@ -117,51 +117,35 @@ int main(int argc, char** argv) {
     // Print OpenCV version
     std::cout << "OpenCV version: " << CV_VERSION << std::endl;
 
-    // Attempt to open the default camera (index 0)
-    int camera_index = 0;
-    VideoCapture cap(camera_index);
+    cv::VideoCapture cap(0);
+
     if (!cap.isOpened()) {
-        std::cerr << "Error: Could not open the camera at index " << camera_index << std::endl;
+        std::cerr << "Error: Could not open the camera" << std::endl;
         return -1;
     }
 
-    // Check and print camera resolution (width and height)
-    std::cout << "Camera opened successfully." << std::endl;
-    std::cout << "Resolution: " << cap.get(CAP_PROP_FRAME_WIDTH)
-              << "x" << cap.get(CAP_PROP_FRAME_HEIGHT) << std::endl;
+    std::cout << "Camera Properties:" << std::endl;
+    std::cout << "Frame width: " << cap.get(cv::CAP_PROP_FRAME_WIDTH) << std::endl;
+    std::cout << "Frame height: " << cap.get(cv::CAP_PROP_FRAME_HEIGHT) << std::endl;
+    std::cout << "FPS: " << cap.get(cv::CAP_PROP_FPS) << std::endl;
 
-    cv::Mat img;
-    int frame_count = 0;
-
-    // Capture frames from the camera
+    cv::Mat frame;
     while (true) {
-        if (!cap.read(img)) {
+        if (!cap.read(frame)) {
             std::cerr << "Error: Could not read the frame" << std::endl;
             break;
         }
 
-        if (img.empty()) {
-            std::cerr << "Error: Captured frame is empty" << std::endl;
-            break;
-        }
+        cv::imshow("Camera Feed", frame);
 
-        // Show the captured frame
-        imshow("Camera Feed", img);
-
-        // Add frame count and dimensions for debugging
-        std::cout << "Frame count: " << ++frame_count << ", Size: "
-                  << img.cols << "x" << img.rows << std::endl;
-
-        // Press 'q' to exit the loop
         if (cv::waitKey(30) == 'q') {
-            std::cout << "Exiting camera feed..." << std::endl;
             break;
         }
     }
 
-    // Release the camera
     cap.release();
     cv::destroyAllWindows();
+
     //main_thread.join();
 
     return 0;
