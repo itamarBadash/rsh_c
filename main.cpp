@@ -122,22 +122,29 @@ int main(int argc, char** argv) {
         std::cerr << "Error: Could not open the camera" << std::endl;
         return -1;
     }
-    cv::Mat img;
 
+    cv::Mat img;
+    int frame_count = 0;
+
+    // Capture frames from the camera
     while (true) {
         if (!cap.read(img)) {
             std::cerr << "Error: Could not read the frame" << std::endl;
             break;
         }
+
         if (img.empty()) {
-            cerr << "Error: Captured frame is empty" << endl;
+            std::cerr << "Error: Captured frame is empty" << std::endl;
             break;
         }
 
-        imshow("Image", img);
-        if (waitKey(1) >= 0) break;  // Add an exit condition
-    }
+        // Print frame information to confirm the camera feed is working
+        std::cout << "Frame " << ++frame_count << " captured. Size: "
+                  << img.cols << "x" << img.rows << std::endl;
 
+        // Add an exit condition
+        if (waitKey(1) >= 0) break;
+    }
     //main_thread.join();
 
     return 0;
