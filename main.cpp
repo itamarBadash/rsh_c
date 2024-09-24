@@ -12,7 +12,6 @@
 #include "Src/Communications/UDPServer.h"
 #include "Src/Modules/CommunicationManager.h"
 #include <chrono>
-#include <opencv2/highgui.hpp>
 #include <opencv2/videoio.hpp>
 
 using std::chrono::seconds;
@@ -142,7 +141,6 @@ int main(int argc, char** argv) {
         std::cout << "Frame " << std::endl;
 
         // Add an exit condition
-        if (waitKey(1) >= 0) break;
     }
     //main_thread.join();
 
