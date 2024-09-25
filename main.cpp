@@ -15,6 +15,8 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/videoio.hpp>
 
+#include "Src/Modules/BaseCamera.h"
+
 using std::chrono::seconds;
 using std::chrono::milliseconds;
 using std::this_thread::sleep_for;
@@ -53,13 +55,47 @@ void main_thread_function(std::shared_ptr<System> system,
     }
 }
 
+void stream_thread_function() {
+    BaseCamera camera(0, 640, 480);
+
+
+    // Initialize the UDP server (listening on port 12345)
+    UDPServer udpServer(12345);
+
+    // Start the UDP server
+    if (!udpServer.start()) {
+        std::cerr << "Failed to start UDP server" << std::endl;
+        return ;
+    }
+
+    // Frame capturing and streaming loop
+    cv::Mat frame;
+    while (true) {
+        // Capture a frame
+        if (!camera.getFrame(frame)) {
+            std::cerr << "Failed to capture frame" << std::endl;
+            break;
+        }
+
+        // Send the frame via UDP
+        if (!udpServer.send_frame(frame)) {
+            std::cerr << "Failed to send frame" << std::endl;
+        }
+
+        // Simulate ~30fps video stream
+        std::this_thread::sleep_for(std::chrono::milliseconds(33));
+    }
+
+    udpServer.stop();
+}
+
 int main(int argc, char** argv) {
 
     if (argc != 2) {
         usage(argv[0]);
         return 1;
     }
-/*
+
     Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::GroundStation}};
     ConnectionResult connection_result = mavsdk.add_any_connection(argv[1]);
 
@@ -111,43 +147,17 @@ int main(int argc, char** argv) {
 
     auto addon = std::make_shared<BaseAddon>("system");
 
-    std::thread main_thread(main_thread_function, system, command_manager,telemetry_manager,communication_manager);
-*/
+    std::thread stream_thread(stream_thread_function);
+    std::thread main_thread(main_thread_function, system, command_manager, telemetry_manager, communication_manager);
+
+
 
     // Print OpenCV version
     std::cout << "OpenCV version: " << CV_VERSION << std::endl;
 
-    cv::VideoCapture cap(0);
 
-    if (!cap.isOpened()) {
-        std::cerr << "Error: Could not open the camera" << std::endl;
-        return -1;
-    }
-
-    std::cout << "Camera Properties:" << std::endl;
-    std::cout << "Frame width: " << cap.get(cv::CAP_PROP_FRAME_WIDTH) << std::endl;
-    std::cout << "Frame height: " << cap.get(cv::CAP_PROP_FRAME_HEIGHT) << std::endl;
-    std::cout << "FPS: " << cap.get(cv::CAP_PROP_FPS) << std::endl;
-
-    cv::Mat frame;
-    while (true) {
-        if (!cap.read(frame)) {
-            std::cerr << "Error: Could not read the frame" << std::endl;
-            break;
-        }
-
-        cv::imshow("Camera Feed", frame);
-
-        if (cv::waitKey(30) == 'q') {
-            break;
-        }
-    }
-
-    cap.release();
-    cv::destroyAllWindows();
-
-    //main_thread.join();
-
+    main_thread.join();
+    stream_thread.join();
     return 0;
 }
 
