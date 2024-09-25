@@ -95,7 +95,7 @@ int main(int argc, char** argv) {
         usage(argv[0]);
         return 1;
     }
-
+/*
     Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::GroundStation}};
     ConnectionResult connection_result = mavsdk.add_any_connection(argv[1]);
 
@@ -157,8 +157,8 @@ int main(int argc, char** argv) {
 
     main_thread.join();
     stream_thread.join();
+*/
 
-/*
 
     cv::VideoCapture cap(0);  // Change the index if needed
     if (!cap.isOpened()) {
@@ -182,7 +182,7 @@ int main(int argc, char** argv) {
 
     udp_server.stop();
     cap.release();
-    cv::destroyAllWindows();*/
+    cv::destroyAllWindows();
     return 0;
 }
 
