@@ -1,9 +1,13 @@
 #include "UDPVideoStreamer.h"
 #include <iostream>
+#include <stdexcept>
+#include <vector>
+#include <arpa/inet.h> // or <winsock2.h> on Windows for network functions
 
 // Constructor: Initializes camera and UDP socket
 UDPVideoStreamer::UDPVideoStreamer(int camera_index, const std::string& dest_ip, int dest_port)
     : camera_index_(camera_index), dest_ip_(dest_ip), dest_port_(dest_port), sock_(-1) {
+
     // Initialize camera
     cap_.open(camera_index_);
     if (!cap_.isOpened()) {
@@ -21,7 +25,12 @@ UDPVideoStreamer::UDPVideoStreamer(int camera_index, const std::string& dest_ip,
     // Configure server address for UDP
     server_address_.sin_family = AF_INET;
     server_address_.sin_port = htons(dest_port_);
-    server_address_.sin_addr.s_addr = inet_addr(dest_ip_.c_str());
+
+    // Convert IP address string to binary format
+    if (inet_pton(AF_INET, dest_ip_.c_str(), &server_address_.sin_addr) <= 0) {
+        std::cerr << "Error: Invalid IP address" << std::endl;
+        throw std::runtime_error("Invalid IP address");
+    }
 }
 
 // Destructor: Clean up resources
@@ -51,11 +60,18 @@ void UDPVideoStreamer::stream() {
             break;
         }
 
+        // Check if the buffer size exceeds the maximum UDP packet size
+        if (buffer.size() > 65507) { // Maximum size for a single UDP datagram
+            std::cerr << "Error: Frame too large to send via UDP" << std::endl;
+            break;
+        }
+
         // Send the encoded frame over UDP
         ssize_t bytes_sent = sendto(sock_, buffer.data(), buffer.size(), 0,
                                     (sockaddr*)&server_address_, sizeof(server_address_));
         if (bytes_sent < 0) {
-            std::cerr << "Error: Failed to send frame" << std::endl;
+            perror("Error: Failed to send frame");
+            break;
         }
 
         // Optionally display the frame locally
