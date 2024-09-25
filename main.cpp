@@ -164,7 +164,8 @@ int main(int argc, char** argv) {
         std::cerr << "Error: Could not open camera" << std::endl;
         return -1;
     }
-
+    UDPServer udp_server(12345);
+    udp_server.start();
     cv::Mat frame;
     while (true) {
         cap >> frame;
@@ -172,10 +173,13 @@ int main(int argc, char** argv) {
             std::cerr << "Error: No frame captured" << std::endl;
             break;
         }
+        udp_server.send_frame(frame);
         cv::imshow("Camera", frame);
+
         if (cv::waitKey(30) >= 0) break;  // Exit if a key is pressed
     }
 
+    udp_server.stop();
     cap.release();
     cv::destroyAllWindows();
     return 0;
