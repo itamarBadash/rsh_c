@@ -4,6 +4,9 @@
 #include <vector>
 #include <arpa/inet.h> // or <winsock2.h> on Windows for network functions
 
+// Max UDP packet size for payload
+const size_t MAX_UDP_PAYLOAD_SIZE = 65000;
+
 // Constructor: Initializes camera and UDP socket
 UDPVideoStreamer::UDPVideoStreamer(int camera_index, const std::string& dest_ip, int dest_port)
     : camera_index_(camera_index), dest_ip_(dest_ip), dest_port_(dest_port), sock_(-1) {
@@ -41,6 +44,28 @@ UDPVideoStreamer::~UDPVideoStreamer() {
     cap_.release();
 }
 
+// Function to send frame chunks
+void UDPVideoStreamer::send_frame_chunks(const std::vector<uchar>& buffer) {
+    size_t total_size = buffer.size();
+    size_t offset = 0;
+
+    while (offset < total_size) {
+        // Calculate the size of the current chunk
+        size_t chunk_size = std::min(MAX_UDP_PAYLOAD_SIZE, total_size - offset);
+
+        // Send the chunk over UDP
+        ssize_t bytes_sent = sendto(sock_, buffer.data() + offset, chunk_size, 0,
+                                    (sockaddr*)&server_address_, sizeof(server_address_));
+        if (bytes_sent < 0) {
+            perror("Error: Failed to send frame chunk");
+            break;
+        }
+
+        // Move the offset forward
+        offset += chunk_size;
+    }
+}
+
 // Stream video frames over UDP
 void UDPVideoStreamer::stream() {
     cv::Mat frame;
@@ -60,19 +85,8 @@ void UDPVideoStreamer::stream() {
             break;
         }
 
-        // Check if the buffer size exceeds the maximum UDP packet size
-        if (buffer.size() > 65507) { // Maximum size for a single UDP datagram
-            std::cerr << "Error: Frame too large to send via UDP" << std::endl;
-            break;
-        }
-
-        // Send the encoded frame over UDP
-        ssize_t bytes_sent = sendto(sock_, buffer.data(), buffer.size(), 0,
-                                    (sockaddr*)&server_address_, sizeof(server_address_));
-        if (bytes_sent < 0) {
-            perror("Error: Failed to send frame");
-            break;
-        }
+        // Send the encoded frame over UDP in chunks
+        send_frame_chunks(buffer);
 
         // Optionally display the frame locally
         cv::imshow("Camera", frame);
