@@ -200,7 +200,6 @@ void UDPServer::setCommandManager(std::shared_ptr<CommandManager> command) {
 }
 
 bool UDPServer::send_frame(const cv::Mat& frame) {
-    std::cout << "enter" << std::endl;;
     std::vector<uchar> encodedFrame;
     if (!cv::imencode(".jpg", frame, encodedFrame)) {
         std::cerr << "Failed to encode frame" << std::endl;
@@ -212,6 +211,7 @@ bool UDPServer::send_frame(const cv::Mat& frame) {
 
     for (const auto& clientAddrStr : clientAddresses) {
         sockaddr_in clientAddr;
+        std::cout << "enter"<<std::endl;
         size_t colonPos = clientAddrStr.find(':');
         std::string ip = clientAddrStr.substr(0, colonPos);
         int port = std::stoi(clientAddrStr.substr(colonPos + 1));
