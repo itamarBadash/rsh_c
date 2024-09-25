@@ -205,13 +205,13 @@ bool UDPServer::send_frame(const cv::Mat& frame) {
         std::cerr << "Failed to encode frame" << std::endl;
         return false;
     }
+        std::cout << "enter"<<std::endl;
 
     int frameSize = encodedFrame.size();
     std::lock_guard<std::mutex> lock(clientAddressesMutex);
 
     for (const auto& clientAddrStr : clientAddresses) {
         sockaddr_in clientAddr;
-        std::cout << "enter"<<std::endl;
         size_t colonPos = clientAddrStr.find(':');
         std::string ip = clientAddrStr.substr(0, colonPos);
         int port = std::stoi(clientAddrStr.substr(colonPos + 1));
