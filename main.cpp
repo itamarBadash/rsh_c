@@ -74,7 +74,6 @@ void stream_thread_function() {
         // Capture a frame
         if (!camera.getFrame(frame)) {
             std::cerr << "Failed to capture frame" << std::endl;
-            break;
         }
 
         // Send the frame via UDP
