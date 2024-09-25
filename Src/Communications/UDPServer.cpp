@@ -200,6 +200,7 @@ void UDPServer::setCommandManager(std::shared_ptr<CommandManager> command) {
 }
 
 bool UDPServer::send_frame(const cv::Mat& frame) {
+    std::cout << "enter" << std::endl;;
     std::vector<uchar> encodedFrame;
     if (!cv::imencode(".jpg", frame, encodedFrame)) {
         std::cerr << "Failed to encode frame" << std::endl;
