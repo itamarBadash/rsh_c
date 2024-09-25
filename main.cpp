@@ -165,7 +165,7 @@ int main(int argc, char** argv) {
         std::cerr << "Error: Could not open camera" << std::endl;
         return -1;
     }
-    UDPServer udp_server(12345);
+    UDPServer udp_server(8080);
     udp_server.start();
     cv::Mat frame;
     while (true) {
