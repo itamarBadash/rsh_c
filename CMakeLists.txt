@@ -28,6 +28,8 @@ add_executable(base
         Src/Communications/ICommunication.h
         Src/Modules/BaseCamera.cpp
         Src/Modules/BaseCamera.h
+        UDPVideoStreamer.cpp
+        UDPVideoStreamer.h
 )
 
 # Set the path to OpenCV based on the operating system

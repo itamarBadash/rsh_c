@@ -15,6 +15,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/videoio.hpp>
 
+#include "UDPVideoStreamer.h"
 #include "Src/Modules/BaseCamera.h"
 
 using std::chrono::seconds;
@@ -157,7 +158,7 @@ int main(int argc, char** argv) {
 
     main_thread.join();
     stream_thread.join();
-*/
+
 
 
     cv::VideoCapture cap(0);  // Change the index if needed
@@ -165,8 +166,6 @@ int main(int argc, char** argv) {
         std::cerr << "Error: Could not open camera" << std::endl;
         return -1;
     }
-    UDPServer udp_server(8080);
-    udp_server.start();
     cv::Mat frame;
     while (true) {
         cap >> frame;
@@ -174,15 +173,22 @@ int main(int argc, char** argv) {
             std::cerr << "Error: No frame captured" << std::endl;
             break;
         }
-        udp_server.send_frame(frame);
         cv::imshow("Camera", frame);
 
         if (cv::waitKey(30) >= 0) break;  // Exit if a key is pressed
     }
 
-    udp_server.stop();
     cap.release();
     cv::destroyAllWindows();
+    return 0;*/
+
+    try {
+        UDPVideoStreamer streamer(0, "192.168.20.8", 8080);  // Use appropriate IP and port
+        streamer.stream();
+    } catch (const std::exception& ex) {
+        std::cerr << "Exception: " << ex.what() << std::endl;
+        return -1;
+    }
     return 0;
 }
 
