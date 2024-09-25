@@ -16,6 +16,8 @@ public:
     // Destructor: Cleans up resources
     ~UDPVideoStreamer();
 
+    void send_frame_chunks(const std::vector<uchar> &buffer);
+
     // Method to start streaming video frames over UDP
     void stream();
 
