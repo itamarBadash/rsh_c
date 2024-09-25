@@ -56,7 +56,6 @@ void UDPVideoStreamer::stream() {
                                     (sockaddr*)&server_address_, sizeof(server_address_));
         if (bytes_sent < 0) {
             std::cerr << "Error: Failed to send frame" << std::endl;
-            break;
         }
 
         // Optionally display the frame locally
