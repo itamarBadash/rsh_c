@@ -94,7 +94,7 @@ int main(int argc, char** argv) {
         usage(argv[0]);
         return 1;
     }
-
+/*
     Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::GroundStation}};
     ConnectionResult connection_result = mavsdk.add_any_connection(argv[1]);
 
@@ -157,6 +157,27 @@ int main(int argc, char** argv) {
 
     main_thread.join();
     stream_thread.join();
+    */
+
+    cv::VideoCapture cap(0);  // Change the index if needed
+    if (!cap.isOpened()) {
+        std::cerr << "Error: Could not open camera" << std::endl;
+        return -1;
+    }
+
+    cv::Mat frame;
+    while (true) {
+        cap >> frame;
+        if (frame.empty()) {
+            std::cerr << "Error: No frame captured" << std::endl;
+            break;
+        }
+        cv::imshow("Camera", frame);
+        if (cv::waitKey(30) >= 0) break;  // Exit if a key is pressed
+    }
+
+    cap.release();
+    cv::destroyAllWindows();
     return 0;
 }
 
