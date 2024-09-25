@@ -200,35 +200,16 @@ void UDPServer::setCommandManager(std::shared_ptr<CommandManager> command) {
 }
 
 bool UDPServer::send_frame(const cv::Mat& frame) {
-    std::vector<uchar> encodedFrame;
-    if (!cv::imencode(".jpg", frame, encodedFrame)) {
-        std::cerr << "Failed to encode frame" << std::endl;
+    // Compress the frame using JPEG encoding
+    std::vector<uchar> encoded_frame;
+    std::vector<int> params = {cv::IMWRITE_JPEG_QUALITY, 80}; // JPEG quality (80%)
+    cv::imencode(".jpg", frame, encoded_frame, params);
+
+    // Send the encoded frame via UDP
+    if (sendto(sockfd, encoded_frame.data(), encoded_frame.size(), 0,
+               (struct sockaddr*)&client_addr, sizeof(client_addr)) < 0) {
+        std::cerr << "Failed to send frame via UDP" << std::endl;
         return false;
-    }
-
-    int frameSize = encodedFrame.size();
-    std::lock_guard<std::mutex> lock(clientAddressesMutex);
-
-    for (const auto& clientAddrStr : clientAddresses) {
-        sockaddr_in clientAddr;
-        size_t colonPos = clientAddrStr.find(':');
-        std::string ip = clientAddrStr.substr(0, colonPos);
-        int port = std::stoi(clientAddrStr.substr(colonPos + 1));
-
-        clientAddr.sin_family = AF_INET;
-        clientAddr.sin_port = htons(port);
-        inet_pton(AF_INET, ip.c_str(), &clientAddr.sin_addr);
-
-        // Fragment the frame if it's too large
-        const int maxPacketSize = 65507; // Maximum size of UDP packet data
-        int totalBytesSent = 0;
-
-        while (totalBytesSent < frameSize) {
-            int chunkSize = std::min(maxPacketSize, frameSize - totalBytesSent);
-            sendto(serverSocket, encodedFrame.data() + totalBytesSent, chunkSize, 0, (struct sockaddr*)&clientAddr, sizeof(clientAddr));
-            totalBytesSent += chunkSize;
-        }
-    }
-
+               }
     return true;
 }

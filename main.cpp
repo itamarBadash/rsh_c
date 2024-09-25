@@ -58,14 +58,13 @@ void main_thread_function(std::shared_ptr<System> system,
 void stream_thread_function() {
     BaseCamera camera(0, 640, 480);
 
-
     // Initialize the UDP server (listening on port 12345)
     UDPServer udpServer(12345);
 
     // Start the UDP server
     if (!udpServer.start()) {
         std::cerr << "Failed to start UDP server" << std::endl;
-        return ;
+        return;
     }
 
     // Frame capturing and streaming loop
@@ -74,7 +73,9 @@ void stream_thread_function() {
         // Capture a frame
         if (!camera.getFrame(frame)) {
             std::cerr << "Failed to capture frame" << std::endl;
+            continue;
         }
+        cv::imshow("Camera", frame);
 
         // Send the frame via UDP
         if (!udpServer.send_frame(frame)) {
