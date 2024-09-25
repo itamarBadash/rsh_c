@@ -200,16 +200,61 @@ void UDPServer::setCommandManager(std::shared_ptr<CommandManager> command) {
 }
 
 bool UDPServer::send_frame(const cv::Mat& frame) {
-    // Compress the frame using JPEG encoding
-    std::vector<uchar> encoded_frame;
-    std::vector<int> params = {cv::IMWRITE_JPEG_QUALITY, 80}; // JPEG quality (80%)
-    cv::imencode(".jpg", frame, encoded_frame, params);
-
-    // Send the encoded frame via UDP
-    if (sendto(sockfd, encoded_frame.data(), encoded_frame.size(), 0,
-               (struct sockaddr*)&client_addr, sizeof(client_addr)) < 0) {
-        std::cerr << "Failed to send frame via UDP" << std::endl;
+    std::vector<uchar> encodedFrame;
+    if (!cv::imencode(".jpg", frame, encodedFrame)) {
+        std::cerr << "Failed to encode frame" << std::endl;
         return false;
-               }
+    }
+
+    int frameSize = encodedFrame.size();
+    std::lock_guard<std::mutex> lock(clientAddressesMutex);
+
+    for (const auto& clientAddrStr : clientAddresses) {
+        sockaddr_in clientAddr;
+        size_t colonPos = clientAddrStr.find(':');
+        std::string ip = clientAddrStr.substr(0, colonPos);
+        int port = std::stoi(clientAddrStr.substr(colonPos + 1));
+
+        clientAddr.sin_family = AF_INET;
+        clientAddr.sin_port = htons(port);
+        inet_pton(AF_INET, ip.c_str(), &clientAddr.sin_addr);
+
+        // Fragment the frame if it's too large
+        const int maxPacketSize = 65507; // Maximum size of UDP packet data
+        const int headerSize = sizeof(int) * 3; // Frame ID, Fragment ID, Total Fragments
+
+        int totalBytesSent = 0;
+        int totalFragments = (frameSize + (maxPacketSize - headerSize) - 1) / (maxPacketSize - headerSize);
+        static int frameID = 0; // Increment frameID to uniquely identify each frame
+        frameID++;
+
+        for (int fragmentID = 0; totalBytesSent < frameSize; ++fragmentID) {
+            int chunkSize = std::min(maxPacketSize - headerSize, frameSize - totalBytesSent);
+
+            // Build packet header (Frame ID, Fragment ID, Total Fragments)
+            std::vector<uchar> packet(headerSize + chunkSize);
+            int* header = reinterpret_cast<int*>(packet.data());
+            header[0] = frameID;
+            header[1] = fragmentID;
+            header[2] = totalFragments;
+
+            // Copy the fragment data into the packet after the header
+            std::copy(encodedFrame.begin() + totalBytesSent,
+                      encodedFrame.begin() + totalBytesSent + chunkSize,
+                      packet.begin() + headerSize);
+
+            // Send the packet
+            int sentBytes = sendto(serverSocket, packet.data(), packet.size(), 0,
+                                   (struct sockaddr*)&clientAddr, sizeof(clientAddr));
+
+            if (sentBytes < 0) {
+                std::cerr << "Failed to send fragment " << fragmentID << " of frame " << frameID << std::endl;
+                return false;
+            }
+
+            totalBytesSent += chunkSize;
+        }
+    }
+
     return true;
 }
