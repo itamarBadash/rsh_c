@@ -83,8 +83,6 @@ void UDPVideoStreamer::stream() {
         }
 
         frame_count++;
-        std::cout << "Frame " << frame_count << ": Shape = " << frame.size()
-                  << ", Type = " << frame.type() << std::endl;
 
         // Encode frame as JPEG and store in buffer
         std::vector<int> encode_params;
@@ -96,8 +94,6 @@ void UDPVideoStreamer::stream() {
             break;
         }
 
-        std::cout << "Encoded frame size: " << buffer.size() << " bytes" << std::endl;
-
         // Send frame size first
         uint32_t frame_size = htonl(buffer.size());
         sendto(sock_, &frame_size, sizeof(frame_size), 0, (sockaddr*)&server_address_, sizeof(server_address_));
@@ -107,11 +103,6 @@ void UDPVideoStreamer::stream() {
 
         // Optionally display the frame locally
         cv::imshow("Camera", frame);
-
-        // Save every 100th frame for analysis
-        if (frame_count % 100 == 0) {
-            cv::imwrite("debug_sent_frame_" + std::to_string(frame_count) + ".jpg", frame);
-        }
 
         // Break if a key is pressed
         if (cv::waitKey(30) >= 0) break;
