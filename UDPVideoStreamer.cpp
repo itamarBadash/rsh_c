@@ -11,12 +11,21 @@ const size_t MAX_UDP_PAYLOAD_SIZE = 65000;
 UDPVideoStreamer::UDPVideoStreamer(int camera_index, const std::string& dest_ip, int dest_port)
     : camera_index_(camera_index), dest_ip_(dest_ip), dest_port_(dest_port), sock_(-1) {
 
-    // Initialize camera
-    cap_.open(camera_index_);
-    if (!cap_.isOpened()) {
-        std::cerr << "Error: Could not open camera" << std::endl;
-        throw std::runtime_error("Camera could not be opened");
-    }
+        // Initialize camera
+        cap_.open(camera_index_);
+        if (!cap_.isOpened()) {
+            std::cerr << "Error: Could not open camera" << std::endl;
+            throw std::runtime_error("Camera could not be opened");
+        }
+
+        // Set camera resolution
+        cap_.set(cv::CAP_PROP_FRAME_WIDTH, 640);
+        cap_.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
+
+        // Check if the resolution was set correctly
+        double width = cap_.get(cv::CAP_PROP_FRAME_WIDTH);
+        double height = cap_.get(cv::CAP_PROP_FRAME_HEIGHT);
+        std::cout << "Camera resolution: " << width << "x" << height << std::endl;
 
     // Initialize UDP socket
     sock_ = socket(AF_INET, SOCK_DGRAM, 0);
