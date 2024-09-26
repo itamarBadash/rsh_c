@@ -3,10 +3,9 @@
 #include <stdexcept>
 #include <vector>
 #include <arpa/inet.h> // or <winsock2.h> on Windows for network functions
-#include <cstring> // for memcpy
 
 // Max UDP packet size for payload
-const size_t MAX_UDP_PAYLOAD_SIZE = 1450;  // Lower to avoid IP fragmentation
+const size_t MAX_UDP_PAYLOAD_SIZE = 65000;
 
 // Constructor: Initializes camera and UDP socket
 UDPVideoStreamer::UDPVideoStreamer(int camera_index, const std::string& dest_ip, int dest_port)
@@ -45,36 +44,26 @@ UDPVideoStreamer::~UDPVideoStreamer() {
     cap_.release();
 }
 
-// Function to send frame chunks with frame ID and chunk size
+// Function to send frame chunks
 void UDPVideoStreamer::send_frame_chunks(const std::vector<uchar>& buffer) {
     size_t total_size = buffer.size();
     size_t offset = 0;
-    uint32_t frame_id = 1;  // Add a unique frame ID to track each frame
 
     while (offset < total_size) {
-        size_t chunk_size = std::min(MAX_UDP_PAYLOAD_SIZE - sizeof(frame_id), total_size - offset);
-
-        // Create a packet buffer with frame ID and chunk data
-        std::vector<uchar> packet(sizeof(frame_id) + chunk_size);
-
-        // Copy the frame ID into the packet
-        memcpy(packet.data(), &frame_id, sizeof(frame_id));
-
-        // Copy the chunk data into the packet
-        memcpy(packet.data() + sizeof(frame_id), buffer.data() + offset, chunk_size);
+        // Calculate the size of the current chunk
+        size_t chunk_size = std::min(MAX_UDP_PAYLOAD_SIZE, total_size - offset);
 
         // Send the chunk over UDP
-        ssize_t bytes_sent = sendto(sock_, packet.data(), packet.size(), 0,
+        ssize_t bytes_sent = sendto(sock_, buffer.data() + offset, chunk_size, 0,
                                     (sockaddr*)&server_address_, sizeof(server_address_));
         if (bytes_sent < 0) {
             perror("Error: Failed to send frame chunk");
             break;
         }
 
+        // Move the offset forward
         offset += chunk_size;
     }
-
-    frame_id++;  // Increment frame ID for the next frame
 }
 
 // Stream video frames over UDP
