@@ -83,8 +83,7 @@ void UDPVideoStreamer::stream() {
         }
 
         frame_count++;
-        std::cout << "Frame " << frame_count << ": Shape = " << frame.size()
-                  << ", Type = " << frame.type() << std::endl;
+
 
         // Encode frame as JPEG and store in buffer
         std::vector<int> encode_params;
@@ -95,8 +94,6 @@ void UDPVideoStreamer::stream() {
             std::cerr << "Error: Could not encode frame" << std::endl;
             break;
         }
-
-        std::cout << "Encoded frame size: " << buffer.size() << " bytes" << std::endl;
 
         // Send frame size first
         uint32_t frame_size = htonl(buffer.size());
