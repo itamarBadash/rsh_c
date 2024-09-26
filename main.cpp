@@ -57,37 +57,12 @@ void main_thread_function(std::shared_ptr<System> system,
 }
 
 void stream_thread_function() {
-    BaseCamera camera(0, 640, 480);
-
-    // Initialize the UDP server (listening on port 12345)
-    UDPServer udpServer(12345);
-
-    // Start the UDP server
-    if (!udpServer.start()) {
-        std::cerr << "Failed to start UDP server" << std::endl;
-        return;
+    try {
+        UDPVideoStreamer streamer(0, "192.168.20.8", 8080);  // Use appropriate IP and port
+        streamer.stream();
+    } catch (const std::exception& ex) {
+        std::cerr << "Exception: " << ex.what() << std::endl;
     }
-
-    // Frame capturing and streaming loop
-    cv::Mat frame;
-    while (true) {
-        // Capture a frame
-        if (!camera.getFrame(frame)) {
-            std::cerr << "Failed to capture frame" << std::endl;
-            continue;
-        }
-        cv::imshow("Camera", frame);
-
-        // Send the frame via UDP
-        if (!udpServer.send_frame(frame)) {
-            std::cerr << "Failed to send frame" << std::endl;
-        }
-
-        // Simulate ~30fps video stream
-        std::this_thread::sleep_for(std::chrono::milliseconds(33));
-    }
-
-    udpServer.stop();
 }
 
 int main(int argc, char** argv) {
@@ -96,7 +71,7 @@ int main(int argc, char** argv) {
         usage(argv[0]);
         return 1;
     }
-/*
+
     Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::GroundStation}};
     ConnectionResult connection_result = mavsdk.add_any_connection(argv[1]);
 
@@ -159,36 +134,6 @@ int main(int argc, char** argv) {
     main_thread.join();
     stream_thread.join();
 
-
-
-    cv::VideoCapture cap(0);  // Change the index if needed
-    if (!cap.isOpened()) {
-        std::cerr << "Error: Could not open camera" << std::endl;
-        return -1;
-    }
-    cv::Mat frame;
-    while (true) {
-        cap >> frame;
-        if (frame.empty()) {
-            std::cerr << "Error: No frame captured" << std::endl;
-            break;
-        }
-        cv::imshow("Camera", frame);
-
-        if (cv::waitKey(30) >= 0) break;  // Exit if a key is pressed
-    }
-
-    cap.release();
-    cv::destroyAllWindows();
-    return 0;*/
-
-    try {
-        UDPVideoStreamer streamer(0, "192.168.20.8", 8080);  // Use appropriate IP and port
-        streamer.stream();
-    } catch (const std::exception& ex) {
-        std::cerr << "Exception: " << ex.what() << std::endl;
-        return -1;
-    }
     return 0;
 }
 
