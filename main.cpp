@@ -16,7 +16,6 @@
 #include <opencv2/videoio.hpp>
 
 #include "Src/Modules/UDPVideoStreamer.h"
-#include "Src/Modules/BaseCamera.h"
 
 using std::chrono::seconds;
 using std::chrono::milliseconds;
