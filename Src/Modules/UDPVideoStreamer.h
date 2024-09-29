@@ -1,7 +1,7 @@
 #ifndef UDP_VIDEO_STREAMER_H
 #define UDP_VIDEO_STREAMER_H
 
-#include <opencv2/opencv.hpp>
+#include <../../opencv/build/include/opencv2/opencv.hpp>
 #include <string>
 #include <vector>
 #include <sys/socket.h>

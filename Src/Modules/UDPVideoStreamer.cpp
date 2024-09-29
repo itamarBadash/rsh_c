@@ -101,9 +101,6 @@ void UDPVideoStreamer::stream() {
         // Send the encoded frame over UDP in chunks
         send_frame_chunks(buffer);
 
-        // Optionally display the frame locally
-        cv::imshow("Camera", frame);
-
         // Break if a key is pressed
         if (cv::waitKey(30) >= 0) break;
     }
