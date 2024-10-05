@@ -97,8 +97,6 @@ CommandManager::Result CommandManager::manual_control_loop() {
     const std::chrono::milliseconds interval(100);  // 0.1 seconds interval
 
     while (manual_continue_loop) {
-        // Example RC values to override, these should be replaced with your actual data
-
         Result result = send_rc_override(manual_channels);
         if (result != Result::Success) {
             std::cerr << "Failed to send RC override in manual control loop" << std::endl;
@@ -117,15 +115,13 @@ CommandManager::Result CommandManager::start_manual_control() {
         return Result::ConnectionError;
     }
 
-    // Ensure previous manual control loop is not running
     if (manual_control_thread.joinable()) {
-        stop_manual_control();  // Stop any existing loop before starting a new one
+        stop_manual_control();
     }
 
     manual_continue_loop = true;
     set_flight_mode(1,5);
 
-    // Start the manual control loop in a new background thread
     manual_control_thread = std::thread([this]() {
         manual_control_loop();
     });
@@ -136,7 +132,6 @@ CommandManager::Result CommandManager::start_manual_control() {
 CommandManager::Result CommandManager::stop_manual_control() {
     manual_continue_loop = false;
 
-    // Wait for the background thread to finish
     if (manual_control_thread.joinable()) {
         manual_control_thread.join();
     }
