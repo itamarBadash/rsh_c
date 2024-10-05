@@ -1,6 +1,7 @@
 #ifndef COMMANDMANAGER_H
 #define COMMANDMANAGER_H
 
+#include <atomic>
 #include <mavsdk/mavsdk.h>
 #include <mavsdk/plugins/action/action.h>
 #include <mavsdk/plugins/manual_control/manual_control.h>
@@ -11,6 +12,8 @@
 #include <string>
 #include <functional>
 #include <map>
+#include <mutex>
+#include <thread>
 
 class CommandManager {
 public:
@@ -25,6 +28,7 @@ public:
     };
 
     CommandManager(const std::shared_ptr<mavsdk::System>& system);
+    ~CommandManager();
 
     // Big commands
     Result takeoff();
@@ -34,9 +38,14 @@ public:
     Result set_flight_mode(uint8_t base_mode, uint32_t custom_mode);
     Result arm();
     Result disarm();
-    Result set_manual_control(float x, float y, float z, float r);
+    Result manual_control_loop();
     Result start_manual_control();
-    Result send_rc_override(uint16_t channel1, uint16_t channel2, uint16_t channel3, uint16_t channel4, uint16_t channel5 = UINT16_MAX, uint16_t channel6 = UINT16_MAX, uint16_t channel7 = UINT16_MAX, uint16_t channel8 = UINT16_MAX);
+    Result stop_manual_control();
+    Result update_manual_control(const std::vector<uint16_t>& channels);
+
+
+    Result send_rc_override(const std::vector<uint16_t>& channels);
+
     Result handle_command(const std::string& command, const std::vector<float>& parameters);
     bool IsViable();
     bool is_command_valid(const std::string& command) const;
@@ -46,6 +55,11 @@ private:
     std::shared_ptr<mavsdk::ManualControl> manual_control;
     std::shared_ptr<mavsdk::MavlinkPassthrough> mavlink_passthrough;
     std::shared_ptr<mavsdk::System> system;
+
+    std::atomic<bool> manual_continue_loop;
+    std::thread manual_control_thread;
+    std::mutex manual_control_mutex;
+    std::vector<uint16_t> manual_channels = {1500, 1500, 1500, 1500}; // Replace with actual channel values
 
     bool viable;
 

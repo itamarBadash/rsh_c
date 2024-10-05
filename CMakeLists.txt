@@ -1,23 +1,11 @@
 cmake_minimum_required(VERSION 3.10)
 project(base)
 
+# Set C++ standard to 17
 set(CMAKE_CXX_STANDARD 17)
 
-# Set CMAKE_PREFIX_PATH to the install directory of MAVSDK
-set(CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/install)
-
-find_package(MAVSDK REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
-
-# Add MAVSDK includes
-include_directories(${CMAKE_PREFIX_PATH}/include)
-include_directories(${CMAKE_PREFIX_PATH}/include/mavsdk)
-include_directories(${CMAKE_PREFIX_PATH}/inih)
-
-# Add MAVSDK library paths
-#ink_directories(${CMAKE_PREFIX_PATH}/lib)
-
-add_executable(base main.cpp
+add_executable(base
+        main.cpp
         Src/Modules/TelemetryManager.cpp
         Src/Modules/TelemetryManager.h
         Src/Modules/CommandManager.cpp
@@ -38,9 +26,54 @@ add_executable(base main.cpp
         Src/Modules/CommunicationManager.cpp
         Src/Modules/CommunicationManager.h
         Src/Communications/ICommunication.h
+        Src/Modules/UDPVideoStreamer.cpp
+        Src/Modules/UDPVideoStreamer.h
 )
 
-# Link MAVSDK libraries
-target_link_libraries(base
-        MAVSDK::mavsdk
-)
+# Set the path to OpenCV based on the operating system
+if(WIN32)
+    # Windows specific OpenCV settings
+    message(STATUS "Using manually specified OpenCV for Windows")
+
+    # Link the required OpenCV libraries (adjust for your setup)
+    set(OpenCV_DIR "${CMAKE_SOURCE_DIR}/opencv/build")
+
+    find_package(OpenCV REQUIRED)
+
+    # Add OpenCV include and library directories for Windows
+    include_directories(${OpenCV_INCLUDE_DIRS})
+    link_directories(${OpenCV_LIBS_DIR})
+    target_link_libraries(base ${OpenCV_LIBS})
+
+    # Post-build step: Copy OpenCV DLLs to the output directory (Windows only)
+    add_custom_command(TARGET base POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${OpenCV_DLL_DIR}" $<TARGET_FILE_DIR:base>)
+
+elseif(UNIX)
+    # Linux specific OpenCV settings
+    message(STATUS "Using system-installed OpenCV for Linux")
+
+    # Find system-installed OpenCV
+    find_package(OpenCV REQUIRED)
+
+    # Add system-installed OpenCV include directories for Linux
+    include_directories(${OpenCV_INCLUDE_DIRS})
+else()
+    message(FATAL_ERROR "Unsupported platform")
+endif()
+
+# Find MAVSDK (this will locate MAVSDK installed via vcpkg or other package managers)
+find_package(MAVSDK REQUIRED)
+
+# Link libraries to the executable
+if(WIN32)
+    target_link_libraries(base
+            MAVSDK::mavsdk  # Link MAVSDK on Windows
+    )
+elseif(UNIX)
+    target_link_libraries(base
+            MAVSDK::mavsdk  # Link MAVSDK on Linux
+            ${OpenCV_LIBS}  # System-installed OpenCV on Linux
+    )
+endif()

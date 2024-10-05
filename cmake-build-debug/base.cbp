@@ -118,6 +118,12 @@
 		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Src/Modules/BaseAddon.h">
 			<Option target="base"/>
 		</Unit>
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Src/Modules/BaseCamera.cpp">
+			<Option target="base"/>
+		</Unit>
+		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Src/Modules/BaseCamera.h">
+			<Option target="base"/>
+		</Unit>
 		<Unit filename="C:/Users/itaba/Desktop/Hoopoe/rsh_c/Src/Modules/CommandManager.cpp">
 			<Option target="base"/>
 		</Unit>

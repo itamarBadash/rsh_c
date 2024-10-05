@@ -2,6 +2,8 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <mavsdk/mavlink/common/mavlink.h>
+
 
 CommandManager::CommandManager(const std::shared_ptr<mavsdk::System>& system) : system(system)
 {
@@ -20,6 +22,10 @@ CommandManager::CommandManager(const std::shared_ptr<mavsdk::System>& system) : 
     initialize_command_handlers();
 }
 
+CommandManager::~CommandManager() {
+    stop_manual_control();
+}
+
 bool CommandManager::IsViable() { return viable; }
 
 void CommandManager::initialize_command_handlers() {
@@ -28,15 +34,23 @@ void CommandManager::initialize_command_handlers() {
             {"land", [this](const std::vector<float>&) { return land(); }},
             {"return_to_launch", [this](const std::vector<float>&) { return return_to_launch(); }},
             {"hold", [this](const std::vector<float>&) { return hold(); }},
+            {"stop_manual_control", [this](const std::vector<float>&) { return stop_manual_control(); }},
             {"set_flight_mode", [this](const std::vector<float>& params) {
                 if (params.size() == 2) {
                     return set_flight_mode(static_cast<uint8_t>(params[0]), static_cast<uint32_t>(params[1]));
                 }
                 return Result::Failure;
             }},
+            {"start_manual_control", [this](const std::vector<float>&) { return start_manual_control(); }},
             {"set_manual_control", [this](const std::vector<float>& params) {
                 if (params.size() == 4) {
-                    return set_manual_control(params[0], params[1], params[2], params[3]);
+                    std::vector<uint16_t> args = {
+                        static_cast<uint16_t>(params[0]),
+                        static_cast<uint16_t>(params[1]),
+                        static_cast<uint16_t>(params[2]),
+                        static_cast<uint16_t>(params[3])
+                    };
+                    return update_manual_control(args);
                 }
                 return Result::Failure;
             }},
@@ -74,25 +88,76 @@ CommandManager::Result CommandManager::disarm() {
     return execute_action([this]() { return action->disarm(); }, "Disarm");
 }
 
-CommandManager::Result CommandManager::arm() {
-    return execute_action([this]() { return action->arm(); }, "Arm");
-}
-
-CommandManager::Result CommandManager::set_manual_control(float x, float y, float z, float r) {
-    auto start = std::chrono::high_resolution_clock::now();
-
-    auto result = manual_control->set_manual_control_input(x, y, z, r);
-    std::cout<<"cjeck"<<std::endl;
-
-    if (!viable || result != mavsdk::ManualControl::Result::Success) {
-        std::cerr << "Manual control input failed: " << result << std::endl;
-        return Result::Failure;
+CommandManager::Result CommandManager::manual_control_loop() {
+    if (!viable) {
+        std::cerr << "System not viable for manual control loop" << std::endl;
+        return Result::ConnectionError;
     }
 
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> elapsed = end - start;
+    const std::chrono::milliseconds interval(100);  // 0.1 seconds interval
+
+    while (manual_continue_loop) {
+        // Example RC values to override, these should be replaced with your actual data
+
+        Result result = send_rc_override(manual_channels);
+        if (result != Result::Success) {
+            std::cerr << "Failed to send RC override in manual control loop" << std::endl;
+            return result;
+        }
+        std::this_thread::sleep_for(interval);
+    }
 
     return Result::Success;
+
+}
+
+CommandManager::Result CommandManager::start_manual_control() {
+    if (!viable) {
+        std::cerr << "System not viable for manual control loop" << std::endl;
+        return Result::ConnectionError;
+    }
+
+    // Ensure previous manual control loop is not running
+    if (manual_control_thread.joinable()) {
+        stop_manual_control();  // Stop any existing loop before starting a new one
+    }
+
+    manual_continue_loop = true;
+    set_flight_mode(1,5);
+
+    // Start the manual control loop in a new background thread
+    manual_control_thread = std::thread([this]() {
+        manual_control_loop();
+    });
+
+    return Result::Success;
+}
+
+CommandManager::Result CommandManager::stop_manual_control() {
+    manual_continue_loop = false;
+
+    // Wait for the background thread to finish
+    if (manual_control_thread.joinable()) {
+        manual_control_thread.join();
+    }
+
+    return Result::Success;
+}
+
+CommandManager::Result CommandManager::update_manual_control(const std::vector<uint16_t> &channels) {
+    if (channels.size() != manual_channels.size()) {
+        std::cerr << "Invalid channel size. Expected " << manual_channels.size() << " channels." << std::endl;
+        return Result::Failure;
+    }
+    std::lock_guard<std::mutex> lock(manual_control_mutex);
+    manual_channels = channels;
+
+
+    return Result::Success;
+}
+
+CommandManager::Result CommandManager::arm() {
+    return execute_action([this]() { return action->arm(); }, "Arm");
 }
 
 CommandManager::Result CommandManager::handle_command(const std::string& command, const std::vector<float>& parameters) {
@@ -148,11 +213,54 @@ CommandManager::Result CommandManager::execute_action(std::function<mavsdk::Acti
     return Result::Success;
 }
 
-CommandManager::Result CommandManager::start_manual_control() {
-    set_manual_control(0.f, 0.f, 0.5f, 0.f);
-    auto manual_control_result = manual_control->start_position_control();
-    if (manual_control_result != mavsdk::ManualControl::Result::Success) {
-        std::cerr << "Position control start failed: " << manual_control_result << '\n';
+CommandManager::Result CommandManager::send_rc_override(const std::vector<uint16_t>& channels) {
+    auto result = mavlink_passthrough->queue_message([&](MavlinkAddress mavlink_address, uint8_t channel) {
+        mavlink_message_t message;
+
+        // Ensure we are using the GCS ID (255) for sending the message
+        uint8_t gcs_sys_id = 255;
+        uint8_t gcs_comp_id = mavlink_address.component_id; // Typically, the component ID is fine as-is
+
+        // Create an array of 18 channels initialized to UINT16_MAX
+        uint16_t channel_values[18];
+        std::fill_n(channel_values, 18, UINT16_MAX);
+
+        // Copy the provided channel values into the beginning of the array
+        std::copy(channels.begin(), channels.end(), channel_values);
+
+        // Pack the RC channels override message
+        mavlink_msg_rc_channels_override_pack_chan(
+            gcs_sys_id, // Use the GCS system ID
+            gcs_comp_id, // Use the appropriate component ID
+            channel,
+            &message,
+            system->get_system_id(), // Target system ID (usually the drone)
+            mavlink_address.component_id, // Target component ID
+            channel_values[0], // RC channel 1 (Throttle/Yaw/Roll/Pitch as appropriate)
+            channel_values[1], // RC channel 2
+            channel_values[2], // RC channel 3
+            channel_values[3], // RC channel 4
+            channel_values[4], // RC channel 5
+            channel_values[5], // RC channel 6
+            channel_values[6], // RC channel 7
+            channel_values[7], // RC channel 8
+            channel_values[8], // RC channel 9
+            channel_values[9], // RC channel 10
+            channel_values[10], // RC channel 11
+            channel_values[11], // RC channel 12
+            channel_values[12], // RC channel 13
+            channel_values[13], // RC channel 14
+            channel_values[14], // RC channel 15
+            channel_values[15], // RC channel 16
+            channel_values[16], // RC channel 17
+            channel_values[17]  // RC channel 18
+        );
+
+        return message;
+    });
+
+    if (result != mavsdk::MavlinkPassthrough::Result::Success) {
+        std::cerr << "Failed to send RC override message" << std::endl;
         return Result::Failure;
     }
     return Result::Success;

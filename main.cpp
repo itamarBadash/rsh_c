@@ -12,11 +12,17 @@
 #include "Src/Communications/UDPServer.h"
 #include "Src/Modules/CommunicationManager.h"
 #include <chrono>
+#include <opencv2/highgui.hpp>
+#include <opencv2/videoio.hpp>
+
+#include "Src/Modules/UDPVideoStreamer.h"
+
 using std::chrono::seconds;
 using std::chrono::milliseconds;
 using std::this_thread::sleep_for;
 using namespace mavsdk;
-
+using namespace cv;
+using namespace std;
 class Listener {
 public:
     void onEvent(int value) {
@@ -46,6 +52,15 @@ void main_thread_function(std::shared_ptr<System> system,
 
     while (true) {
         std::this_thread::sleep_for(std::chrono::seconds(3));
+    }
+}
+
+void stream_thread_function() {
+    try {
+        UDPVideoStreamer streamer(0, "192.168.20.8", 12345);  // Use appropriate IP and port
+        streamer.stream();
+    } catch (const std::exception& ex) {
+        std::cerr << "Exception: " << ex.what() << std::endl;
     }
 }
 
@@ -92,7 +107,7 @@ int main(int argc, char** argv) {
 
     auto command_manager = std::make_shared<CommandManager>(system);
     auto telemetry_manager = std::make_shared<TelemetryManager>(system);
-    auto communication_manager = std::make_shared<CommunicationManager>(ECT_UDP);
+    auto communication_manager = std::make_shared<CommunicationManager>(ECT_UDP,8080);
 
     communication_manager->set_command(command_manager);
 
@@ -102,14 +117,21 @@ int main(int argc, char** argv) {
 
 
     SUBSCRIBE_TO_EVENT("InfoRequest", ([telemetry_manager, communication_manager]() {
-    communication_manager->send_message(telemetry_manager->getTelemetryData().print());
+    communication_manager->send_message_all(telemetry_manager->getTelemetryData().print());
     }));
 
     auto addon = std::make_shared<BaseAddon>("system");
 
-    std::thread main_thread(main_thread_function, system, command_manager,telemetry_manager,communication_manager);
+    std::thread stream_thread(stream_thread_function);
+    std::thread main_thread(main_thread_function, system, command_manager, telemetry_manager, communication_manager);
+
+
+    // Print OpenCV version
+    std::cout << "OpenCV version: " << CV_VERSION << std::endl;
+
 
     main_thread.join();
+    stream_thread.join();
 
     return 0;
 }

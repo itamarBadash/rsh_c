@@ -11,6 +11,8 @@
 #include <memory>
 #include <condition_variable>
 #include <unordered_set>
+#include <opencv2/core/mat.hpp>
+
 #include "../Modules/CommandManager.h"
 #include "ICommunication.h"
 
@@ -23,6 +25,8 @@ public:
     void stop() override;
     bool send_message(const std::string& message) override;
     void setCommandManager(std::shared_ptr<CommandManager> command) override;
+
+    bool send_frame(const cv::Mat &frame);
 
 private:
     int serverSocket;
