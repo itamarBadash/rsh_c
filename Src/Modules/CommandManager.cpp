@@ -260,34 +260,3 @@ CommandManager::Result CommandManager::send_rc_override(const std::vector<uint16
     }
     return Result::Success;
 }
-
-CommandManager::Result CommandManager::send_rc_override(uint16_t channel1, uint16_t channel2, uint16_t channel3, uint16_t channel4, uint16_t channel5 = UINT16_MAX, uint16_t channel6 = UINT16_MAX, uint16_t channel7 = UINT16_MAX, uint16_t channel8 = UINT16_MAX) {
-    auto result = mavlink_passthrough->queue_message([&](MavlinkAddress mavlink_address, uint8_t channel) {
-        mavlink_message_t message;
-        mavlink_msg_rc_channels_override_pack_chan(
-                mavlink_address.system_id,              // System ID
-                mavlink_address.component_id,           // Component ID
-                channel,                                // Channel
-                &message,                               // Message pointer
-                system->get_system_id(),                // Target system ID
-                0,                                      // Target component ID (0 for all components)
-                channel1,                               // RC channel 1 override
-                channel2,                               // RC channel 2 override
-                channel3,                               // RC channel 3 override (Throttle)
-                channel4,                               // RC channel 4 override (Yaw)
-                channel5,                               // RC channel 5 override (optional)
-                channel6,                               // RC channel 6 override (optional)
-                channel7,                               // RC channel 7 override (optional)
-                channel8                                // RC channel 8 override (optional)
-        );
-        return message;
-    });
-
-    if (result != mavsdk::MavlinkPassthrough::Result::Success) {
-        std::cerr << "Failed to queue RC override command" << std::endl;
-        return Result::Failure;
-    }
-
-    std::cout << "RC override command sent successfully" << std::endl;
-    return Result::Success;
-}
