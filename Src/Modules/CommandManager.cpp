@@ -135,6 +135,12 @@ CommandManager::Result CommandManager::stop_manual_control() {
     if (manual_control_thread.joinable()) {
         manual_control_thread.join();
     }
+    auto result = action->return_to_launch();
+    if (result != mavsdk::Action::Result::Success) {
+        std::cerr << "Return to launch failed: " << result << std::endl;
+        return Result::CommandFailed;
+    }
+    std::cout << "command successful\n";
 
     return Result::Success;
 }
@@ -146,7 +152,6 @@ CommandManager::Result CommandManager::update_manual_control(const std::vector<u
     }
     std::lock_guard<std::mutex> lock(manual_control_mutex);
     manual_channels = channels;
-
 
     return Result::Success;
 }
