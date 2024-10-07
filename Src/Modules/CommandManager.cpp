@@ -114,13 +114,18 @@ CommandManager::Result CommandManager::start_manual_control() {
         std::cerr << "System not viable for manual control loop" << std::endl;
         return Result::ConnectionError;
     }
+    auto result = action->arm();
+
+    if(result != mavsdk::Action::Result::Success) {
+        std::cerr << "Arm Failed" << std::endl;
+        return Result::Failure;
+    }
 
     if (manual_control_thread.joinable()) {
         stop_manual_control();
     }
 
     manual_continue_loop = true;
-    action->arm();
     set_flight_mode(1,5);
 
     return Result::Success;
