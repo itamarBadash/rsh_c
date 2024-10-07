@@ -119,9 +119,18 @@ CommandManager::Result CommandManager::start_manual_control() {
         stop_manual_control();
     }
 
+    auto result = action->arm();
+    if(result != mavsdk::Action::Result::Success) {
+        std::cerr << "failed arm" << std::endl;
+        return Result::Failure;
+    }
+
     manual_continue_loop = true;
     set_flight_mode(1,5);
 
+        manual_control_thread = std::thread([this]() {
+            manual_control_loop();
+        });
     return Result::Success;
 }
 
