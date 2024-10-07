@@ -120,17 +120,9 @@ CommandManager::Result CommandManager::start_manual_control() {
     }
 
     manual_continue_loop = true;
+    action->arm();
     set_flight_mode(1,5);
-    auto result = arm();
-    if(result != Result::Success) {
-        std::cerr << "failed arm" << std::endl;
-        return Result::Failure;
-    }
-    else {
-        manual_control_thread = std::thread([this]() {
-            manual_control_loop();
-        });
-    }
+
     return Result::Success;
 }
 
