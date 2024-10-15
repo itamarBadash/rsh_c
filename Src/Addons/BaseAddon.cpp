@@ -23,8 +23,17 @@ BaseAddon::Result BaseAddon::Activate() {
     if (device_handle) {
         std::cout << "Activating " << name << " on bus " << (int)bus_number << " address " << (int)device_address << std::endl;
 
-        // Claim the interface before sending any control transfer
-        int result = libusb_claim_interface(device_handle, 0);  // Assuming interface 0
+        // Detach kernel driver (if applicable)
+        int result = libusb_detach_kernel_driver(device_handle, 0);  // Detach interface 0
+        if (result == 0) {
+            std::cout << "Kernel driver detached successfully." << std::endl;
+        } else if (result != LIBUSB_ERROR_NOT_FOUND) {
+            std::cerr << "Failed to detach kernel driver: " << libusb_error_name(result) << std::endl;
+            return Result::Failure;
+        }
+
+        // Claim the interface after detaching kernel driver
+        result = libusb_claim_interface(device_handle, 0);  // Assuming interface 0
         if (result < 0) {
             std::cerr << "Failed to claim interface: " << libusb_error_name(result) << std::endl;
             return Result::Failure;
@@ -58,8 +67,17 @@ BaseAddon::Result BaseAddon::Deactivate() {
     if (device_handle) {
         std::cout << "Deactivating " << name << " on bus " << (int)bus_number << " address " << (int)device_address << std::endl;
 
-        // Claim the interface before sending any control transfer
-        int result = libusb_claim_interface(device_handle, 0);  // Assuming interface 0
+        // Detach kernel driver (if applicable)
+        int result = libusb_detach_kernel_driver(device_handle, 0);  // Detach interface 0
+        if (result == 0) {
+            std::cout << "Kernel driver detached successfully." << std::endl;
+        } else if (result != LIBUSB_ERROR_NOT_FOUND) {
+            std::cerr << "Failed to detach kernel driver: " << libusb_error_name(result) << std::endl;
+            return Result::Failure;
+        }
+
+        // Claim the interface after detaching kernel driver
+        result = libusb_claim_interface(device_handle, 0);  // Assuming interface 0
         if (result < 0) {
             std::cerr << "Failed to claim interface: " << libusb_error_name(result) << std::endl;
             return Result::Failure;
