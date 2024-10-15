@@ -45,15 +45,19 @@ BaseAddon::Result BaseAddon::Activate() {
         // Send a control transfer to activate the device
         result = libusb_control_transfer(device_handle,
                                          LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE | LIBUSB_ENDPOINT_OUT,
-                                         0x01,      // Activation command (vendor-specific)
-                                         0x0001,    // Activation value (1 for activate)
-                                         0x0000,    // Index (usually 0 for device-wide command)
+                                         0x01,      // Vendor-specific command (modify if needed)
+                                         0x0001,    // Activation value (modify if needed)
+                                         0x0000,    // Index (modify if needed)
                                          nullptr,   // No data payload
-                                         0,         // Data length
+                                         0,         // No data length
                                          1000);     // Timeout in milliseconds
 
         if (result < 0) {
             std::cerr << "Failed to activate device: " << libusb_error_name(result) << std::endl;
+            // Additional debugging: check if it's an endpoint issue
+            if (result == LIBUSB_ERROR_PIPE) {
+                std::cerr << "Control request was not supported by the device." << std::endl;
+            }
             return Result::Failure;
         }
 
