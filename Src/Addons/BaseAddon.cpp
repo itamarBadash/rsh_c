@@ -17,16 +17,34 @@ std::string BaseAddon::getName() const {
 
 BaseAddon::Result BaseAddon::Activate() {
     if (device_handle) {
-        return SendCommand(0x01, 1, 0);  // Example command to activate the device
+        // Ensure the correct interface is claimed before sending commands
+        int claim_result = libusb_claim_interface(device_handle, 0);
+        if (claim_result < 0) {
+            std::cerr << "Failed to claim interface: " << libusb_error_name(claim_result) << std::endl;
+            return Result::ConnectionError;
+        }
+
+        // Send the activation command (0x01, value = 1)
+        return SendCommand(0x01, 1, 0);
     }
-    std::cout << name << "(no USB device connected)." << std::endl;
+
+    std::cout << name << " (no USB device connected)." << std::endl;
     return Result::ConnectionError;
 }
 
 BaseAddon::Result BaseAddon::Deactivate() {
     if (device_handle) {
-        return SendCommand(0x01, 0, 0);  // Example command to deactivate the device
+        // Ensure the correct interface is claimed before sending commands
+        int claim_result = libusb_claim_interface(device_handle, 0);
+        if (claim_result < 0) {
+            std::cerr << "Failed to claim interface: " << libusb_error_name(claim_result) << std::endl;
+            return Result::ConnectionError;
+        }
+
+        // Send the deactivation command (0x01, value = 0)
+        return SendCommand(0x01, 0, 0);
     }
+
     std::cout << name << " (no USB device connected)." << std::endl;
     return Result::ConnectionError;
 }
