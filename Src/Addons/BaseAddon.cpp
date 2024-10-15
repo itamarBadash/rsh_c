@@ -22,7 +22,23 @@ uint8_t BaseAddon::getDeviceAddress() const {
 BaseAddon::Result BaseAddon::Activate() {
     if (device_handle) {
         std::cout << "Activating " << name << " on bus " << (int)bus_number << " address " << (int)device_address << std::endl;
-        // Implement activation logic here...
+
+        // Example: Send a control transfer to activate the device
+        int result = libusb_control_transfer(device_handle,
+                                             LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE | LIBUSB_ENDPOINT_OUT,
+                                             0x01,      // Activation command (vendor-specific)
+                                             0x0001,    // Activation value (1 for activate)
+                                             0x0000,    // Index (usually 0 for device-wide command)
+                                             nullptr,   // No data payload
+                                             0,         // Data length
+                                             1000);     // Timeout in milliseconds
+
+        if (result < 0) {
+            std::cerr << "Failed to activate device: " << libusb_error_name(result) << std::endl;
+            return Result::Failure;
+        }
+
+        std::cout << name << " activated successfully." << std::endl;
         return Result::Success;
     }
     return Result::ConnectionError;
@@ -31,7 +47,23 @@ BaseAddon::Result BaseAddon::Activate() {
 BaseAddon::Result BaseAddon::Deactivate() {
     if (device_handle) {
         std::cout << "Deactivating " << name << " on bus " << (int)bus_number << " address " << (int)device_address << std::endl;
-        // Implement deactivation logic here...
+
+        // Example: Send a control transfer to deactivate the device
+        int result = libusb_control_transfer(device_handle,
+                                             LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE | LIBUSB_ENDPOINT_OUT,
+                                             0x01,      // Deactivation command (vendor-specific)
+                                             0x0000,    // Deactivation value (0 for deactivate)
+                                             0x0000,    // Index (usually 0 for device-wide command)
+                                             nullptr,   // No data payload
+                                             0,         // Data length
+                                             1000);     // Timeout in milliseconds
+
+        if (result < 0) {
+            std::cerr << "Failed to deactivate device: " << libusb_error_name(result) << std::endl;
+            return Result::Failure;
+        }
+
+        std::cout << name << " deactivated successfully." << std::endl;
         return Result::Success;
     }
     return Result::ConnectionError;
