@@ -76,15 +76,30 @@ if(WIN32)
 
 elseif(UNIX)
     # Linux specific OpenCV settings
-    message(STATUS "Using system-installed OpenCV for Linux")
+    message(STATUS "Using system-installed OpenCV and libusb for Linux")
 
     # Find system-installed OpenCV
     find_package(OpenCV REQUIRED)
 
+    # Find system-installed libusb-1.0
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(LIBUSB REQUIRED libusb-1.0)
+
     # Add system-installed OpenCV include directories for Linux
     include_directories(${OpenCV_INCLUDE_DIRS})
-else()
-    message(FATAL_ERROR "Unsupported platform")
+
+    # Add system-installed libusb include directories for Linux
+    include_directories(${LIBUSB_INCLUDE_DIRS})
+
+    # Link system-installed libusb-1.0 library for Linux
+    link_directories(${LIBUSB_LIBRARY_DIRS})
+
+    # Link libraries
+    target_link_libraries(base
+            MAVSDK::mavsdk  # Link MAVSDK on Linux
+            ${OpenCV_LIBS}  # System-installed OpenCV on Linux
+            ${LIBUSB_LIBRARIES}  # Link libusb-1.0 on Linux
+    )
 endif()
 
 # Find MAVSDK (this will locate MAVSDK installed via vcpkg or other package managers)
