@@ -61,6 +61,7 @@ int AddonsManager::getAddonCount() const {
 }
 
 void AddonsManager::activate(int index) {
+    std::cout << addon_ptrs.size()<<std::endl;
     if (index >= 0 && index < addon_ptrs.size()) {
         BaseAddon::Result result = addon_ptrs[index]->Activate();
         if (result == BaseAddon::Result::Success) {

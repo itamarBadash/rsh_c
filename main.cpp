@@ -146,7 +146,7 @@ int main(int argc, char** argv) {
         std::this_thread::sleep_for(std::chrono::seconds(1)); // Wait for 1 second before checking again
     }
 
-    std::cout << "USB device detected! You can now activate/deactivate addons." << std::endl;
+    std::cout << "USB device detected! You can now activate/deactivate addons."<< addonsManager.getAddonCount() << std::endl;
 
     // Main application loop for activating and deactivating addons
     char command;
