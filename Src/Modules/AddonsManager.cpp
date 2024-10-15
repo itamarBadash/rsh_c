@@ -45,8 +45,6 @@ void AddonsManager::detect_usb_devices() {
             // For demonstration, we treat every detected USB device as an addon.
             std::shared_ptr<BaseAddon> new_addon = std::make_shared<BaseAddon>("USB Addon", nullptr);
             addon_ptrs.push_back(new_addon);
-
-            std::cout << "Detected and added new USB device as addon: " << desc.idVendor << ":" << desc.idProduct << std::endl;
         }
     }
 
