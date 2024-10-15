@@ -1,33 +1,87 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="C:\Users\Badash\CLionProjects\base\main.cpp">
+    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\Badash\CLionProjects\base\TelemetryManager.cpp">
+    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\TelemetryManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\Badash\CLionProjects\base\CommandManager.cpp">
+    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\CommandManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Communications\SerialCommunication.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\inih\ini.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\inih\cpp\INIReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\BaseAddon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Communications\TCPServer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Communications\UDPServer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\CommunicationManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\UDPVideoStreamer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="C:\Users\Badash\CLionProjects\base\TelemetryManager.h">
+    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\TelemetryManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\Badash\CLionProjects\base\CommandManager.h">
+    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\CommandManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Communications\SerialCommunication.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\inih\ini.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\inih\cpp\INIReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Events\EventManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\BaseAddon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Communications\TCPServer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Communications\UDPServer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\CommunicationManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Communications\ICommunication.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\UDPVideoStreamer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\Badash\CLionProjects\base\CMakeLists.txt" />
+    <CustomBuild Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{5B32F71D-0760-309D-A7BD-6282E526D554}</UniqueIdentifier>
+      <UniqueIdentifier>{98C625D9-453D-305E-BE60-6E4EFFA829C7}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{EAEF60A8-8D38-3A1F-B6BA-8C0677746673}</UniqueIdentifier>
+      <UniqueIdentifier>{8BE75B05-979F-3E03-B9AF-7D114878754D}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

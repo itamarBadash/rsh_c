@@ -35,20 +35,44 @@ if(WIN32)
     # Windows specific OpenCV settings
     message(STATUS "Using manually specified OpenCV for Windows")
 
-    # Link the required OpenCV libraries (adjust for your setup)
     set(OpenCV_DIR "${CMAKE_SOURCE_DIR}/opencv/build")
+    set(MAVSDK_DIR "${CMAKE_SOURCE_DIR}/install/lib/cmake/MAVSDK")
 
     find_package(OpenCV REQUIRED)
+    find_package(MAVSDK REQUIRED)
 
     # Add OpenCV include and library directories for Windows
     include_directories(${OpenCV_INCLUDE_DIRS})
     link_directories(${OpenCV_LIBS_DIR})
+
+    include_directories(${MAVSDK_INCLUDE_DIRS})
+    link_directories(${MAVSDK_LIBS_DIR})
+
     target_link_libraries(base ${OpenCV_LIBS})
+    target_link_libraries(base ${MAVSDK_LIBS})
 
     # Post-build step: Copy OpenCV DLLs to the output directory (Windows only)
     add_custom_command(TARGET base POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_directory
             "${OpenCV_DLL_DIR}" $<TARGET_FILE_DIR:base>)
+
+    add_custom_command(TARGET base POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${MAVSDK_DLL_DIR}" $<TARGET_FILE_DIR:base>)
+
+    set(LIBUSB_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/libusb/include")
+    include_directories(${LIBUSB_INCLUDE_DIR})
+
+    set(LIBUSB_LIB_DIR "${CMAKE_SOURCE_DIR}/libusb/VS2022/MS64/static")
+    link_directories(${LIBUSB_LIB_DIR})
+
+    target_link_libraries(base libusb-1.0)
+
+    add_custom_command(TARGET base POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_SOURCE_DIR}/libusb/VS2022/MS64/dll" $<TARGET_FILE_DIR:base>)
+
+
 
 elseif(UNIX)
     # Linux specific OpenCV settings

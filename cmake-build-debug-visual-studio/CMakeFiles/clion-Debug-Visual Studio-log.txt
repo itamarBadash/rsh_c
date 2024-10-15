@@ -1,6 +1,24 @@
-"C:\Program Files\JetBrains\CLion 2024.1.5\bin\cmake\win\x64\bin\cmake.exe" -G "Visual Studio 17 2022" -S C:\Users\itaba\Desktop\Hoopoe\rsh_c -B C:\Users\itaba\Desktop\Hoopoe\rsh_c
+"C:\Program Files\JetBrains\CLion 2024.1.5\bin\cmake\win\x64\bin\cmake.exe" -G "Visual Studio 17 2022" -S C:\Users\itaba\Desktop\Hoopoe\rsh_c -B C:\Users\itaba\Desktop\Hoopoe\rsh_c\cmake-build-debug-visual-studio
 -- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.22631.
+-- The C compiler identification is MSVC 19.40.33813.0
+-- The CXX compiler identification is MSVC 19.40.33813.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.40.33807/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.40.33807/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
 -- Using manually specified OpenCV for Windows
--- Configuring done (0.0s)
--- Generating done (0.0s)
--- Build files have been written to: C:/Users/itaba/Desktop/Hoopoe/rsh_c
+-- OpenCV ARCH: x64
+-- OpenCV RUNTIME: vc16
+-- OpenCV STATIC: OFF
+-- Found OpenCV: C:/Users/itaba/Desktop/Hoopoe/rsh_c/opencv/build (found version "4.10.0") 
+-- Found OpenCV 4.10.0 in C:/Users/itaba/Desktop/Hoopoe/rsh_c/opencv/build/x64/vc16/lib
+-- You might need to add C:\Users\itaba\Desktop\Hoopoe\rsh_c\opencv\build\x64\vc16\bin to your PATH to be able to run your applications.
+-- Configuring done (5.5s)
+-- Generating done (0.1s)
+-- Build files have been written to: C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug-visual-studio
