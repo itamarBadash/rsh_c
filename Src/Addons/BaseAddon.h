@@ -17,30 +17,29 @@ public:
         Unknown
     };
 
-    // Constructor that accepts a name for the addon and an optional USB device handle
-    BaseAddon(const std::string& new_name, libusb_device_handle* dev_handle = nullptr);
+    // Constructor that accepts a name, device handle, bus number, and device address
+    BaseAddon(const std::string& new_name, libusb_device_handle* dev_handle, uint8_t bus, uint8_t address);
 
-    // Virtual destructor to allow proper cleanup of derived classes
+    // Virtual destructor to allow proper cleanup
     virtual ~BaseAddon();
 
-    // Getter for the name of the addon
-    std::string getName() const;
+    // Getter for the bus number
+    uint8_t getBusNumber() const;
 
-    // Virtual function to activate the addon (can be overridden by derived classes)
+    // Getter for the device address
+    uint8_t getDeviceAddress() const;
+
+    // Virtual function to activate the addon
     virtual Result Activate();
 
-    // Virtual function to deactivate the addon (to be overridden by derived classes)
+    // Virtual function to deactivate the addon
     virtual Result Deactivate();
 
-    // Additional methods for controlling device status
-    virtual Result GetStatus();
-
-    // USB control transfer for sending custom commands to the device
-    virtual Result SendCommand(uint8_t request, uint16_t value, uint16_t index);
-
 protected:
-    std::string name;  // Name of the addon
-    libusb_device_handle* device_handle;  // Handle to the connected USB device
+    std::string name;
+    libusb_device_handle* device_handle;
+    uint8_t bus_number;  // Bus number of the USB device
+    uint8_t device_address;  // Address of the USB device
 };
 
-#endif //BASE_BASEADDON_H
+#endif // BASE_BASEADDON_H

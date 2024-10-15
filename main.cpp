@@ -134,7 +134,10 @@ int main(int argc, char** argv) {
 
     main_thread.join();
     stream_thread.join();
-    */    AddonsManager addonsManager;
+    */
+
+    // Start the addon manager to begin monitoring USB devices in the background
+    AddonsManager addonsManager;
 
     // Start the addon manager to begin monitoring USB devices in the background
     std::cout << "Starting AddonsManager to monitor USB devices..." << std::endl;
@@ -146,7 +149,7 @@ int main(int argc, char** argv) {
         std::this_thread::sleep_for(std::chrono::seconds(1)); // Wait for 1 second before checking again
     }
 
-    std::cout << "USB device detected! You can now activate/deactivate addons."<< addonsManager.getAddonCount() << std::endl;
+    std::cout << "USB device detected! You can now activate/deactivate addons. Number of devices: " << addonsManager.getAddonCount() << std::endl;
 
     // Main application loop for activating and deactivating addons
     char command;

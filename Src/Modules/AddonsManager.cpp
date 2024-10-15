@@ -12,24 +12,24 @@ AddonsManager::~AddonsManager() {
     if (monitoring_thread.joinable()) {
         monitoring_thread.join();
     }
-    libusb_exit(nullptr); // Clean up libusb context
+    libusb_exit(nullptr);  // Clean up libusb context
 }
 
 void AddonsManager::start() {
     running = true;
-    monitoring_thread = std::thread(&AddonsManager::monitor_addons, this); // Start the background monitoring thread
+    monitoring_thread = std::thread(&AddonsManager::monitor_addons, this);  // Start the background monitoring thread
 }
 
 void AddonsManager::monitor_addons() {
     while (running) {
         detect_usb_devices();
-        std::this_thread::sleep_for(std::chrono::seconds(1)); // Check for new devices every second
+        std::this_thread::sleep_for(std::chrono::seconds(1));  // Check for new devices every second
     }
 }
 
 void AddonsManager::detect_usb_devices() {
     libusb_device **devices;
-    libusb_context *ctx = nullptr;  // This context must be initialized earlier in the AddonsManager (or in start)
+    libusb_context *ctx = nullptr;  // Ensure this context is initialized in the constructor
     ssize_t device_count = libusb_get_device_list(ctx, &devices);
 
     if (device_count < 0) {
@@ -42,26 +42,41 @@ void AddonsManager::detect_usb_devices() {
         libusb_device_descriptor desc;
 
         if (libusb_get_device_descriptor(device, &desc) == 0) {
-            libusb_device_handle *handle = nullptr;
+            // Get bus number and device address
+            uint8_t bus = libusb_get_bus_number(device);
+            uint8_t address = libusb_get_device_address(device);
 
-            if (libusb_open(device, &handle) == 0 && handle != nullptr) {
-                std::shared_ptr<BaseAddon> new_addon = std::make_shared<BaseAddon>("USB Addon", handle);
-                addon_ptrs.push_back(new_addon);
-            } else {
-                std::cerr << "Failed to open USB device: " << desc.idVendor << ":" << desc.idProduct << std::endl;
+            // Check if this device is already in the addon_ptrs list
+            bool device_already_added = false;
+            for (const auto& addon : addon_ptrs) {
+                if (addon->getBusNumber() == bus && addon->getDeviceAddress() == address) {
+                    device_already_added = true;
+                    break;
+                }
+            }
+
+            // If device is not already in the list, add it
+            if (!device_already_added) {
+                libusb_device_handle *handle = nullptr;
+                if (libusb_open(device, &handle) == 0 && handle != nullptr) {
+                    std::shared_ptr<BaseAddon> new_addon = std::make_shared<BaseAddon>("USB Addon", handle, bus, address);
+                    addon_ptrs.push_back(new_addon);
+                    std::cout << "Added new USB device: " << desc.idVendor << ":" << desc.idProduct << std::endl;
+                } else {
+                    std::cerr << "Failed to open USB device: " << desc.idVendor << ":" << desc.idProduct << std::endl;
+                }
             }
         }
     }
 
-    libusb_free_device_list(devices, 1);
+    libusb_free_device_list(devices, 1);  // Free the list of devices
 }
 
 int AddonsManager::getAddonCount() const {
-    return addon_ptrs.size(); // Return the number of detected addons
+    return addon_ptrs.size();  // Return the number of detected addons
 }
 
 void AddonsManager::activate(int index) {
-    std::cout << addon_ptrs.size()<<std::endl;
     if (index >= 0 && index < addon_ptrs.size()) {
         BaseAddon::Result result = addon_ptrs[index]->Activate();
         if (result == BaseAddon::Result::Success) {
@@ -69,7 +84,7 @@ void AddonsManager::activate(int index) {
         } else {
             std::cerr << "Failed to activate addon " << index << std::endl;
         }
-    }else {
+    } else {
         std::cerr << "Invalid addon index." << std::endl;
     }
 }
