@@ -29,7 +29,7 @@ void AddonsManager::monitor_addons() {
 
 void AddonsManager::detect_usb_devices() {
     libusb_device **devices;
-    libusb_context *ctx = nullptr;
+    libusb_context *ctx = nullptr;  // This context must be initialized earlier in the AddonsManager (or in start)
     ssize_t device_count = libusb_get_device_list(ctx, &devices);
 
     if (device_count < 0) {
@@ -42,13 +42,21 @@ void AddonsManager::detect_usb_devices() {
         libusb_device_descriptor desc;
 
         if (libusb_get_device_descriptor(device, &desc) == 0) {
-            // For demonstration, we treat every detected USB device as an addon.
-            std::shared_ptr<BaseAddon> new_addon = std::make_shared<BaseAddon>("USB Addon", nullptr);
-            addon_ptrs.push_back(new_addon);
+            libusb_device_handle *handle = nullptr;
+
+            if (libusb_open(device, &handle) == 0 && handle != nullptr) {
+                std::cout << "Successfully opened device: " << desc.idVendor << ":" << desc.idProduct << std::endl;
+
+                // Now we create a new BaseAddon and pass the valid device handle
+                std::shared_ptr<BaseAddon> new_addon = std::make_shared<BaseAddon>("USB Addon", handle);
+                addon_ptrs.push_back(new_addon);
+            } else {
+                std::cerr << "Failed to open USB device: " << desc.idVendor << ":" << desc.idProduct << std::endl;
+            }
         }
     }
 
-    libusb_free_device_list(devices, 1); // Free the list of devices
+    libusb_free_device_list(devices, 1);
 }
 
 int AddonsManager::getAddonCount() const {
@@ -63,7 +71,7 @@ void AddonsManager::activate(int index) {
         } else {
             std::cerr << "Failed to activate addon " << index << std::endl;
         }
-    } else {
+    }else {
         std::cerr << "Invalid addon index." << std::endl;
     }
 }
