@@ -64,43 +64,16 @@ BaseAddon::Result BaseAddon::Activate() {
 
 BaseAddon::Result BaseAddon::Deactivate() {
     if (device_handle) {
-        std::cout << "Deactivating " << name << " on bus " << (int)bus_number << " address " << (int)device_address << std::endl;
+        std::cout << "Resetting USB device " << name << " on bus " << (int)bus_number << " address " << (int)device_address << std::endl;
 
-        // Detach kernel driver (if applicable)
-        int result = libusb_detach_kernel_driver(device_handle, 0);  // Detach interface 0
-        if (result == 0) {
-            std::cout << "Kernel driver detached successfully." << std::endl;
-        } else if (result != LIBUSB_ERROR_NOT_FOUND) {
-            std::cerr << "Failed to detach kernel driver: " << libusb_error_name(result) << std::endl;
-            return Result::Failure;
-        }
-
-        // Claim the interface after detaching kernel driver
-        result = libusb_claim_interface(device_handle, 0);  // Assuming interface 0
+        // Reset the USB device
+        int result = libusb_reset_device(device_handle);
         if (result < 0) {
-            std::cerr << "Failed to claim interface: " << libusb_error_name(result) << std::endl;
+            std::cerr << "Failed to reset device: " << libusb_error_name(result) << std::endl;
             return Result::Failure;
         }
 
-        // Clear halt in case the endpoint is stalled
-        libusb_clear_halt(device_handle, LIBUSB_ENDPOINT_OUT);
-
-        // Send a control transfer to deactivate the device
-        result = libusb_control_transfer(device_handle,
-                                         LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE | LIBUSB_ENDPOINT_OUT,
-                                         0x01,      // Deactivation command (vendor-specific)
-                                         0x0000,    // Deactivation value (0 for deactivate)
-                                         0x0000,    // Index (usually 0 for device-wide command)
-                                         nullptr,   // No data payload
-                                         0,         // Data length
-                                         1000);     // Timeout in milliseconds
-
-        if (result < 0) {
-            std::cerr << "Failed to deactivate device: " << libusb_error_name(result) << std::endl;
-            return Result::Failure;
-        }
-
-        std::cout << name << " deactivated successfully." << std::endl;
+        std::cout << "Device reset successfully." << std::endl;
         return Result::Success;
     }
     return Result::ConnectionError;
