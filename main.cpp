@@ -6,7 +6,7 @@
 #include "Src/Modules/CommandManager.h"
 #include "Src/Communications/SerialCommunication.h"
 #include "inih/cpp/INIReader.h"
-#include "Src/Modules/BaseAddon.h"
+#include "Src/Addons//BaseAddon.h"
 #include "Events/EventManager.h"
 #include "Src/Communications/TCPServer.h"
 #include "Src/Communications/UDPServer.h"
