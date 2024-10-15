@@ -17,8 +17,8 @@ add_executable(base
         inih/cpp/INIReader.cpp
         inih/cpp/INIReader.h
         Events/EventManager.h
-        Src/Modules/BaseAddon.cpp
-        Src/Modules/BaseAddon.h
+        Src/Addons/BaseAddon.cpp
+        Src/Addons/BaseAddon.h
         Src/Communications/TCPServer.cpp
         Src/Communications/TCPServer.h
         Src/Communications/UDPServer.cpp
@@ -28,6 +28,8 @@ add_executable(base
         Src/Communications/ICommunication.h
         Src/Modules/UDPVideoStreamer.cpp
         Src/Modules/UDPVideoStreamer.h
+        Src/Modules/AddonsManager.cpp
+        Src/Modules/AddonsManager.h
 )
 
 # Set the path to OpenCV based on the operating system

@@ -461,8 +461,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\inih\cpp\INIReader.cpp" />
     <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\inih\cpp\INIReader.h" />
     <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Events\EventManager.h" />
-    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\BaseAddon.cpp" />
-    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\BaseAddon.h" />
+    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Addons\BaseAddon.cpp" />
+    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Addons\BaseAddon.h" />
     <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Communications\TCPServer.cpp" />
     <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Communications\TCPServer.h" />
     <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Communications\UDPServer.cpp" />
@@ -472,6 +472,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Communications\ICommunication.h" />
     <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\UDPVideoStreamer.cpp" />
     <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\UDPVideoStreamer.h" />
+    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\AddonsManager.cpp" />
+    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\AddonsManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\cmake-build-debug-visual-studio\ZERO_CHECK.vcxproj">

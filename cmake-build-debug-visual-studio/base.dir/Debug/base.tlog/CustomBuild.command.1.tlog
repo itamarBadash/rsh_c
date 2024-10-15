@@ -1,6 +1,6 @@
-^C:\USERS\BADASH\CLIONPROJECTS\BASE\CMAKELISTS.TXT
+^C:\USERS\ITABA\DESKTOP\HOOPOE\RSH_C\CMAKELISTS.TXT
 setlocal
-"C:\Program Files\JetBrains\CLion 2024.1.1\bin\cmake\win\x64\bin\cmake.exe" -SC:/Users/Badash/CLionProjects/base -BC:/Users/Badash/CLionProjects/base/cmake-build-debug-visual-studio --check-stamp-file C:/Users/Badash/CLionProjects/base/cmake-build-debug-visual-studio/CMakeFiles/generate.stamp
+"C:\Program Files\JetBrains\CLion 2024.1.5\bin\cmake\win\x64\bin\cmake.exe" -SC:/Users/itaba/Desktop/Hoopoe/rsh_c -BC:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug-visual-studio --check-stamp-file C:/Users/itaba/Desktop/Hoopoe/rsh_c/cmake-build-debug-visual-studio/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone

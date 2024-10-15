@@ -19,7 +19,7 @@
     <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\inih\cpp\INIReader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\BaseAddon.cpp">
+    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Addons\BaseAddon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Communications\TCPServer.cpp">
@@ -32,6 +32,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\UDPVideoStreamer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\AddonsManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -54,7 +57,7 @@
     <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Events\EventManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\BaseAddon.h">
+    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Addons\BaseAddon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Communications\TCPServer.h">
@@ -70,6 +73,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\UDPVideoStreamer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\AddonsManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
