@@ -4,17 +4,10 @@
 #include <thread>
 #include "Src/Modules/TelemetryManager.h"
 #include "Src/Modules/CommandManager.h"
-#include "Src/Communications/SerialCommunication.h"
 #include "inih/cpp/INIReader.h"
-#include "Src/Addons//BaseAddon.h"
 #include "Events/EventManager.h"
-#include "Src/Communications/TCPServer.h"
-#include "Src/Communications/UDPServer.h"
 #include "Src/Modules/CommunicationManager.h"
 #include <chrono>
-#include <opencv2/highgui.hpp>
-#include <opencv2/videoio.hpp>
-
 #include "Src/Modules/AddonsManager.h"
 #include "Src/Modules/UDPVideoStreamer.h"
 
@@ -71,7 +64,7 @@ int main(int argc, char** argv) {
         usage(argv[0]);
         return 1;
     }
-    /*
+
 
     Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::GroundStation}};
     ConnectionResult connection_result = mavsdk.add_any_connection(argv[1]);
@@ -122,8 +115,6 @@ int main(int argc, char** argv) {
     communication_manager->send_message_all(telemetry_manager->getTelemetryData().print());
     }));
 
-    auto addon = std::make_shared<BaseAddon>("system");
-
     std::thread stream_thread(stream_thread_function);
     std::thread main_thread(main_thread_function, system, command_manager, telemetry_manager, communication_manager);
 
@@ -134,53 +125,6 @@ int main(int argc, char** argv) {
 
     main_thread.join();
     stream_thread.join();
-    */
-
-    // Start the addon manager to begin monitoring USB devices in the background
-    AddonsManager addonsManager;
-
-    // Start the addon manager to begin monitoring USB devices in the background
-    std::cout << "Starting AddonsManager to monitor USB devices..." << std::endl;
-    addonsManager.start();
-
-    // Wait until at least one addon (USB device) is detected
-    while (addonsManager.getAddonCount() == 0) {
-        std::cout << "Waiting for a USB device to be connected..." << std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(1)); // Wait for 1 second before checking again
-    }
-
-    std::cout << "USB device detected! You can now activate/deactivate addons. Number of devices: " << addonsManager.getAddonCount() << std::endl;
-
-    // Main application loop for activating and deactivating addons
-    char command;
-    while (true) {
-        std::cout << "\nEnter a command (a = activate addon, d = deactivate addon, q = quit): ";
-        std::cin >> command;
-
-        if (command == 'q') {
-            std::cout << "Exiting program." << std::endl;
-            break; // Exit the loop
-        }
-
-        if (addonsManager.getAddonCount() == 0) {
-            std::cout << "No devices connected. Please wait for a USB device to be detected." << std::endl;
-            continue; // Go back to the main loop
-        }
-
-        int index;
-        std::cout << "Enter the index of the addon: ";
-        std::cin >> index;
-
-        if (command == 'a') {
-            // Activate the addon at the specified index
-            addonsManager.activate(index);
-        } else if (command == 'd') {
-            // Deactivate the addon at the specified index
-            addonsManager.deactivate(index);
-        } else {
-            std::cout << "Unknown command." << std::endl;
-        }
-    }
 
     return 0;
 }
