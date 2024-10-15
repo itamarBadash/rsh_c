@@ -45,9 +45,6 @@ void AddonsManager::detect_usb_devices() {
             libusb_device_handle *handle = nullptr;
 
             if (libusb_open(device, &handle) == 0 && handle != nullptr) {
-                std::cout << "Successfully opened device: " << desc.idVendor << ":" << desc.idProduct << std::endl;
-
-                // Now we create a new BaseAddon and pass the valid device handle
                 std::shared_ptr<BaseAddon> new_addon = std::make_shared<BaseAddon>("USB Addon", handle);
                 addon_ptrs.push_back(new_addon);
             } else {
