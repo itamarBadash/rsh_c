@@ -12,7 +12,8 @@ AddonsManager::~AddonsManager() {
     if (monitoring_thread.joinable()) {
         monitoring_thread.join();
     }
-    libusb_exit(nullptr);  // Clean up libusb context
+    libusb_exit(nullptr);
+    addon_ptrs.clear();
 }
 
 void AddonsManager::start() {
