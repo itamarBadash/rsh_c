@@ -184,7 +184,7 @@ BaseAddon::Result BaseAddon::executeIoctlCommand(const Command &cmd) {
     std::cout << "Device file opened successfully." << std::endl;
 
     struct v4l2_control control;
-    control.id = 0x00980900;
+    control.id = cmd.args.at("control_id").get<int>();
     control.value = cmd.args.at("value").get<int>();
 
     std::cout << "Executing ioctl command with control ID: " << control.id << " and value: " << control.value << std::endl;
