@@ -3,7 +3,7 @@
     {
       "name": "set_brightness",
       "request_type": "ioctl",
-      "ioctl_code": 3222837760,
+      "ioctl_code": 3222825548,
       "is_read": false,
       "data_length": 8,
       "args": {
@@ -15,7 +15,7 @@
     {
       "name": "set_contrast",
       "request_type": "ioctl",
-      "ioctl_code": 3222837760,
+      "ioctl_code": 3222825548,
       "is_read": false,
       "data_length": 8,
       "args": {
@@ -27,13 +27,13 @@
     {
       "name": "set_hue",
       "request_type": "ioctl",
-      "ioctl_code": 3222837760,
+      "ioctl_code": 3222825548,
       "is_read": false,
       "data_length": 8,
       "args": {
         "fd": "/dev/video0",
         "control_id": 9963779,
-        "value": 30
+        "value": 101
       }
     }
   ]
