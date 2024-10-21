@@ -9,7 +9,8 @@ BaseAddon::BaseAddon(const std::string& new_name, libusb_device_handle* dev_hand
 
 BaseAddon::~BaseAddon() {
     if (device_handle) {
-        libusb_close(device_handle);  // Close the device handle when the addon is destroyed
+        libusb_close(device_handle);  // Close the device handle if it's valid
+        device_handle = nullptr;      // Set the handle to nullptr after closing
     }
 }
 
