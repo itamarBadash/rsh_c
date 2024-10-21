@@ -190,7 +190,7 @@ int main(int argc, char** argv) {
     }
 
     // Step 4: Load the JSON file containing commands
-    const std::string commandFilePath = "Src/Addons/json/webcam_commands.json";  // Path to your JSON file
+    const std::string commandFilePath = "../Src/Addons/json/webcam_commands.json";  // Path to your JSON file
     if (!cameraAddon->loadCommandsFromFile(commandFilePath)) {
         std::cerr << "Failed to load commands from JSON file: " << commandFilePath << std::endl;
         manager.stop();
