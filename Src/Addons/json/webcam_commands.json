@@ -5,7 +5,10 @@
       "request_type": "ioctl",
       "ioctl_code": 2153775104,
       "data_length": 4,
-      "is_read": true
+      "is_read": true,
+      "args": {
+        "fd": "/dev/video0"
+      }
     },
     {
       "name": "set_brightness",
@@ -13,14 +16,20 @@
       "ioctl_code": 2153775104,
       "data_length": 0,
       "is_read": false,
-      "value": 150
+      "args": {
+        "fd": "/dev/video0",
+        "value": 200
+      }
     },
     {
       "name": "get_contrast",
       "request_type": "ioctl",
       "ioctl_code": 2153775105,
       "data_length": 4,
-      "is_read": true
+      "is_read": true,
+      "args": {
+        "fd": "/dev/video0"
+      }
     },
     {
       "name": "set_contrast",
@@ -28,14 +37,20 @@
       "ioctl_code": 2153775105,
       "data_length": 0,
       "is_read": false,
-      "value": 50
+      "args": {
+        "fd": "/dev/video0",
+        "value": 25
+      }
     },
     {
       "name": "get_hue",
       "request_type": "ioctl",
       "ioctl_code": 2153775107,
       "data_length": 4,
-      "is_read": true
+      "is_read": true,
+      "args": {
+        "fd": "/dev/video0"
+      }
     },
     {
       "name": "set_hue",
@@ -43,7 +58,20 @@
       "ioctl_code": 2153775107,
       "data_length": 0,
       "is_read": false,
-      "value": 0
+      "args": {
+        "fd": "/dev/video0",
+        "value": 100
+      }
+    },
+    {
+      "name": "get_device_info",
+      "request_type": "ioctl",
+      "ioctl_code": 2150120064,
+      "data_length": 1024,
+      "is_read": true,
+      "args": {
+        "fd": "/dev/video0"
+      }
     }
   ]
 }
