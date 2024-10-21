@@ -6,7 +6,8 @@
 #include <fcntl.h>
 #include <cstring>
 #include <linux/videodev2.h>
-
+#include <unistd.h>
+#include <errno.h>
 
 using namespace nlohmann;
 
@@ -182,24 +183,10 @@ BaseAddon::Result BaseAddon::executeIoctlCommand(const Command &cmd) {
     struct v4l2_control control;
     const auto& controlJson = cmd.args.at("control");
 
-    // Map string control IDs to actual V4L2 control IDs
-    std::map<std::string, int> controlMap = {
-        {"V4L2_CID_BRIGHTNESS", V4L2_CID_BRIGHTNESS},
-        {"V4L2_CID_CONTRAST", V4L2_CID_CONTRAST},
-        {"V4L2_CID_HUE", V4L2_CID_HUE}
-    };
+    control.id = controlJson.at("id").get<__u32>();
+    control.value = controlJson.at("value").get<__s32>();
 
-    control.id = controlMap[controlJson.at("id").get<std::string>()];
-    control.value = controlJson.at("value").get<int>();
-
-    int result;
-    if (cmd.ioctl_code == "VIDIOC_S_CTRL") {
-        result = ioctl(fd, VIDIOC_S_CTRL, &control);
-    } else {
-        std::cerr << "Unsupported ioctl command: " << cmd.ioctl_code << std::endl;
-        close(fd);
-        return Result::Failure;
-    }
+    int result = ioctl(fd, static_cast<unsigned long>(cmd.ioctl_code), &control);
 
     close(fd);
 
@@ -208,12 +195,11 @@ BaseAddon::Result BaseAddon::executeIoctlCommand(const Command &cmd) {
         return Result::Failure;
     }
 
-    std::cout << "Successfully set " << controlJson.at("id").get<std::string>()
-              << " to " << control.value << std::endl;
+    std::cout << "Successfully set control ID " << control.id
+              << " to value " << control.value << std::endl;
 
     return Result::Success;
 }
-
 const std::vector<BaseAddon::Command>& BaseAddon::getCommands() const {
     return commands;
 }

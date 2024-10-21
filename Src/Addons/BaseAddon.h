@@ -23,11 +23,11 @@ public:
     struct Command {
         std::string name;
         std::string request_type;
+        unsigned long ioctl_code;   // Changed to unsigned long for ioctl compatibility
         uint8_t request = 0;        // Only used for USB commands
         uint16_t value = 0;         // Only used for USB commands
         uint16_t index = 0;         // Only used for USB commands
         uint16_t data_length = 0;   // Used for both USB and ioctl
-        uint32_t ioctl_code = 0;    // Used for ioctl commands
         bool is_read = false;       // Used for ioctl commands to determine read/write
         std::map<std::string, nlohmann::json> args; // Additional arguments for ioctl commands
     };
@@ -75,6 +75,7 @@ namespace nlohmann {
         static void from_json(const json& j, BaseAddon::Command& cmd) {
             j.at("name").get_to(cmd.name);
             j.at("request_type").get_to(cmd.request_type);
+            j.at("ioctl_code").get_to(cmd.ioctl_code);
 
             if (cmd.request_type == "usb") {
                 j.at("request").get_to(cmd.request);
@@ -82,7 +83,6 @@ namespace nlohmann {
                 j.at("index").get_to(cmd.index);
                 j.at("data_length").get_to(cmd.data_length);
             } else if (cmd.request_type == "ioctl") {
-                j.at("ioctl_code").get_to(cmd.ioctl_code);
                 j.at("data_length").get_to(cmd.data_length);
                 if (j.contains("is_read")) {
                     j.at("is_read").get_to(cmd.is_read);
@@ -95,9 +95,10 @@ namespace nlohmann {
 
         static void to_json(json& j, const BaseAddon::Command& cmd) {
             j = json{
-                {"name", cmd.name},
-                {"request_type", cmd.request_type},
-                {"data_length", cmd.data_length}
+                    {"name", cmd.name},
+                    {"request_type", cmd.request_type},
+                    {"ioctl_code", cmd.ioctl_code},
+                    {"data_length", cmd.data_length}
             };
 
             if (cmd.request_type == "usb") {
@@ -105,7 +106,6 @@ namespace nlohmann {
                 j["value"] = cmd.value;
                 j["index"] = cmd.index;
             } else if (cmd.request_type == "ioctl") {
-                j["ioctl_code"] = cmd.ioctl_code;
                 j["is_read"] = cmd.is_read;
                 j["args"] = cmd.args;
             }
