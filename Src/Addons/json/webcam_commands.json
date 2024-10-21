@@ -2,7 +2,7 @@
   "commands": [
     {
       "name": "SetBrightness",
-      "request_type": "standard",
+      "request_type": "v4l2",
       "request": 10094848,
       "value": 200,
       "index": 0,
