@@ -142,7 +142,7 @@ int main(int argc, char** argv) {
     stream_thread.join();
 
 */
-
+    cout<< VIDIOC_S_CTRL<< std::endl;
      AddonsManager manager;
 
     // Step 2: Start detecting USB devices (in a separate thread if desired)
