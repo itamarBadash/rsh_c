@@ -1,0 +1,60 @@
+{
+  "commands": [
+    {
+      "name": "SetBrightness",
+      "request_type": "standard",
+      "request": 0,
+      "value": 200,
+      "index": 0,
+      "data_length": 0
+    },
+    {
+      "name": "SetContrast",
+      "request_type": "standard",
+      "request": 0,
+      "value": 150,
+      "index": 0,
+      "data_length": 0
+    },
+    {
+      "name": "SetSaturation",
+      "request_type": "standard",
+      "request": 0,
+      "value": 200,
+      "index": 0,
+      "data_length": 0
+    },
+    {
+      "name": "SetHue",
+      "request_type": "standard",
+      "request": 0,
+      "value": 30,
+      "index": 0,
+      "data_length": 0
+    },
+    {
+      "name": "SetSharpness",
+      "request_type": "standard",
+      "request": 0,
+      "value": 7,
+      "index": 0,
+      "data_length": 0
+    },
+    {
+      "name": "SetWhiteBalanceAuto",
+      "request_type": "standard",
+      "request": 0,
+      "value": 0,
+      "index": 0,
+      "data_length": 0
+    },
+    {
+      "name": "SetExposureAuto",
+      "request_type": "standard",
+      "request": 0,
+      "value": 0,
+      "index": 0,
+      "data_length": 0
+    }
+  ]
+}

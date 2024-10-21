@@ -14,17 +14,21 @@ public:
     ~AddonsManager();
 
     void start();
+    void stop();
+    int getAddonCount() const;
+    std::shared_ptr<BaseAddon> getAddon(int index) const;
+
     void activate(int index);
     void deactivate(int index);
-    int getAddonCount() const;
 
 private:
-    std::vector<std::shared_ptr<BaseAddon>> addon_ptrs;
-    std::thread monitoring_thread;
-    std::atomic<bool> running;
-
     void monitor_addons();
     void detect_usb_devices();
+
+    bool running;
+    std::thread monitoring_thread;
+    std::vector<std::shared_ptr<BaseAddon>> addon_ptrs;
 };
 
 #endif // ADDONSMANAGER_H
+

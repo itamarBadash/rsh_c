@@ -39,6 +39,10 @@ public:
 
     virtual Result Deactivate();
 
+    const std::vector<BaseAddon::Command> &getCommands() const;
+
+    libusb_device_handle *getDeviceHandle() const;
+
     bool loadCommandsFromFile(const std::string& filePath);
 
     Result executeCommand(const std::string& commandName);

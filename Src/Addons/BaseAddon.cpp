@@ -3,24 +3,20 @@
 #include <fstream>
 
 using namespace nlohmann;
-// Constructor
 BaseAddon::BaseAddon(const std::string& new_name, libusb_device_handle* dev_handle, uint8_t bus, uint8_t address)
     : name(new_name), device_handle(dev_handle), bus_number(bus), device_address(address) {
 }
 
-// Destructor
 BaseAddon::~BaseAddon() {
     if (device_handle) {
         libusb_close(device_handle);  // Close the device handle when the addon is destroyed
     }
 }
 
-// Get bus number
 uint8_t BaseAddon::getBusNumber() const {
     return bus_number;
 }
 
-// Get device address
 uint8_t BaseAddon::getDeviceAddress() const {
     return device_address;
 }
@@ -149,4 +145,11 @@ BaseAddon::Result BaseAddon::Deactivate() {
         return Result::Success;
     }
     return Result::ConnectionError;
+}
+
+const std::vector<BaseAddon::Command>& BaseAddon::getCommands() const {
+    return commands;
+}
+libusb_device_handle* BaseAddon::getDeviceHandle() const {
+    return device_handle;
 }

@@ -8,10 +8,7 @@ AddonsManager::AddonsManager() : running(false) {
 
 AddonsManager::~AddonsManager() {
     // Stop the background thread and clean up
-    running = false;
-    if (monitoring_thread.joinable()) {
-        monitoring_thread.join();
-    }
+    stop();  // Ensure we stop monitoring when the manager is destroyed
     libusb_exit(nullptr);
     addon_ptrs.clear();
 }
@@ -19,6 +16,13 @@ AddonsManager::~AddonsManager() {
 void AddonsManager::start() {
     running = true;
     monitoring_thread = std::thread(&AddonsManager::monitor_addons, this);  // Start the background monitoring thread
+}
+
+void AddonsManager::stop() {
+    running = false;
+    if (monitoring_thread.joinable()) {
+        monitoring_thread.join();
+    }
 }
 
 void AddonsManager::monitor_addons() {
@@ -75,6 +79,13 @@ void AddonsManager::detect_usb_devices() {
 
 int AddonsManager::getAddonCount() const {
     return addon_ptrs.size();  // Return the number of detected addons
+}
+
+std::shared_ptr<BaseAddon> AddonsManager::getAddon(int index) const {
+    if (index >= 0 && index < addon_ptrs.size()) {
+        return addon_ptrs[index];
+    }
+    return nullptr;
 }
 
 void AddonsManager::activate(int index) {

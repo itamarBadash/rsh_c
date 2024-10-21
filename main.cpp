@@ -58,6 +58,16 @@ void stream_thread_function() {
     }
 }
 
+bool isCameraDevice(const libusb_device_descriptor& desc) {
+    // UVC cameras typically have a device class of 239, a subclass of 2, and a protocol of 1.
+    // You can also specify known VIDs and PIDs if needed.
+    const int CAMERA_DEVICE_CLASS = 239;  // USB Miscellaneous class (which contains the UVC class)
+    const int CAMERA_DEVICE_SUBCLASS = 2;  // UVC subclass for video devices
+
+    // Check if the device class and subclass match UVC specifications
+    return (desc.bDeviceClass == CAMERA_DEVICE_CLASS && desc.bDeviceSubClass == CAMERA_DEVICE_SUBCLASS);
+}
+
 int main(int argc, char** argv) {
 
     if (argc != 2) {
@@ -65,7 +75,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-
+ /*
     Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::GroundStation}};
     ConnectionResult connection_result = mavsdk.add_any_connection(argv[1]);
 
@@ -126,6 +136,74 @@ int main(int argc, char** argv) {
     main_thread.join();
     stream_thread.join();
 
+*/
+
+     AddonsManager manager;
+
+    // Step 2: Start detecting USB devices (in a separate thread if desired)
+    manager.start();
+    std::this_thread::sleep_for(std::chrono::seconds(2));  // Give some time to detect devices
+
+    // Step 3: Identify the camera device
+    int addonCount = manager.getAddonCount();
+    if (addonCount == 0) {
+        std::cerr << "No USB devices detected." << std::endl;
+        return 1;
+    }
+
+    // Search for a device that matches camera criteria
+    std::shared_ptr<BaseAddon> cameraAddon = nullptr;
+    for (int i = 0; i < addonCount; ++i) {
+        std::shared_ptr<BaseAddon> addon = manager.getAddon(i);
+        if (addon) {
+            // Get the device descriptor for each addon
+            libusb_device* device = libusb_get_device(addon->getDeviceHandle());
+            libusb_device_descriptor desc;
+            if (libusb_get_device_descriptor(device, &desc) == 0) {
+                // Check if this device is a camera
+                if (isCameraDevice(desc)) {
+                    cameraAddon = addon;
+                    std::cout << "Camera detected: Vendor ID: " << desc.idVendor << ", Product ID: " << desc.idProduct << std::endl;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (!cameraAddon) {
+        std::cerr << "No camera device detected." << std::endl;
+        return 1;
+    }
+
+    // Step 4: Load the JSON file containing commands
+    const std::string commandFilePath = "Src/Addons/json/webcam_commands.json";  // Path to your JSON file
+    if (!cameraAddon->loadCommandsFromFile(commandFilePath)) {
+        std::cerr << "Failed to load commands from JSON file: " << commandFilePath << std::endl;
+        return 1;
+    }
+
+    // Step 5: Activate the camera addon
+    if (cameraAddon->Activate() != BaseAddon::Result::Success) {
+        std::cerr << "Failed to activate the camera." << std::endl;
+        return 1;
+    }
+
+    // Step 6: Execute all commands listed in the JSON file
+    std::cout << "Executing commands from JSON file..." << std::endl;
+    const auto& commands = cameraAddon->getCommands();
+    for (const auto& command : commands) {
+        if (cameraAddon->executeCommand(command.name) != BaseAddon::Result::Success) {
+            std::cerr << "Failed to execute command: " << command.name << std::endl;
+        }
+    }
+
+    // Step 7: Deactivate the camera when done
+    if (cameraAddon->Deactivate() != BaseAddon::Result::Success) {
+        std::cerr << "Failed to deactivate the camera." << std::endl;
+    }
+
+    // Stop the monitoring thread and cleanup
+    manager.stop();
     return 0;
 }
 
