@@ -1,65 +1,50 @@
 {
   "commands": [
     {
-      "name": "get_brightness",
-      "request_type": "ioctl",
-      "ioctl_code": 2153775104,
-      "data_length": 4,
-      "is_read": true,
-      "args": {
-        "fd": "/dev/video0"
-      }
-    },
-    {
       "name": "set_brightness",
       "request_type": "ioctl",
-      "ioctl_code": 2153775104,
-      "data_length": 4,
+      "ioctl_code": 3222286084,
       "is_read": false,
+      "data_length": 4,
       "args": {
         "fd": "/dev/video0",
+        "control_id": 9963776,
+        "min_value": 1,
+        "max_value": 255,
+        "step": 1,
+        "default_value": 16,
         "value": 200
-      }
-    },
-    {
-      "name": "get_contrast",
-      "request_type": "ioctl",
-      "ioctl_code": 2153775105,
-      "data_length": 4,
-      "is_read": true,
-      "args": {
-        "fd": "/dev/video0"
       }
     },
     {
       "name": "set_contrast",
       "request_type": "ioctl",
-      "ioctl_code": 2153775105,
-      "data_length": 4,
+      "ioctl_code": 3222286084,
       "is_read": false,
+      "data_length": 4,
       "args": {
         "fd": "/dev/video0",
+        "control_id": 9963777,
+        "min_value": 1,
+        "max_value": 255,
+        "step": 1,
+        "default_value": 16,
         "value": 25
-      }
-    },
-    {
-      "name": "get_hue",
-      "request_type": "ioctl",
-      "ioctl_code": 2153775107,
-      "data_length": 4,
-      "is_read": true,
-      "args": {
-        "fd": "/dev/video0"
       }
     },
     {
       "name": "set_hue",
       "request_type": "ioctl",
-      "ioctl_code": 2153775107,
-      "data_length": 4,
+      "ioctl_code": 3222286084,
       "is_read": false,
+      "data_length": 4,
       "args": {
         "fd": "/dev/video0",
+        "control_id": 9963779,
+        "min_value": -128,
+        "max_value": 127,
+        "step": 1,
+        "default_value": 16,
         "value": 100
       }
     }
