@@ -9,7 +9,7 @@
       "args": {
         "fd": "/dev/video0",
         "control_id": 9963776,
-        "value": 200
+        "value": 199
       }
     },
     {
@@ -21,7 +21,7 @@
       "args": {
         "fd": "/dev/video0",
         "control_id": 9963777,
-        "value": 24
+        "value": 26
       }
     },
     {
@@ -33,7 +33,7 @@
       "args": {
         "fd": "/dev/video0",
         "control_id": 9963779,
-        "value": 100
+        "value": 30
       }
     }
   ]
