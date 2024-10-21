@@ -3,7 +3,7 @@
     {
       "name": "set_brightness",
       "request_type": "ioctl",
-      "ioctl_code": 3222825548,
+      "ioctl_code": 3221771804,
       "is_read": false,
       "data_length": 8,
       "args": {
