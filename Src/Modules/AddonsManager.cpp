@@ -8,9 +8,10 @@ AddonsManager::AddonsManager() : running(false) {
 
 AddonsManager::~AddonsManager() {
     // Stop the background thread and clean up
-    stop();  // Ensure we stop monitoring when the manager is destroyed
-    libusb_exit(nullptr);
+    stop();
     addon_ptrs.clear();
+    libusb_exit(nullptr);
+
 }
 
 void AddonsManager::start() {
