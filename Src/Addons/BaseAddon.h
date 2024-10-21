@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <libusb.h>
-#include <../../include/json.hpp>
+#include <../../Include/json.hpp>
 
 class BaseAddon {
 public:
