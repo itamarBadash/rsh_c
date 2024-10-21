@@ -213,11 +213,6 @@ int main(int argc, char** argv) {
         }
     }
 
-    // Step 7: Deactivate the camera when done
-    if (cameraAddon->Deactivate() != BaseAddon::Result::Success) {
-        std::cerr << "Failed to deactivate the camera." << std::endl;
-    }
-
     // Stop the monitoring thread and cleanup
     manager.stop();
     return 0;
