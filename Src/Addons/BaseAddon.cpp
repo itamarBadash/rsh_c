@@ -189,7 +189,7 @@ BaseAddon::Result BaseAddon::executeIoctlCommand(const Command &cmd) {
 
     std::cout << "Executing ioctl command with control ID: " << control.id << " and value: " << control.value << std::endl;
 
-    int result = ioctl(fd, cmd.ioctl_code, &control);
+    int result = ioctl(fd, VIDIOC_S_CTRL, &control);
 
     close(fd);
 
