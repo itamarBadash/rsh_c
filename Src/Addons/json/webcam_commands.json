@@ -5,6 +5,7 @@
       "request_type": "ioctl",
       "ioctl_code": 3222837760,
       "is_read": false,
+      "data_length": 8,
       "args": {
         "fd": "/dev/video0",
         "control": {
@@ -18,6 +19,7 @@
       "request_type": "ioctl",
       "ioctl_code": 3222837760,
       "is_read": false,
+      "data_length": 8,
       "args": {
         "fd": "/dev/video0",
         "control": {
@@ -31,6 +33,7 @@
       "request_type": "ioctl",
       "ioctl_code": 3222837760,
       "is_read": false,
+      "data_length": 8,
       "args": {
         "fd": "/dev/video0",
         "control": {
