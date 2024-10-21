@@ -6,8 +6,7 @@
 #include <fcntl.h>
 #include <cstring>
 #include <linux/videodev2.h>
-#include <unistd.h>
-#include <errno.h>
+
 
 using namespace nlohmann;
 
@@ -181,12 +180,10 @@ BaseAddon::Result BaseAddon::executeIoctlCommand(const Command &cmd) {
     }
 
     struct v4l2_control control;
-    const auto& controlJson = cmd.args.at("control");
+    control.id = cmd.args.at("control_id").get<int>();
+    control.value = cmd.args.at("value").get<int>();
 
-    control.id = controlJson.at("id").get<__u32>();
-    control.value = controlJson.at("value").get<__s32>();
-
-    int result = ioctl(fd, static_cast<unsigned long>(cmd.ioctl_code), &control);
+    int result = ioctl(fd, cmd.ioctl_code, &control);
 
     close(fd);
 
@@ -194,9 +191,6 @@ BaseAddon::Result BaseAddon::executeIoctlCommand(const Command &cmd) {
         std::cerr << "Failed to execute ioctl command: " << strerror(errno) << std::endl;
         return Result::Failure;
     }
-
-    std::cout << "Successfully set control ID " << control.id
-              << " to value " << control.value << std::endl;
 
     return Result::Success;
 }
