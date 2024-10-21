@@ -187,35 +187,45 @@ BaseAddon::Result BaseAddon::executeIoctlCommand(const Command& cmd) {
     // Determine if the command requires a read or write operation
     bool isRead = cmd.is_read;
 
-    // Prepare a buffer if a specific data length is required
+    // Prepare buffer if a specific data length is required
     uint8_t* buffer = nullptr;
-    if (cmd.data_length > 0) {
-        buffer = new uint8_t[cmd.data_length];
-        memset(buffer, 0, cmd.data_length);  // Zero out the buffer initially
-    }
+    int result = 0;
 
-    // Execute the ioctl command based on the provided ioctl code
-    int result;
-    if (isRead && buffer) {
-        // Reading data from the ioctl command
-        result = ioctl(fd, cmd.ioctl_code, buffer);
-        if (result >= 0) {
-            std::cout << "Successfully read data from '" << cmd.name << "': ";
-            for (int i = 0; i < cmd.data_length; ++i) {
-                std::cout << std::hex << (int)buffer[i] << " ";
+    if (isRead) {
+        // Reading data (e.g., get_brightness, get_contrast)
+        if (cmd.data_length > 0) {
+            buffer = new uint8_t[cmd.data_length];
+            memset(buffer, 0, cmd.data_length);  // Zero out the buffer initially
+            result = ioctl(fd, cmd.ioctl_code, buffer);
+
+            if (result >= 0) {
+                std::cout << "Successfully read data from '" << cmd.name << "': ";
+                for (int i = 0; i < cmd.data_length; ++i) {
+                    std::cout << std::hex << (int)buffer[i] << " ";
+                }
+                std::cout << std::endl;
+            } else {
+                std::cerr << "Failed to read data from '" << cmd.name << "' with error: " << strerror(errno) << std::endl;
             }
-            std::cout << std::endl;
-        }
-    } else if (!isRead) {
-        // Writing data or sending a control value (if no buffer is used)
-        auto value_it = cmd.args.find("value");
-        int32_t value = (value_it != cmd.args.end()) ? value_it->second.get<int32_t>() : 0;
-        result = ioctl(fd, cmd.ioctl_code, &value);
-        if (result >= 0) {
-            std::cout << "Successfully wrote value '" << value << "' for command '" << cmd.name << "'" << std::endl;
+
+        } else {
+            std::cerr << "Data length not specified for read command." << std::endl;
         }
     } else {
-        result = ioctl(fd, cmd.ioctl_code, nullptr);  // Handle cases where neither read nor value is specified
+        // Writing data (e.g., set_brightness, set_contrast)
+        auto value_it = cmd.args.find("value");
+        if (value_it != cmd.args.end()) {
+            int32_t value = value_it->second.get<int32_t>();
+            result = ioctl(fd, cmd.ioctl_code, &value);
+
+            if (result >= 0) {
+                std::cout << "Successfully wrote value '" << value << "' for command '" << cmd.name << "'" << std::endl;
+            } else {
+                std::cerr << "Failed to write value for '" << cmd.name << "' with error: " << strerror(errno) << std::endl;
+            }
+        } else {
+            std::cerr << "No value specified for write command." << std::endl;
+        }
     }
 
     // Clean up the buffer if it was allocated
@@ -226,9 +236,7 @@ BaseAddon::Result BaseAddon::executeIoctlCommand(const Command& cmd) {
     // Close the file descriptor after executing the ioctl command
     close(fd);
 
-    // Check the result of the ioctl call
     if (result < 0) {
-        std::cerr << "Failed to execute ioctl command '" << cmd.name << "' with error: " << strerror(errno) << std::endl;
         return Result::Failure;
     }
 
