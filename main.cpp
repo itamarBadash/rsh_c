@@ -138,7 +138,7 @@ int main(int argc, char** argv) {
 
 */
 
-      AddonsManager manager;
+     AddonsManager manager;
 
     // Step 2: Start detecting USB devices (in a separate thread if desired)
     manager.start();
@@ -148,7 +148,7 @@ int main(int argc, char** argv) {
     int addonCount = manager.getAddonCount();
     if (addonCount == 0) {
         std::cerr << "No USB devices detected." << std::endl;
-        manager.stop();
+        manager.stop();  // Ensure the manager stops before exiting
         return 1;
     }
 
@@ -157,21 +157,19 @@ int main(int argc, char** argv) {
     for (int i = 0; i < addonCount; ++i) {
         std::shared_ptr<BaseAddon> addon = manager.getAddon(i);
         if (addon) {
-            // Get the device handle and validate it
+            // Get the device descriptor for each addon
             libusb_device_handle* handle = addon->getDeviceHandle();
             if (!handle) {
                 std::cerr << "Invalid device handle for addon at index " << i << std::endl;
                 continue;
             }
 
-            // Get the associated libusb_device object
             libusb_device* device = libusb_get_device(handle);
             if (!device) {
                 std::cerr << "Failed to get libusb_device for addon at index " << i << std::endl;
                 continue;
             }
 
-            // Get the device descriptor for each addon
             libusb_device_descriptor desc;
             if (libusb_get_device_descriptor(device, &desc) == 0) {
                 // Check if this device is a camera
@@ -180,16 +178,15 @@ int main(int argc, char** argv) {
                     std::cout << "Camera detected: Vendor ID: " << desc.idVendor << ", Product ID: " << desc.idProduct << std::endl;
                     break;
                 }
-            } else {
-                std::cerr << "Failed to get device descriptor for addon at index " << i << std::endl;
             }
         }
     }
 
+    // If no camera was found, stop the manager and exit cleanly
     if (!cameraAddon) {
         std::cerr << "No camera device detected." << std::endl;
-        manager.stop();
-        return 1;
+        manager.stop();  // Ensure manager stops the monitoring thread
+        return 1;  // Exit immediately to avoid accessing null pointers later
     }
 
     // Step 4: Load the JSON file containing commands
