@@ -1,8 +1,12 @@
 #include "BaseAddon.h"
 #include <iostream>
 #include <fstream>
+#include <sys/ioctl.h>
+#include <fcntl.h>
+#include <cstring>
 
 using namespace nlohmann;
+
 BaseAddon::BaseAddon(const std::string& new_name, libusb_device_handle* dev_handle, uint8_t bus, uint8_t address)
     : name(new_name), device_handle(dev_handle), bus_number(bus), device_address(address) {
 }
@@ -49,30 +53,46 @@ BaseAddon::Result BaseAddon::executeCommand(const std::string& commandName) {
     });
 
     if (it != commands.end()) {
-        // Prepare and send a control transfer based on the command
-        uint8_t requestType = determineRequestType(it->request_type);
-        int result = libusb_control_transfer(
-            device_handle,
-            requestType,
-            it->request,
-            it->value,
-            it->index,
-            nullptr,  // Assuming no data for this example
-            it->data_length,
-            1000  // Timeout in milliseconds
-        );
-
-        if (result < 0) {
-            std::cerr << "Failed to execute command '" << commandName << "': " << libusb_error_name(result) << std::endl;
-            return Result::Failure;
+        if (it->request_type == "usb") {
+            return executeUsbControlCommand(*it);
+        } else if (it->request_type == "ioctl") {
+            return executeIoctlCommand(*it);
+        } else {
+            std::cerr << "Unsupported request type: " << it->request_type << std::endl;
+            return Result::UnsupportedCommandType;
         }
-
-        std::cout << "Executed command '" << commandName << "' successfully." << std::endl;
-        return Result::Success;
     }
 
     std::cerr << "Command '" << commandName << "' not found." << std::endl;
     return Result::Failure;
+}
+
+// Helper method to execute USB control commands
+BaseAddon::Result BaseAddon::executeUsbControlCommand(const Command& cmd) {
+    uint8_t requestType = determineRequestType(cmd.request_type);
+
+    // Prepare buffer if the command specifies a data length
+    std::vector<uint8_t> buffer(cmd.data_length, 0);
+    uint8_t* buffer_ptr = (cmd.data_length > 0) ? buffer.data() : nullptr;
+
+    int result = libusb_control_transfer(
+        device_handle,
+        requestType,
+        cmd.request,
+        cmd.value,
+        cmd.index,
+        buffer_ptr,
+        cmd.data_length,
+        1000  // Timeout in milliseconds
+    );
+
+    if (result < 0) {
+        std::cerr << "Failed to execute USB control command '" << cmd.name << "': " << libusb_error_name(result) << std::endl;
+        return Result::Failure;
+    }
+
+    std::cout << "Executed USB control command '" << cmd.name << "' successfully." << std::endl;
+    return Result::Success;
 }
 
 // Helper method to determine request type from a string
@@ -148,9 +168,69 @@ BaseAddon::Result BaseAddon::Deactivate() {
     return Result::ConnectionError;
 }
 
+// Define the ioctl-like function to send custom control codes
+BaseAddon::Result BaseAddon::executeIoctlCommand(const Command& cmd) {
+    // Open the device file provided in the JSON command args (assumes 'fd' is specified in args)
+    int fd = open(cmd.args["fd"].get<std::string>().c_str(), O_RDWR);
+    if (fd < 0) {
+        std::cerr << "Failed to open device file: " << cmd.args["fd"] << " with error: " << strerror(errno) << std::endl;
+        return Result::Failure;
+    }
+
+    // Determine if the command requires a read or write operation
+    bool isRead = cmd.args.contains("is_read") && cmd.args["is_read"].get<bool>();
+
+    // Prepare a buffer if a specific data length is required
+    uint8_t* buffer = nullptr;
+    if (cmd.data_length > 0) {
+        buffer = new uint8_t[cmd.data_length];
+        memset(buffer, 0, cmd.data_length);  // Zero out the buffer initially
+    }
+
+    // Execute the ioctl command based on the provided ioctl code
+    int result;
+    if (isRead && buffer) {
+        // Reading data from the ioctl command
+        result = ioctl(fd, cmd.ioctl_code, buffer);
+        if (result >= 0) {
+            std::cout << "Successfully read data from '" << cmd.name << "': ";
+            for (int i = 0; i < cmd.data_length; ++i) {
+                std::cout << std::hex << (int)buffer[i] << " ";
+            }
+            std::cout << std::endl;
+        }
+    } else if (!isRead) {
+        // Writing data or sending a control value (if no buffer is used)
+        int32_t value = cmd.args.contains("value") ? cmd.args["value"].get<int32_t>() : 0;
+        result = ioctl(fd, cmd.ioctl_code, &value);
+        if (result >= 0) {
+            std::cout << "Successfully wrote value '" << value << "' for command '" << cmd.name << "'" << std::endl;
+        }
+    } else {
+        result = ioctl(fd, cmd.ioctl_code, nullptr);  // Handle cases where neither read nor value is specified
+    }
+
+    // Clean up the buffer if it was allocated
+    if (buffer) {
+        delete[] buffer;
+    }
+
+    // Close the file descriptor after executing the ioctl command
+    close(fd);
+
+    // Check the result of the ioctl call
+    if (result < 0) {
+        std::cerr << "Failed to execute ioctl command '" << cmd.name << "' with error: " << strerror(errno) << std::endl;
+        return Result::Failure;
+    }
+
+    return Result::Success;
+}
+
 const std::vector<BaseAddon::Command>& BaseAddon::getCommands() const {
     return commands;
 }
+
 libusb_device_handle* BaseAddon::getDeviceHandle() const {
     return device_handle;
 }

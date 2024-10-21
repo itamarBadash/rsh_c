@@ -39,6 +39,10 @@ public:
 
     virtual Result Deactivate();
 
+    Result executeIoctlCommand(const Command &cmd);
+
+    Result sendIoctl(uint8_t ioctl_code, uint16_t value, uint16_t index, uint8_t *data, uint16_t length);
+
     const std::vector<BaseAddon::Command> &getCommands() const;
 
     libusb_device_handle *getDeviceHandle() const;
@@ -46,6 +50,8 @@ public:
     bool loadCommandsFromFile(const std::string& filePath);
 
     Result executeCommand(const std::string& commandName);
+
+    Result executeUsbControlCommand(const Command &cmd);
 
 protected:
     std::string name;
