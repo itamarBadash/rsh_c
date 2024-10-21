@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <sys/ioctl.h>
+#include <unistd.h>
 #include <fcntl.h>
 #include <cstring>
 
