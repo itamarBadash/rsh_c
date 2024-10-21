@@ -180,10 +180,26 @@ BaseAddon::Result BaseAddon::executeIoctlCommand(const Command &cmd) {
     }
 
     struct v4l2_control control;
-    control.id = cmd.args.at("control_id").get<int>();
-    control.value = cmd.args.at("value").get<int>();
+    const auto& controlJson = cmd.args.at("control");
 
-    int result = ioctl(fd, cmd.ioctl_code, &control);
+    // Map string control IDs to actual V4L2 control IDs
+    std::map<std::string, int> controlMap = {
+        {"V4L2_CID_BRIGHTNESS", V4L2_CID_BRIGHTNESS},
+        {"V4L2_CID_CONTRAST", V4L2_CID_CONTRAST},
+        {"V4L2_CID_HUE", V4L2_CID_HUE}
+    };
+
+    control.id = controlMap[controlJson.at("id").get<std::string>()];
+    control.value = controlJson.at("value").get<int>();
+
+    int result;
+    if (cmd.ioctl_code == "VIDIOC_S_CTRL") {
+        result = ioctl(fd, VIDIOC_S_CTRL, &control);
+    } else {
+        std::cerr << "Unsupported ioctl command: " << cmd.ioctl_code << std::endl;
+        close(fd);
+        return Result::Failure;
+    }
 
     close(fd);
 
@@ -192,8 +208,12 @@ BaseAddon::Result BaseAddon::executeIoctlCommand(const Command &cmd) {
         return Result::Failure;
     }
 
+    std::cout << "Successfully set " << controlJson.at("id").get<std::string>()
+              << " to " << control.value << std::endl;
+
     return Result::Success;
 }
+
 const std::vector<BaseAddon::Command>& BaseAddon::getCommands() const {
     return commands;
 }
