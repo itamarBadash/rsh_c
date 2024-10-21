@@ -10,6 +10,11 @@
 #include <chrono>
 #include "Src/Modules/AddonsManager.h"
 #include "Src/Modules/UDPVideoStreamer.h"
+#include <linux/videodev2.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
+#include <stdio.h>
 
 using std::chrono::seconds;
 using std::chrono::milliseconds;
@@ -137,7 +142,7 @@ int main(int argc, char** argv) {
     stream_thread.join();
 
 */
-
+/*
      AddonsManager manager;
 
     // Step 2: Start detecting USB devices (in a separate thread if desired)
@@ -215,6 +220,23 @@ int main(int argc, char** argv) {
 
     // Stop the monitoring thread and cleanup
     manager.stop();
+    */
+    int fd = open("/dev/video0", O_RDWR);
+    if (fd == -1) {
+        perror("Opening video device");
+        return 1;
+    }
+
+    struct v4l2_control control;
+    control.id = V4L2_CID_BRIGHTNESS;  // 0x00980900
+    control.value = 200;  // Adjust brightness
+
+    if (ioctl(fd, VIDIOC_S_CTRL, &control) == -1) {
+        perror("Setting Brightness");
+        return 1;
+    }
+
+    close(fd);
     return 0;
 }
 
