@@ -171,14 +171,20 @@ BaseAddon::Result BaseAddon::Deactivate() {
 // Define the ioctl-like function to send custom control codes
 BaseAddon::Result BaseAddon::executeIoctlCommand(const Command& cmd) {
     // Open the device file provided in the JSON command args (assumes 'fd' is specified in args)
-    int fd = open(cmd.args["fd"].get<std::string>().c_str(), O_RDWR);
+    auto fd_it = cmd.args.find("fd");
+    if (fd_it == cmd.args.end()) {
+        std::cerr << "Missing 'fd' argument in ioctl command '" << cmd.name << "'" << std::endl;
+        return Result::Failure;
+    }
+
+    int fd = open(fd_it->second.get<std::string>().c_str(), O_RDWR);
     if (fd < 0) {
-        std::cerr << "Failed to open device file: " << cmd.args["fd"] << " with error: " << strerror(errno) << std::endl;
+        std::cerr << "Failed to open device file: " << fd_it->second.get<std::string>() << " with error: " << strerror(errno) << std::endl;
         return Result::Failure;
     }
 
     // Determine if the command requires a read or write operation
-    bool isRead = cmd.args.contains("is_read") && cmd.args["is_read"].get<bool>();
+    bool isRead = cmd.is_read;
 
     // Prepare a buffer if a specific data length is required
     uint8_t* buffer = nullptr;
@@ -201,7 +207,8 @@ BaseAddon::Result BaseAddon::executeIoctlCommand(const Command& cmd) {
         }
     } else if (!isRead) {
         // Writing data or sending a control value (if no buffer is used)
-        int32_t value = cmd.args.contains("value") ? cmd.args["value"].get<int32_t>() : 0;
+        auto value_it = cmd.args.find("value");
+        int32_t value = (value_it != cmd.args.end()) ? value_it->second.get<int32_t>() : 0;
         result = ioctl(fd, cmd.ioctl_code, &value);
         if (result >= 0) {
             std::cout << "Successfully wrote value '" << value << "' for command '" << cmd.name << "'" << std::endl;
