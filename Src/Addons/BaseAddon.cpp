@@ -172,28 +172,36 @@ BaseAddon::Result BaseAddon::Deactivate() {
 
 // Define the ioctl-like function to send custom control codes
 BaseAddon::Result BaseAddon::executeIoctlCommand(const Command &cmd) {
-    int fd = open(cmd.args.at("fd").get<std::string>().c_str(), O_RDWR);
+    std::string deviceFile = cmd.args.at("fd").get<std::string>();
+    std::cout << "Opening device file: " << deviceFile << std::endl;
+
+    int fd = open(deviceFile.c_str(), O_RDWR);
     if (fd < 0) {
         std::cerr << "Failed to open device file: " << strerror(errno) << std::endl;
         return Result::Failure;
     }
 
+    std::cout << "Device file opened successfully." << std::endl;
+
     struct v4l2_control control;
     control.id = cmd.args.at("control_id").get<int>();
     control.value = cmd.args.at("value").get<int>();
+
+    std::cout << "Executing ioctl command with control ID: " << control.id << " and value: " << control.value << std::endl;
 
     int result = ioctl(fd, cmd.ioctl_code, &control);
 
     close(fd);
 
     if (result < 0) {
-        std::cerr << "Failed to execute ioctl command: " << strerror(errno) << std::endl;
+        std::cerr << "Failed to execute ioctl command: " << strerror(errno) << " (errno: " << errno << ")" << std::endl;
         return Result::Failure;
     }
 
+    std::cout << "Ioctl command executed successfully." << std::endl;
+
     return Result::Success;
-}
-const std::vector<BaseAddon::Command>& BaseAddon::getCommands() const {
+}const std::vector<BaseAddon::Command>& BaseAddon::getCommands() const {
     return commands;
 }
 

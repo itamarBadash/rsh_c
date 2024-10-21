@@ -11,30 +11,6 @@
         "control_id": 9963776,
         "value": 199
       }
-    },
-    {
-      "name": "set_contrast",
-      "request_type": "ioctl",
-      "ioctl_code": 3222825548,
-      "is_read": false,
-      "data_length": 8,
-      "args": {
-        "fd": "/dev/video0",
-        "control_id": 9963777,
-        "value": 26
-      }
-    },
-    {
-      "name": "set_hue",
-      "request_type": "ioctl",
-      "ioctl_code": 3222825548,
-      "is_read": false,
-      "data_length": 8,
-      "args": {
-        "fd": "/dev/video0",
-        "control_id": 9963779,
-        "value": 101
-      }
     }
   ]
 }
