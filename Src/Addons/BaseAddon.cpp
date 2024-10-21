@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <cstring>
+#include <linux/videodev2.h>
 
 using namespace nlohmann;
 
@@ -170,79 +171,28 @@ BaseAddon::Result BaseAddon::Deactivate() {
 }
 
 // Define the ioctl-like function to send custom control codes
-BaseAddon::Result BaseAddon::executeIoctlCommand(const Command& cmd) {
-    // Open the device file provided in the JSON command args (assumes 'fd' is specified in args)
-    auto fd_it = cmd.args.find("fd");
-    if (fd_it == cmd.args.end()) {
-        std::cerr << "Missing 'fd' argument in ioctl command '" << cmd.name << "'" << std::endl;
-        return Result::Failure;
-    }
-
-    int fd = open(fd_it->second.get<std::string>().c_str(), O_RDWR);
+BaseAddon::Result BaseAddon::executeIoctlCommand(const Command &cmd) {
+    int fd = open(cmd.args.at("fd").get<std::string>().c_str(), O_RDWR);
     if (fd < 0) {
-        std::cerr << "Failed to open device file: " << fd_it->second.get<std::string>() << " with error: " << strerror(errno) << std::endl;
+        std::cerr << "Failed to open device file: " << strerror(errno) << std::endl;
         return Result::Failure;
     }
 
-    // Determine if the command requires a read or write operation
-    bool isRead = cmd.is_read;
+    struct v4l2_control control;
+    control.id = cmd.args.at("control_id").get<int>();
+    control.value = cmd.args.at("value").get<int>();
 
-    // Prepare buffer if a specific data length is required
-    uint8_t* buffer = nullptr;
-    int result = 0;
+    int result = ioctl(fd, cmd.ioctl_code, &control);
 
-    if (isRead) {
-        // Reading data (e.g., get_brightness, get_contrast)
-        if (cmd.data_length > 0) {
-            buffer = new uint8_t[cmd.data_length];
-            memset(buffer, 0, cmd.data_length);  // Zero out the buffer initially
-            result = ioctl(fd, cmd.ioctl_code, buffer);
-
-            if (result >= 0) {
-                std::cout << "Successfully read data from '" << cmd.name << "': ";
-                for (int i = 0; i < cmd.data_length; ++i) {
-                    std::cout << std::hex << (int)buffer[i] << " ";
-                }
-                std::cout << std::endl;
-            } else {
-                std::cerr << "Failed to read data from '" << cmd.name << "' with error: " << strerror(errno) << std::endl;
-            }
-
-        } else {
-            std::cerr << "Data length not specified for read command." << std::endl;
-        }
-    } else {
-        // Writing data (e.g., set_brightness, set_contrast)
-        auto value_it = cmd.args.find("value");
-        if (value_it != cmd.args.end()) {
-            int32_t value = value_it->second.get<int32_t>();
-            result = ioctl(fd, cmd.ioctl_code, &value);
-
-            if (result >= 0) {
-                std::cout << "Successfully wrote value '" << value << "' for command '" << cmd.name << "'" << std::endl;
-            } else {
-                std::cerr << "Failed to write value for '" << cmd.name << "' with error: " << strerror(errno) << std::endl;
-            }
-        } else {
-            std::cerr << "No value specified for write command." << std::endl;
-        }
-    }
-
-    // Clean up the buffer if it was allocated
-    if (buffer) {
-        delete[] buffer;
-    }
-
-    // Close the file descriptor after executing the ioctl command
     close(fd);
 
     if (result < 0) {
+        std::cerr << "Failed to execute ioctl command: " << strerror(errno) << std::endl;
         return Result::Failure;
     }
 
     return Result::Success;
 }
-
 const std::vector<BaseAddon::Command>& BaseAddon::getCommands() const {
     return commands;
 }
