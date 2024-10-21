@@ -1,28 +1,49 @@
 {
   "commands": [
     {
-      "name": "SetBrightness",
-      "request_type": "v4l2",
-      "request": 10094848,
-      "value": 200,
-      "index": 0,
-      "data_length": 0
+      "name": "get_brightness",
+      "request_type": "ioctl",
+      "ioctl_code": 2153775104,
+      "data_length": 4,
+      "is_read": true
     },
     {
-      "name": "SetContrast",
-      "request_type": "v4l2",
-      "request": 10094849,
-      "value": 150,
-      "index": 0,
-      "data_length": 0
+      "name": "set_brightness",
+      "request_type": "ioctl",
+      "ioctl_code": 2153775104,
+      "data_length": 0,
+      "is_read": false,
+      "value": 150
     },
     {
-      "name": "SetHue",
-      "request_type": "v4l2",
-      "request": 10094851,
-      "value": 30,
-      "index": 0,
-      "data_length": 0
+      "name": "get_contrast",
+      "request_type": "ioctl",
+      "ioctl_code": 2153775105,
+      "data_length": 4,
+      "is_read": true
+    },
+    {
+      "name": "set_contrast",
+      "request_type": "ioctl",
+      "ioctl_code": 2153775105,
+      "data_length": 0,
+      "is_read": false,
+      "value": 50
+    },
+    {
+      "name": "get_hue",
+      "request_type": "ioctl",
+      "ioctl_code": 2153775107,
+      "data_length": 4,
+      "is_read": true
+    },
+    {
+      "name": "set_hue",
+      "request_type": "ioctl",
+      "ioctl_code": 2153775107,
+      "data_length": 0,
+      "is_read": false,
+      "value": 0
     }
   ]
 }
