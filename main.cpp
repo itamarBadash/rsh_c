@@ -229,7 +229,7 @@ int main(int argc, char** argv) {
 
     struct v4l2_control control;
     control.id = V4L2_CID_BRIGHTNESS;  // 0x00980900
-    control.value = 200;  // Adjust brightness
+    control.value = 211;  // Adjust brightness
 
     if (ioctl(fd, VIDIOC_S_CTRL, &control) == -1) {
         perror("Setting Brightness");
