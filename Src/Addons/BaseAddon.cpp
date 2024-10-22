@@ -31,6 +31,13 @@ uint8_t BaseAddon::getDeviceAddress() const {
     return device_address;
 }
 
+#include <filesystem>  // For C++17 filesystem
+#include <nlohmann/json.hpp>
+#include <iostream>
+#include <fstream>
+
+namespace fs = std::filesystem;
+
 bool BaseAddon::loadCommandsFromDirectory(const std::string& dirPath) {
     // Iterate over all files in the specified directory
     for (const auto& entry : fs::directory_iterator(dirPath)) {
@@ -56,9 +63,17 @@ bool BaseAddon::loadCommandsFromDirectory(const std::string& dirPath) {
                     libusb_device_descriptor desc;
                     int result = libusb_get_device_descriptor(libusb_get_device(device_handle), &desc);
                     if (result != 0) {
-                        std::cerr << "Failed to get device descriptor for file: " << filePath << ". Error: " << libusb_error_name(result) << std::endl;
+                        std::cerr << "Failed to get device descriptor for file: " << filePath
+                                  << ". Error: " << libusb_error_name(result) << std::endl;
                         continue;
                     }
+
+                    // Print debug information
+                    std::cout << "Checking file: " << filePath << std::endl;
+                    std::cout << "Expected USB class: " << usb_class
+                              << ", subclass: " << usb_subclass << std::endl;
+                    std::cout << "Actual USB class: " << (int)desc.bDeviceClass
+                              << ", subclass: " << (int)desc.bDeviceSubClass << std::endl;
 
                     // Compare the class and subclass
                     if (desc.bDeviceClass == usb_class && desc.bDeviceSubClass == usb_subclass) {
@@ -66,11 +81,20 @@ bool BaseAddon::loadCommandsFromDirectory(const std::string& dirPath) {
                         // Load the commands from the matching file
                         commands = jsonData["commands"].get<std::vector<Command>>();
                         return true;
+                    } else {
+                        std::cout << "File: " << filePath
+                                  << " does not match the device. Expected class: " << usb_class
+                                  << ", subclass: " << usb_subclass << ". Actual class: "
+                                  << (int)desc.bDeviceClass << ", subclass: " << (int)desc.bDeviceSubClass << std::endl;
                     }
+                } else {
+                    std::cerr << "File: " << filePath << " does not contain 'usb_device' information." << std::endl;
                 }
             } catch (const nlohmann::json::exception& e) {
                 std::cerr << "Error parsing JSON file " << filePath << ": " << e.what() << std::endl;
             }
+        } else {
+            std::cout << "Skipping non-JSON file: " << entry.path().string() << std::endl;
         }
     }
 
