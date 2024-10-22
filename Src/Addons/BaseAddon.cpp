@@ -65,18 +65,13 @@ bool BaseAddon::loadCommandsFromDirectory(const std::string& dirPath) {
 
                     if (desc.bDeviceClass == usb_class && desc.bDeviceSubClass == usb_subclass) {
                         std::cout << "Matching file found: " << filePath << std::endl;
-                        // Load the commands from the matching file
                         commands = jsonData["commands"].get<std::vector<Command>>();
                         return true;
-                    } else {
-                        std::cout << "File: " << filePath
-                                  << " does not match the device. Expected class: " << usb_class
-                                  << ", subclass: " << usb_subclass << ". Actual class: "
-                                  << (int)desc.bDeviceClass << ", subclass: " << (int)desc.bDeviceSubClass << std::endl;
                     }
                 } else {
                     std::cerr << "File: " << filePath << " does not contain 'usb_device' information." << std::endl;
                 }
+
             } catch (const nlohmann::json::exception& e) {
                 std::cerr << "Error parsing JSON file " << filePath << ": " << e.what() << std::endl;
             }

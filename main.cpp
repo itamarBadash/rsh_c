@@ -121,7 +121,7 @@ int main(int argc, char** argv) {
     AddonsManager manager;
     manager.start();
     std::this_thread::sleep_for(std::chrono::seconds(2));
-    manager.executeCommand(0,"set_brightness");
+    manager.executeCommand(1,"set_brightness");
 
     std::thread stream_thread(stream_thread_function);
     std::thread main_thread(main_thread_function, system, command_manager, telemetry_manager, communication_manager);
