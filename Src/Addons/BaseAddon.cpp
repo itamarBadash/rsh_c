@@ -31,11 +31,6 @@ uint8_t BaseAddon::getDeviceAddress() const {
     return device_address;
 }
 
-#include <filesystem>  // For C++17 filesystem
-#include <nlohmann/json.hpp>
-#include <iostream>
-#include <fstream>
-
 namespace fs = std::filesystem;
 
 bool BaseAddon::loadCommandsFromDirectory(const std::string& dirPath) {
