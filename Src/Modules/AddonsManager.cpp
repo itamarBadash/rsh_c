@@ -101,9 +101,10 @@ BaseAddon::Result AddonsManager::executeCommand(int index, const std::string& co
         } else {
             std::cerr << "Failed to activate addon " << index << std::endl;
         }
-    } else {
-        std::cerr << "Invalid addon index." << std::endl;
+        return result;
     }
+        std::cerr << "Invalid addon index." << std::endl;
+        return BaseAddon::Result::Failure;
 }
 
 void AddonsManager::activate(int index) {
