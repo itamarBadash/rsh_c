@@ -48,7 +48,6 @@ void AddonsManager::detect_usb_devices() {
         libusb_device_descriptor desc;
 
         if (libusb_get_device_descriptor(device, &desc) == 0) {
-            // Get bus number and device address
             uint8_t bus = libusb_get_bus_number(device);
             uint8_t address = libusb_get_device_address(device);
 
@@ -66,6 +65,11 @@ void AddonsManager::detect_usb_devices() {
                 libusb_device_handle *handle = nullptr;
                 if (libusb_open(device, &handle) == 0 && handle != nullptr) {
                     std::shared_ptr<BaseAddon> new_addon = std::make_shared<BaseAddon>("USB Addon", handle, bus, address);
+
+                   if( new_addon->loadCommandsFromDirectory("../Src/Addons/json")) {
+                       std::cout << "load commands succusful";
+                   }
+
                     addon_ptrs.push_back(new_addon);
                     std::cout << "Added new USB device: " << desc.idVendor << ":" << desc.idProduct << std::endl;
                 } else {
@@ -87,6 +91,19 @@ std::shared_ptr<BaseAddon> AddonsManager::getAddon(int index) const {
         return addon_ptrs[index];
     }
     return nullptr;
+}
+BaseAddon::Result AddonsManager::executeCommand(int index, const std::string& commandName)
+{
+    if (index >= 0 && index < addon_ptrs.size()) {
+        BaseAddon::Result result = addon_ptrs[index]->executeCommand(commandName);
+        if (result == BaseAddon::Result::Success) {
+            std::cout << "Addon " << index << " activated successfully." << std::endl;
+        } else {
+            std::cerr << "Failed to activate addon " << index << std::endl;
+        }
+    } else {
+        std::cerr << "Invalid addon index." << std::endl;
+    }
 }
 
 void AddonsManager::activate(int index) {

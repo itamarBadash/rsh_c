@@ -1,4 +1,8 @@
 {
+  "usb_device": {
+    "usb_class": 239,
+    "usb_subclass":  2
+  },
   "commands": [
     {
       "name": "set_brightness",

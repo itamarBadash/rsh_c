@@ -6,8 +6,11 @@
 #include <fcntl.h>
 #include <cstring>
 #include <linux/videodev2.h>
+#include <filesystem>
 
 using namespace nlohmann;
+namespace fs = std::filesystem;
+
 
 BaseAddon::BaseAddon(const std::string& new_name, libusb_device_handle* dev_handle, uint8_t bus, uint8_t address)
     : name(new_name), device_handle(dev_handle), bus_number(bus), device_address(address) {
@@ -28,27 +31,53 @@ uint8_t BaseAddon::getDeviceAddress() const {
     return device_address;
 }
 
-// Load commands from a JSON file
-bool BaseAddon::loadCommandsFromFile(const std::string& filePath) {
-    std::ifstream file(filePath);
-    if (!file.is_open()) {
-        std::cerr << "Failed to open command file: " << filePath << std::endl;
-        return false;
+bool BaseAddon::loadCommandsFromDirectory(const std::string& dirPath) {
+    // Iterate over all files in the specified directory
+    for (const auto& entry : fs::directory_iterator(dirPath)) {
+        // Ensure we're only processing JSON files
+        if (entry.path().extension() == ".json") {
+            std::string filePath = entry.path().string();
+            std::ifstream file(filePath);
+            if (!file.is_open()) {
+                std::cerr << "Failed to open JSON file: " << filePath << std::endl;
+                continue;
+            }
+
+            try {
+                nlohmann::json jsonData;
+                file >> jsonData;
+
+                // Check for the presence of "usb_device" in the JSON
+                if (jsonData.contains("usb_device")) {
+                    int usb_class = jsonData["usb_device"]["usb_class"].get<int>();
+                    int usb_subclass = jsonData["usb_device"]["usb_subclass"].get<int>();
+
+                    // Retrieve the device descriptor from the libusb device handle
+                    libusb_device_descriptor desc;
+                    int result = libusb_get_device_descriptor(libusb_get_device(device_handle), &desc);
+                    if (result != 0) {
+                        std::cerr << "Failed to get device descriptor for file: " << filePath << ". Error: " << libusb_error_name(result) << std::endl;
+                        continue;
+                    }
+
+                    // Compare the class and subclass
+                    if (desc.bDeviceClass == usb_class && desc.bDeviceSubClass == usb_subclass) {
+                        std::cout << "Matching file found: " << filePath << std::endl;
+                        // Load the commands from the matching file
+                        commands = jsonData["commands"].get<std::vector<Command>>();
+                        return true;
+                    }
+                }
+            } catch (const nlohmann::json::exception& e) {
+                std::cerr << "Error parsing JSON file " << filePath << ": " << e.what() << std::endl;
+            }
+        }
     }
 
-    try {
-        json jsonData;
-        file >> jsonData;
-        commands = jsonData["commands"].get<std::vector<Command>>();  // Assuming you have a Command struct defined
-    } catch (const nlohmann::json::exception& e) {
-        std::cerr << "Error parsing JSON file: " << e.what() << std::endl;
-        return false;
-    }
-
-    return true;
+    std::cerr << "No matching JSON file found in directory: " << dirPath << std::endl;
+    return false;
 }
 
-// Execute a command based on the command name
 BaseAddon::Result BaseAddon::executeCommand(const std::string& commandName) {
     auto it = std::find_if(commands.begin(), commands.end(), [&](const Command& cmd) {
         return cmd.name == commandName;

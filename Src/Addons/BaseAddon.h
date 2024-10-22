@@ -40,6 +40,8 @@ public:
 
     uint8_t getDeviceAddress() const;
 
+    bool loadCommandsFromDirectory(const std::string &dirPath);
+
     virtual Result Activate();
 
     virtual Result Deactivate();
@@ -51,8 +53,6 @@ public:
     const std::vector<BaseAddon::Command> &getCommands() const;
 
     libusb_device_handle *getDeviceHandle() const;
-
-    bool loadCommandsFromFile(const std::string& filePath);
 
     Result executeCommand(const std::string& commandName);
 

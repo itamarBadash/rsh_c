@@ -18,6 +18,8 @@ public:
     int getAddonCount() const;
     std::shared_ptr<BaseAddon> getAddon(int index) const;
 
+    BaseAddon::Result executeCommand(int index, const std::string &commandName);
+
     void activate(int index);
     void deactivate(int index);
 
