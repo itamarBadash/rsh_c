@@ -63,14 +63,6 @@ bool BaseAddon::loadCommandsFromDirectory(const std::string& dirPath) {
                         continue;
                     }
 
-                    // Print debug information
-                    std::cout << "Checking file: " << filePath << std::endl;
-                    std::cout << "Expected USB class: " << usb_class
-                              << ", subclass: " << usb_subclass << std::endl;
-                    std::cout << "Actual USB class: " << (int)desc.bDeviceClass
-                              << ", subclass: " << (int)desc.bDeviceSubClass << std::endl;
-
-                    // Compare the class and subclass
                     if (desc.bDeviceClass == usb_class && desc.bDeviceSubClass == usb_subclass) {
                         std::cout << "Matching file found: " << filePath << std::endl;
                         // Load the commands from the matching file
