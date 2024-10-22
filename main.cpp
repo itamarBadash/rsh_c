@@ -120,8 +120,8 @@ int main(int argc, char** argv) {
     }));
     AddonsManager manager;
     manager.start();
-
     manager.executeCommand(0,"set_brightness");
+
     std::thread stream_thread(stream_thread_function);
     std::thread main_thread(main_thread_function, system, command_manager, telemetry_manager, communication_manager);
 

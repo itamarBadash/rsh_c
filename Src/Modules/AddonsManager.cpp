@@ -103,7 +103,7 @@ BaseAddon::Result AddonsManager::executeCommand(int index, const std::string& co
         }
         return result;
     }
-        std::cerr << "Invalid addon index." << std::endl;
+        std::cerr << "Invalid addon index. "<<index << std::endl;
         return BaseAddon::Result::Failure;
 }
 
