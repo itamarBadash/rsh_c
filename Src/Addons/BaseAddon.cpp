@@ -34,7 +34,6 @@ uint8_t BaseAddon::getDeviceAddress() const {
 namespace fs = std::filesystem;
 
 bool BaseAddon::loadCommandsFromDirectory(const std::string& dirPath) {
-    // Iterate over all files in the specified directory
     for (const auto& entry : fs::directory_iterator(dirPath)) {
         // Ensure we're only processing JSON files
         if (entry.path().extension() == ".json") {
