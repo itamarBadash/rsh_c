@@ -66,7 +66,7 @@ void AddonsManager::detect_usb_devices() {
                 if (libusb_open(device, &handle) == 0 && handle != nullptr) {
                     std::shared_ptr<BaseAddon> new_addon = std::make_shared<BaseAddon>("USB Addon", handle, bus, address);
 
-                   if( new_addon->loadCommandsFromDirectory("../../Addons/json")) {
+                   if( new_addon->loadCommandsFromDirectory("../Src/Addons/json")) {
                        std::cout << "load commands succusful";
                    }
 
