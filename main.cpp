@@ -103,6 +103,7 @@ int main(int argc, char** argv) {
     auto system = systems.at(0);
 
     CREATE_EVENT("InfoRequest");
+    CREATE_EVENT("set_brightness");
 
     auto command_manager = std::make_shared<CommandManager>(system);
     auto telemetry_manager = std::make_shared<TelemetryManager>(system);
@@ -112,15 +113,19 @@ int main(int argc, char** argv) {
 
     communication_manager->start();
 
-    std::this_thread::sleep_for(std::chrono::seconds(3));
+   sleep_for(std::chrono::seconds(3));
 
 
     SUBSCRIBE_TO_EVENT("InfoRequest", ([telemetry_manager, communication_manager]() {
     communication_manager->send_message_all(telemetry_manager->getTelemetryData().print());
     }));
-    AddonsManager manager;
-    manager.start();
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    auto manager = make_shared<AddonsManager>();
+    manager->start();
+
+    sleep_for(std::chrono::seconds(1));
+    SUBSCRIBE_TO_EVENT("set_brightness", ([manager]() {
+        manager->executeCommand(1,"set_brightness");
+    }));
 
     std::thread stream_thread(stream_thread_function);
     std::thread main_thread(main_thread_function, system, command_manager, telemetry_manager, communication_manager);
@@ -131,7 +136,7 @@ int main(int argc, char** argv) {
 
     main_thread.join();
     stream_thread.join();
-    manager.stop();
+    manager->stop();
 
 
     return 0;

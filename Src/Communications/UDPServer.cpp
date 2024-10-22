@@ -127,7 +127,11 @@ void UDPServer::processCommands() {
 
                     if (command == "info") {
                         INVOKE_EVENT("InfoRequest");
-                    } else if (commandManager->is_command_valid(command)) {
+                    }
+                    else if (command == "set_brightness") {
+                        INVOKE_EVENT("set_brightness");
+                    }
+                    else if (commandManager->is_command_valid(command)) {
                         auto result = commandManager->handle_command(command, params);
                         if (result == CommandManager::Result::Success) {
                             std::cout << "Command " << command << " executed successfully." << std::endl;
