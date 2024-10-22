@@ -120,6 +120,7 @@ int main(int argc, char** argv) {
     }));
     AddonsManager manager;
     manager.start();
+    std::this_thread::sleep_for(std::chrono::seconds(2));
     manager.executeCommand(0,"set_brightness");
 
     std::thread stream_thread(stream_thread_function);
