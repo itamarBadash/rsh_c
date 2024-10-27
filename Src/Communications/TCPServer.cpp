@@ -117,16 +117,18 @@ void TCPServer::handleClient(int clientSocket) {
 }
 
 void TCPServer::processCommands() {
-     while (running) {
+    while (running) {
         std::unique_lock<std::mutex> lock(queueMutex);
         queueCondition.wait(lock, [this] { return !commandQueue.empty() || !running; });
 
         while (!commandQueue.empty()) {
-            auto [message, clientAddr] = commandQueue.front();
+            std::string message = commandQueue.front();
             commandQueue.pop();
             lock.unlock();
 
-            if (commandManager != nullptr && commandManager->IsViable()) {
+            std::cout << "Processing command: " << message << std::endl;
+
+          if (commandManager != nullptr && commandManager->IsViable()) {
                 size_t pos = message.find(':');
                 if (pos != std::string::npos) {
                     std::string command = message.substr(0, pos);
