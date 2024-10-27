@@ -126,8 +126,6 @@ void TCPServer::processCommands() {
             commandQueue.pop();
             lock.unlock();
 
-            std::cout << "Processing command: " << message << std::endl;
-
           if (commandManager != nullptr && commandManager->IsViable()) {
                 size_t pos = message.find(':');
                 if (pos != std::string::npos) {
