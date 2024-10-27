@@ -210,7 +210,6 @@ bool TCPServer::send_message(const std::string& message) {
         }
     }
 
-    std::cout << "Message sent to all clients: " << message << std::endl;
     return true;
 }
 
