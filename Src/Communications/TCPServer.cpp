@@ -115,7 +115,6 @@ void TCPServer::handleClient(int clientSocket) {
         clientSockets.erase(std::remove(clientSockets.begin(), clientSockets.end(), clientSocket), clientSockets.end());
     }
 }
-
 void TCPServer::processCommands() {
     while (running) {
         std::unique_lock<std::mutex> lock(queueMutex);
@@ -126,7 +125,7 @@ void TCPServer::processCommands() {
             commandQueue.pop();
             lock.unlock();
 
-          if (commandManager != nullptr && commandManager->IsViable()) {
+            if (commandManager != nullptr && commandManager->IsViable()) {
                 size_t pos = message.find(':');
                 if (pos != std::string::npos) {
                     std::string command = message.substr(0, pos);
@@ -135,23 +134,16 @@ void TCPServer::processCommands() {
                     size_t start = 0;
                     size_t end;
                     while ((end = params_str.find(',', start)) != std::string::npos) {
-                        try {
-                            params.push_back(std::stof(params_str.substr(start, end - start)));
-                        } catch (const std::exception& e) {
-                            std::cerr << "Error parsing parameter: " << e.what() << std::endl;
-                        }
+                        params.push_back(std::stof(params_str.substr(start, end - start)));
                         start = end + 1;
                     }
                     if (start < params_str.length()) {
-                        try {
-                            params.push_back(std::stof(params_str.substr(start)));
-                        } catch (const std::exception& e) {
-                            std::cerr << "Error parsing parameter: " << e.what() << std::endl;
-                        }
+                        params.push_back(std::stof(params_str.substr(start)));
                     }
 
-                    if (command == "info") {
+                    if(command == "info"){
                         INVOKE_EVENT("InfoRequest");
+
                     }
                     else if (command == "set_brightness") {
                         INVOKE_EVENT("set_brightness");
