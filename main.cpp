@@ -56,7 +56,7 @@ void main_thread_function(std::shared_ptr<System> system,
 
 void stream_thread_function() {
     try {
-        UDPVideoStreamer streamer(0, "192.168.20.21", 12345);  // Use appropriate IP and port
+        UDPVideoStreamer streamer(0, "192.168.20.47", 12345);  // Use appropriate IP and port
         streamer.stream();
     } catch (const std::exception& ex) {
         std::cerr << "Exception: " << ex.what() << std::endl;
