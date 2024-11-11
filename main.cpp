@@ -10,10 +10,8 @@
 #include <chrono>
 #include "Src/Modules/AddonsManager.h"
 #include "Src/Modules/UDPVideoStreamer.h"
-#include <linux/videodev2.h>
 #include <fcntl.h>
-#include <unistd.h>
-#include <sys/ioctl.h>
+
 #include <stdio.h>
 
 using std::chrono::seconds;
