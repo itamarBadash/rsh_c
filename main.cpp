@@ -11,6 +11,7 @@
 #include "Src/Modules/AddonsManager.h"
 #include "Src/Modules/UDPVideoStreamer.h"
 #include <fcntl.h>
+
 #include <stdio.h>
 
 using std::chrono::seconds;
@@ -40,26 +41,43 @@ void usage(const std::string& bin_name) {
               << "For example, to connect to the simulator use URL: udp://:14540\n";
 }
 
-void main_thread_function(std::shared_ptr<Mavsdk> mavsdk,
+void main_thread_function(Mavsdk& mavsdk,
+                          const std::string& connection_url,
                           std::shared_ptr<CommandManager> command_manager,
                           std::shared_ptr<TelemetryManager> telemetry_manager,
-                          std::shared_ptr<CommunicationManager> communication_manager,
-                          const std::string& connection_url) {
-    telemetry_manager->start();
+                          std::shared_ptr<CommunicationManager> communication_manager) {
+    bool is_connected = false;
 
     while (true) {
-        // Check connection status
-        if (!mavsdk->systems().empty() && mavsdk->systems().at(0)->is_connected()) {
-            sleep_for(seconds(3));  // Normal operation
-        } else {
-            std::cerr << "System disconnected. Attempting to reconnect...\n";
-            ConnectionResult connection_result = mavsdk->add_any_connection(connection_url);
-            if (connection_result == ConnectionResult::Success) {
-                std::cout << "Reconnection successful!\n";
+        auto systems = mavsdk.systems();
+        if (!systems.empty() && systems[0]->is_connected()) {
+            if (!is_connected) {
+                // System just connected
+                std::cout << "System connected\n";
+                is_connected = true;
+
+                // Start telemetry and command handling
                 telemetry_manager->start();
                 communication_manager->start();
+            }
+
+            // Keep telemetry and command running
+            sleep_for(seconds(3));
+        } else {
+            if (is_connected) {
+                // System just disconnected
+                std::cerr << "System disconnected. Attempting to reconnect...\n";
+                is_connected = false;
+                telemetry_manager->stop();
+                communication_manager->stop();
+            }
+
+            // Attempt reconnection
+            ConnectionResult connection_result = mavsdk.add_any_connection(connection_url);
+            if (connection_result == ConnectionResult::Success) {
+                std::cout << "Reconnection successful!\n";
             } else {
-                std::cerr << "Reconnection failed: " << connection_result << '\n';
+                std::cerr << "Reconnection attempt failed. Retrying in 3 seconds...\n";
                 sleep_for(seconds(3));  // Retry delay
             }
         }
@@ -81,16 +99,19 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::GroundStation}};
     const std::string connection_url = argv[1];
+    Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::GroundStation}};
     ConnectionResult connection_result = mavsdk.add_any_connection(connection_url);
 
     if (connection_result != ConnectionResult::Success) {
         std::cerr << "Initial connection failed: " << connection_result << '\n';
-        return 1;
     }
 
-    // Wait for system to connect
+    // Create a manager instance that is not dependent on the system
+    auto manager = make_shared<AddonsManager>();
+    manager->start();
+
+    // Wait for system to connect (for the first time)
     std::cout << "Waiting for system to connect...\n";
     bool system_discovered = false;
     mavsdk.subscribe_on_new_system([&]() {
@@ -103,42 +124,36 @@ int main(int argc, char** argv) {
     std::this_thread::sleep_for(seconds(3));
     if (!system_discovered) {
         std::cerr << "Timed out waiting for system\n";
-        return 1;
     }
 
     auto systems = mavsdk.systems();
-    if (systems.empty()) {
-        std::cerr << "No systems found\n";
-        return 1;
-    }
+    auto system = (!systems.empty()) ? systems.at(0) : nullptr;
 
-    auto system = systems.at(0);
-
-    CREATE_EVENT("InfoRequest");
-    CREATE_EVENT("set_brightness");
-
+    // Initialize managers that depend on the system
     auto command_manager = std::make_shared<CommandManager>(system);
     auto telemetry_manager = std::make_shared<TelemetryManager>(system);
     auto communication_manager = std::make_shared<CommunicationManager>(ECT_UDP, 8080);
 
     communication_manager->set_command(command_manager);
-    communication_manager->start();
 
-    sleep_for(seconds(3));
+    CREATE_EVENT("InfoRequest");
+    CREATE_EVENT("set_brightness");
 
     SUBSCRIBE_TO_EVENT("InfoRequest", ([telemetry_manager, communication_manager]() {
         communication_manager->send_message_all(telemetry_manager->getTelemetryData().print());
     }));
-    auto manager = make_shared<AddonsManager>();
-    manager->start();
 
-    sleep_for(seconds(1));
     SUBSCRIBE_TO_EVENT("set_brightness", ([manager]() {
         manager->executeCommand(1, "set_brightness");
     }));
 
+    // Start the streaming thread (runs independently)
     std::thread stream_thread(stream_thread_function);
-    std::thread main_thread(main_thread_function, &mavsdk, command_manager, telemetry_manager, communication_manager, connection_url);
+
+    // Start the main thread to manage system connection and reconnection
+    std::thread main_thread(main_thread_function, std::ref(mavsdk), connection_url,
+                            command_manager, telemetry_manager, communication_manager);
+
 
     main_thread.join();
     stream_thread.join();
