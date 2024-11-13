@@ -12,6 +12,7 @@
 #include "Src/Modules/AddonsManager.h"
 #include "Src/Modules/UDPVideoStreamer.h"
 #include <mutex>
+#include <condition_variable>
 #include <fcntl.h>
 #include <stdio.h>
 
@@ -42,53 +43,66 @@ void usage(const std::string& bin_name) {
               << "For example, to connect to the simulator use URL: udp://:14540\n";
 }
 
-std::shared_ptr<System> reconnect_loop(const char* connection_url, Mavsdk& mavsdk) {
+std::shared_ptr<System> connect_to_system(const char* connection_url) {
     std::shared_ptr<System> system;
+    std::mutex mutex;
+    std::condition_variable cv;
+    bool system_discovered = false;
+
     while (true) {
+        Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::GroundStation}};
+
         ConnectionResult connection_result = mavsdk.add_any_connection(connection_url);
         if (connection_result != ConnectionResult::Success) {
             std::cerr << "Connection failed: " << connection_result << '\n';
-        } else {
-            std::cout << "Waiting for system to connect...\n";
-            bool system_discovered = false;
-            mavsdk.subscribe_on_new_system([&]() {
-                const auto systems = mavsdk.systems();
-                if (!systems.empty()) {
-                    system_discovered = true;
-                }
-            });
+            sleep_for(seconds(5)); // Wait before retrying
+            continue;
+        }
 
-            std::this_thread::sleep_for(std::chrono::seconds(3));
-            if (system_discovered) {
-                auto systems = mavsdk.systems();
-                if (!systems.empty()) {
-                    system = systems.at(0);
-                    std::cout << "System connected successfully.\n";
-                    break;
-                }
-            } else {
+        std::cout << "Waiting for system to connect...\n";
+
+        mavsdk.subscribe_on_new_system([&]() {
+            std::lock_guard<std::mutex> lock(mutex);
+            system_discovered = true;
+            cv.notify_one();
+        });
+
+        {
+            std::unique_lock<std::mutex> lock(mutex);
+            if (!cv.wait_for(lock, seconds(10), [&] { return system_discovered; })) {
                 std::cerr << "Timed out waiting for system\n";
+                continue;
             }
         }
-        std::cerr << "Reconnection attempt failed. Retrying in 5 seconds...\n";
-        sleep_for(std::chrono::seconds(5)); // Wait before retrying
+
+        auto systems = mavsdk.systems();
+        if (!systems.empty()) {
+            system = systems.at(0);
+            std::cout << "System connected successfully.\n";
+            break;
+        } else {
+            std::cerr << "No systems found\n";
+        }
+
+        sleep_for(seconds(5)); // Retry after a delay
     }
+
     return system;
 }
 
-void main_thread_function(std::shared_ptr<System> system,
-                          std::shared_ptr<CommandManager> command_manager,
-                          std::shared_ptr<TelemetryManager> telemetry_manager,
-                          std::shared_ptr<CommunicationManager> communication_manager) {
-    telemetry_manager->start();
-
+void monitor_and_reconnect(std::shared_ptr<System>& system, const char* connection_url, std::shared_ptr<CommandManager>& command_manager, std::shared_ptr<TelemetryManager>& telemetry_manager) {
     while (true) {
-        if (system && system->is_connected()) {
-            sleep_for(std::chrono::seconds(3));
-        } else {
-            std::cerr << "System disconnected. Exiting main thread.\n";
-            break;
+        if (!system || !system->is_connected()) {
+            std::cerr << "System disconnected or not available. Attempting to reconnect...\n";
+            system = connect_to_system(connection_url);
+
+            if (system) {
+                command_manager = std::make_shared<CommandManager>(system);
+                telemetry_manager = std::make_shared<TelemetryManager>(system);
+                std::cout << "Reinitialized CommandManager and TelemetryManager after reconnection.\n";
+            }
         }
+        sleep_for(seconds(3)); // Check the connection status periodically
     }
 }
 
@@ -107,9 +121,6 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    // Initialize Mavsdk
-    Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::GroundStation}};
-
     CREATE_EVENT("InfoRequest");
     CREATE_EVENT("set_brightness");
 
@@ -122,37 +133,37 @@ int main(int argc, char** argv) {
     });
 
     auto communication_manager = std::make_shared<CommunicationManager>(ECT_UDP, 8080);
-    communication_manager->start();
+    communication_manager->start(); // Start independently of system connection
 
-    // Start stream thread
+    // Start the stream thread independently of the system connection
     std::thread stream_thread(stream_thread_function);
 
-    // Attempt to connect and keep reconnecting if connection is lost
-    std::shared_ptr<System> system = reconnect_loop(argv[1], mavsdk);
+    // Attempt to connect and monitor the connection status independently
+    std::shared_ptr<System> system = connect_to_system(argv[1]);
+    std::shared_ptr<CommandManager> command_manager;
+    std::shared_ptr<TelemetryManager> telemetry_manager;
 
-    // Proceed only if system is connected
-    if (!system) {
-        std::cerr << "Failed to connect to system.\n";
-        return 1;
+    // Start monitoring and reconnecting in case of disconnection
+    std::thread reconnect_thread(monitor_and_reconnect, std::ref(system), argv[1], std::ref(command_manager), std::ref(telemetry_manager));
+
+    // Set the command manager dynamically once the system is connected
+    if (system) {
+        command_manager = std::make_shared<CommandManager>(system);
+        telemetry_manager = std::make_shared<TelemetryManager>(system);
+        communication_manager->set_command(command_manager);
     }
-
-    auto command_manager = std::make_shared<CommandManager>(system);
-    auto telemetry_manager = std::make_shared<TelemetryManager>(system);
-
-    communication_manager->set_command(command_manager);
 
     sleep_for(std::chrono::seconds(3));
 
     SUBSCRIBE_TO_EVENT("InfoRequest", [=]() {
-        communication_manager->send_message_all(telemetry_manager->getTelemetryData().print());
+        if (telemetry_manager) {
+            communication_manager->send_message_all(telemetry_manager->getTelemetryData().print());
+        }
     });
 
-    // Main thread for telemetry
-    std::thread main_thread(main_thread_function, system, command_manager, telemetry_manager, communication_manager);
-
     // Ensure proper shutdown by joining threads and stopping the manager
-    main_thread.join();
     stream_thread.join();
+    reconnect_thread.detach(); // Allow reconnect thread to run independently
     manager->stop();
 
     return 0;
