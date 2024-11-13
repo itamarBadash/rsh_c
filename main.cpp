@@ -20,12 +20,12 @@ using std::this_thread::sleep_for;
 using namespace mavsdk;
 using namespace cv;
 using namespace std;
+
 class Listener {
 public:
     void onEvent(int value) {
         std::cout << "Listener received event with value: " << value << std::endl;
     }
-
 };
 
 void freeFunctionListener(int value) {
@@ -61,10 +61,9 @@ void stream_thread_function() {
     }
 }
 
-bool ConnectToSystem(char **argv, shared_ptr<System> &system) {
+bool ConnectToSystem(const char *connection_url, std::shared_ptr<System> &system, Mavsdk &mavsdk) {
 
-    Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::GroundStation}};
-    ConnectionResult connection_result = mavsdk.add_any_connection(argv[1]);
+    ConnectionResult connection_result = mavsdk.add_any_connection(connection_url);
 
     if (connection_result != ConnectionResult::Success) {
         std::cerr << "Connection failed: " << connection_result << '\n';
@@ -104,51 +103,50 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    // Initialize Mavsdk outside of ConnectToSystem to avoid re-initialization
+    Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::GroundStation}};
+    std::shared_ptr<System> system;
+
     CREATE_EVENT("InfoRequest");
     CREATE_EVENT("set_brightness");
 
-    auto manager = make_shared<AddonsManager>();
+    auto manager = std::make_shared<AddonsManager>();
     manager->start();
 
     sleep_for(std::chrono::seconds(1));
-    SUBSCRIBE_TO_EVENT("set_brightness", ([manager]() {
-        manager->executeCommand(1,"set_brightness");
-    }));
+    SUBSCRIBE_TO_EVENT("set_brightness", [manager]() {
+        manager->executeCommand(1, "set_brightness");
+    });
 
-    shared_ptr<System> system;
-    auto communication_manager = std::make_shared<CommunicationManager>(ECT_UDP,8080);
+    auto communication_manager = std::make_shared<CommunicationManager>(ECT_UDP, 8080);
     communication_manager->start();
+
+    // Stream thread is not joined if ConnectToSystem fails to prevent blocking
     std::thread stream_thread(stream_thread_function);
 
-
-     while(!ConnectToSystem(argv, system)) {
+    // Loop to attempt system connection
+    while (!ConnectToSystem(argv[1], system, mavsdk)) {
         sleep_for(std::chrono::seconds(3));
-     }
-
-
+    }
 
     auto command_manager = std::make_shared<CommandManager>(system);
     auto telemetry_manager = std::make_shared<TelemetryManager>(system);
 
     communication_manager->set_command(command_manager);
 
-   sleep_for(std::chrono::seconds(3));
+    sleep_for(std::chrono::seconds(3));
 
+    SUBSCRIBE_TO_EVENT("InfoRequest", [telemetry_manager, communication_manager]() {
+        communication_manager->send_message_all(telemetry_manager->getTelemetryData().print());
+    });
 
-    SUBSCRIBE_TO_EVENT("InfoRequest", ([telemetry_manager, communication_manager]() {
-    communication_manager->send_message_all(telemetry_manager->getTelemetryData().print());
-    }));
-
-
+    // Main thread for telemetry
     std::thread main_thread(main_thread_function, system, command_manager, telemetry_manager, communication_manager);
 
-
+    // Ensure proper shutdown by joining threads and stopping the manager
     main_thread.join();
     stream_thread.join();
     manager->stop();
 
-
     return 0;
 }
-
-
