@@ -100,36 +100,38 @@ void UDPServer::processCommands() {
             auto [message, clientAddr] = commandQueue.front();
             commandQueue.pop();
             lock.unlock();
+
             size_t pos = message.find(':');
-                if (pos != std::string::npos) {
-                    std::string command = message.substr(0, pos);
-                    std::string params_str = message.substr(pos + 1);
-                    std::vector<float> params;
-                    size_t start = 0;
-                    size_t end;
-                    while ((end = params_str.find(',', start)) != std::string::npos) {
-                        try {
-                            params.push_back(std::stof(params_str.substr(start, end - start)));
-                        } catch (const std::exception& e) {
-                            std::cerr << "Error parsing parameter: " << e.what() << std::endl;
-                        }
-                        start = end + 1;
+            if (pos != std::string::npos) {
+                std::string command = message.substr(0, pos);
+                std::string params_str = message.substr(pos + 1);
+                std::vector<float> params;
+
+                size_t start = 0;
+                size_t end;
+                while ((end = params_str.find(',', start)) != std::string::npos) {
+                    try {
+                        params.push_back(std::stof(params_str.substr(start, end - start)));
+                    } catch (const std::exception& e) {
+                        std::cerr << "Error parsing parameter: " << e.what() << std::endl;
                     }
-                    if (start < params_str.length()) {
-                        try {
-                            params.push_back(std::stof(params_str.substr(start)));
-                        } catch (const std::exception& e) {
-                            std::cerr << "Error parsing parameter: " << e.what() << std::endl;
-                        }
+                    start = end + 1;
+                }
+
+                if (start < params_str.length()) {
+                    try {
+                        params.push_back(std::stof(params_str.substr(start)));
+                    } catch (const std::exception& e) {
+                        std::cerr << "Error parsing parameter: " << e.what() << std::endl;
                     }
-                    if (command == "info") {
-                        INVOKE_EVENT("InfoRequest");
-                    }
-                    if (command == "set_brightness") {
-                        INVOKE_EVENT("set_brightness");
-                    }
-            if (commandManager != nullptr && commandManager->IsViable()) {
-                     if (commandManager->is_command_valid(command)) {
+                }
+
+                if (command == "info") {
+                    INVOKE_EVENT("InfoRequest");
+                } else if (command == "set_brightness") {
+                    INVOKE_EVENT("set_brightness");
+                } else if (commandManager != nullptr && commandManager->IsViable()) {
+                    if (commandManager->is_command_valid(command)) {
                         auto result = commandManager->handle_command(command, params);
                         if (result == CommandManager::Result::Success) {
                             std::cout << "Command " << command << " executed successfully." << std::endl;
@@ -140,10 +142,10 @@ void UDPServer::processCommands() {
                         std::cerr << "Invalid command: " << command << std::endl;
                     }
                 } else {
-                    std::cerr << "Invalid message format: " << message << std::endl;
+                    std::cerr << "Command manager not set or not viable." << std::endl;
                 }
             } else {
-                std::cerr << "Command manager not set or not viable." << std::endl;
+                std::cerr << "Invalid message format: " << message << std::endl;
             }
 
             lock.lock();
