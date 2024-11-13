@@ -43,10 +43,10 @@ void usage(const std::string& bin_name) {
 
 void main_thread_function(Mavsdk& mavsdk,
                           const std::string& connection_url,
-                          std::shared_ptr<CommandManager> command_manager,
-                          std::shared_ptr<TelemetryManager> telemetry_manager,
                           std::shared_ptr<CommunicationManager> communication_manager) {
     bool is_connected = false;
+    std::shared_ptr<CommandManager> command_manager = nullptr;
+    std::shared_ptr<TelemetryManager> telemetry_manager = nullptr;
 
     while (true) {
         auto systems = mavsdk.systems();
@@ -56,9 +56,22 @@ void main_thread_function(Mavsdk& mavsdk,
                 std::cout << "System connected\n";
                 is_connected = true;
 
-                // Start telemetry and command handling
+                auto system = systems[0];
+
+                // Initialize system-dependent managers only when system is available
+                command_manager = std::make_shared<CommandManager>(system);
+                telemetry_manager = std::make_shared<TelemetryManager>(system);
+
+                // Start telemetry and communication only when connected
                 telemetry_manager->start();
                 communication_manager->start();
+
+                // Subscribe to events that need telemetry_manager
+                SUBSCRIBE_TO_EVENT("InfoRequest", ([telemetry_manager, communication_manager]() {
+                    if (telemetry_manager) {
+                        communication_manager->send_message_all(telemetry_manager->getTelemetryData().print());
+                    }
+                }));
             }
 
             // Keep telemetry and command running
@@ -68,8 +81,14 @@ void main_thread_function(Mavsdk& mavsdk,
                 // System just disconnected
                 std::cerr << "System disconnected. Attempting to reconnect...\n";
                 is_connected = false;
-                telemetry_manager->stop();
+
+                // Stop telemetry and communication managers safely
+                if (telemetry_manager) telemetry_manager->stop();
                 communication_manager->stop();
+
+                // Reset system-dependent managers
+                command_manager = nullptr;
+                telemetry_manager = nullptr;
             }
 
             // Attempt reconnection
@@ -111,37 +130,11 @@ int main(int argc, char** argv) {
     auto manager = make_shared<AddonsManager>();
     manager->start();
 
-    // Wait for system to connect (for the first time)
-    std::cout << "Waiting for system to connect...\n";
-    bool system_discovered = false;
-    mavsdk.subscribe_on_new_system([&]() {
-        const auto systems = mavsdk.systems();
-        if (!systems.empty()) {
-            system_discovered = true;
-        }
-    });
-
-    std::this_thread::sleep_for(seconds(3));
-    if (!system_discovered) {
-        std::cerr << "Timed out waiting for system\n";
-    }
-
-    auto systems = mavsdk.systems();
-    auto system = (!systems.empty()) ? systems.at(0) : nullptr;
-
-    // Initialize managers that depend on the system
-    auto command_manager = std::make_shared<CommandManager>(system);
-    auto telemetry_manager = std::make_shared<TelemetryManager>(system);
+    // Initialize communication manager independently
     auto communication_manager = std::make_shared<CommunicationManager>(ECT_UDP, 8080);
-
-    communication_manager->set_command(command_manager);
 
     CREATE_EVENT("InfoRequest");
     CREATE_EVENT("set_brightness");
-
-    SUBSCRIBE_TO_EVENT("InfoRequest", ([telemetry_manager, communication_manager]() {
-        communication_manager->send_message_all(telemetry_manager->getTelemetryData().print());
-    }));
 
     SUBSCRIBE_TO_EVENT("set_brightness", ([manager]() {
         manager->executeCommand(1, "set_brightness");
@@ -151,8 +144,7 @@ int main(int argc, char** argv) {
     std::thread stream_thread(stream_thread_function);
 
     // Start the main thread to manage system connection and reconnection
-    std::thread main_thread(main_thread_function, std::ref(mavsdk), connection_url,
-                            command_manager, telemetry_manager, communication_manager);
+    std::thread main_thread(main_thread_function, std::ref(mavsdk), connection_url, communication_manager);
 
 
     main_thread.join();
