@@ -91,18 +91,22 @@ std::shared_ptr<System> connect_to_system(const char* connection_url) {
 }
 
 void monitor_and_reconnect(std::shared_ptr<System>& system, const char* connection_url, std::shared_ptr<CommandManager>& command_manager, std::shared_ptr<TelemetryManager>& telemetry_manager) {
-    while (true) {
-        if (!system || !system->is_connected()) {
-            std::cerr << "System disconnected or not available. Attempting to reconnect...\n";
-            system = connect_to_system(connection_url);
+    try {
+        while (true) {
+            if (!system || !system->is_connected()) {
+                std::cerr << "System disconnected or not available. Attempting to reconnect...\n";
+                system = connect_to_system(connection_url);
 
-            if (system) {
-                command_manager = std::make_shared<CommandManager>(system);
-                telemetry_manager = std::make_shared<TelemetryManager>(system);
-                std::cout << "Reinitialized CommandManager and TelemetryManager after reconnection.\n";
+                if (system) {
+                    command_manager = std::make_shared<CommandManager>(system);
+                    telemetry_manager = std::make_shared<TelemetryManager>(system);
+                    std::cout << "Reinitialized CommandManager and TelemetryManager after reconnection.\n";
+                }
             }
+            sleep_for(seconds(3)); // Check the connection status periodically
         }
-        sleep_for(seconds(3)); // Check the connection status periodically
+    } catch (const std::exception& e) {
+        std::cerr << "Exception in monitor_and_reconnect: " << e.what() << std::endl;
     }
 }
 
@@ -111,60 +115,72 @@ void stream_thread_function() {
         UDPVideoStreamer streamer(0, "192.168.20.11", 12345);  // Use appropriate IP and port
         streamer.stream();
     } catch (const std::exception& ex) {
-        std::cerr << "Exception: " << ex.what() << std::endl;
+        std::cerr << "Exception in stream_thread_function: " << ex.what() << std::endl;
     }
 }
 
 int main(int argc, char** argv) {
-    if (argc != 2) {
-        usage(argv[0]);
+    try {
+        if (argc != 2) {
+            usage(argv[0]);
+            return 1;
+        }
+
+        CREATE_EVENT("InfoRequest");
+        CREATE_EVENT("set_brightness");
+
+        auto manager = std::make_shared<AddonsManager>();
+        manager->start();
+
+        sleep_for(std::chrono::seconds(1));
+        SUBSCRIBE_TO_EVENT("set_brightness", [manager]() {
+            manager->executeCommand(1, "set_brightness");
+        });
+
+        auto communication_manager = std::make_shared<CommunicationManager>(ECT_UDP, 8080);
+        communication_manager->start(); // Start independently of system connection
+
+        // Start the stream thread independently of the system connection
+        std::thread stream_thread(stream_thread_function);
+
+        // Attempt to connect and monitor the connection status independently
+        std::shared_ptr<System> system = connect_to_system(argv[1]);
+        std::shared_ptr<CommandManager> command_manager;
+        std::shared_ptr<TelemetryManager> telemetry_manager;
+
+        // Start monitoring and reconnecting in case of disconnection
+        std::thread reconnect_thread(monitor_and_reconnect, std::ref(system), argv[1], std::ref(command_manager), std::ref(telemetry_manager));
+
+        // Set the command manager dynamically once the system is connected
+        if (system) {
+            command_manager = std::make_shared<CommandManager>(system);
+            telemetry_manager = std::make_shared<TelemetryManager>(system);
+            communication_manager->set_command(command_manager);
+        }
+
+        sleep_for(std::chrono::seconds(3));
+
+        SUBSCRIBE_TO_EVENT("InfoRequest", [=]() {
+            if (telemetry_manager) {
+                communication_manager->send_message_all(telemetry_manager->getTelemetryData().print());
+            }
+        });
+
+        // Ensure proper shutdown by joining threads and stopping the manager
+        stream_thread.join();
+        reconnect_thread.detach(); // Allow reconnect thread to run independently
+        manager->stop();
+
+    } catch (const std::system_error& e) {
+        std::cerr << "System error in main: " << e.what() << std::endl;
+        return 1;
+    } catch (const std::exception& e) {
+        std::cerr << "Exception in main: " << e.what() << std::endl;
+        return 1;
+    } catch (...) {
+        std::cerr << "Unknown error in main." << std::endl;
         return 1;
     }
-
-    CREATE_EVENT("InfoRequest");
-    CREATE_EVENT("set_brightness");
-
-    auto manager = std::make_shared<AddonsManager>();
-    manager->start();
-
-    sleep_for(std::chrono::seconds(1));
-    SUBSCRIBE_TO_EVENT("set_brightness", [manager]() {
-        manager->executeCommand(1, "set_brightness");
-    });
-
-    auto communication_manager = std::make_shared<CommunicationManager>(ECT_UDP, 8080);
-    communication_manager->start(); // Start independently of system connection
-
-    // Start the stream thread independently of the system connection
-    std::thread stream_thread(stream_thread_function);
-
-    // Attempt to connect and monitor the connection status independently
-    std::shared_ptr<System> system = connect_to_system(argv[1]);
-    std::shared_ptr<CommandManager> command_manager;
-    std::shared_ptr<TelemetryManager> telemetry_manager;
-
-    // Start monitoring and reconnecting in case of disconnection
-    std::thread reconnect_thread(monitor_and_reconnect, std::ref(system), argv[1], std::ref(command_manager), std::ref(telemetry_manager));
-
-    // Set the command manager dynamically once the system is connected
-    if (system) {
-        command_manager = std::make_shared<CommandManager>(system);
-        telemetry_manager = std::make_shared<TelemetryManager>(system);
-        communication_manager->set_command(command_manager);
-    }
-
-    sleep_for(std::chrono::seconds(3));
-
-    SUBSCRIBE_TO_EVENT("InfoRequest", [=]() {
-        if (telemetry_manager) {
-            communication_manager->send_message_all(telemetry_manager->getTelemetryData().print());
-        }
-    });
-
-    // Ensure proper shutdown by joining threads and stopping the manager
-    stream_thread.join();
-    reconnect_thread.detach(); // Allow reconnect thread to run independently
-    manager->stop();
 
     return 0;
 }
