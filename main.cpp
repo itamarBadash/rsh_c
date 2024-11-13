@@ -136,9 +136,11 @@ int main(int argc, char** argv) {
 
     sleep_for(std::chrono::seconds(3));
 
-    SUBSCRIBE_TO_EVENT("InfoRequest", [telemetry_manager, communication_manager]() {
+    SUBSCRIBE_TO_EVENT("InfoRequest", [=]() {
         communication_manager->send_message_all(telemetry_manager->getTelemetryData().print());
     });
+
+
 
     // Main thread for telemetry
     std::thread main_thread(main_thread_function, system, command_manager, telemetry_manager, communication_manager);
