@@ -68,6 +68,8 @@ int main(int argc, char** argv) {
         return 1;
     }
     auto communication_manager = std::make_shared<CommunicationManager>(ECT_UDP,8080);
+    communication_manager->start();
+
     CREATE_EVENT("InfoRequest");
     CREATE_EVENT("set_brightness");
     std::thread stream_thread(stream_thread_function);
@@ -116,7 +118,6 @@ int main(int argc, char** argv) {
 
     communication_manager->set_command(command_manager);
 
-    communication_manager->start();
 
    sleep_for(std::chrono::seconds(3));
 
