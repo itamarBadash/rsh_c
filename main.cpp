@@ -96,6 +96,14 @@ bool ConnectToSystem(const char *connection_url, std::shared_ptr<System> &system
     return true;
 }
 
+void reconnect_loop(const char* connection_url, std::shared_ptr<System>& system, Mavsdk& mavsdk) {
+    while (!ConnectToSystem(connection_url, system, mavsdk)) {
+        std::cerr << "Reconnection attempt failed. Retrying in 5 seconds...\n";
+        sleep_for(std::chrono::seconds(5)); // Wait before retrying
+    }
+    std::cout << "Successfully connected to system.\n";
+}
+
 int main(int argc, char** argv) {
 
     if (argc != 2) {
@@ -124,10 +132,10 @@ int main(int argc, char** argv) {
     // Stream thread is not joined if ConnectToSystem fails to prevent blocking
     std::thread stream_thread(stream_thread_function);
 
-    // Loop to attempt system connection
-    while (!ConnectToSystem(argv[1], system, mavsdk)) {
-        sleep_for(std::chrono::seconds(3));
-    }
+    // Attempt to connect and keep reconnecting if connection is lost
+    std::thread connection_thread([&]() {
+        reconnect_loop(argv[1], system, mavsdk);
+    });
 
     auto command_manager = std::make_shared<CommandManager>(system);
     auto telemetry_manager = std::make_shared<TelemetryManager>(system);
@@ -140,12 +148,11 @@ int main(int argc, char** argv) {
         communication_manager->send_message_all(telemetry_manager->getTelemetryData().print());
     });
 
-
-
     // Main thread for telemetry
     std::thread main_thread(main_thread_function, system, command_manager, telemetry_manager, communication_manager);
 
     // Ensure proper shutdown by joining threads and stopping the manager
+    connection_thread.join();
     main_thread.join();
     stream_thread.join();
     manager->stop();
