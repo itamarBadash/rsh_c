@@ -43,72 +43,73 @@ void usage(const std::string& bin_name) {
               << "For example, to connect to the simulator use URL: udp://:14540\n";
 }
 
-std::shared_ptr<System> connect_to_system(const char* connection_url) {
+std::shared_ptr<System> connect_to_system(const char* connection_url, Mavsdk& mavsdk) {
     std::shared_ptr<System> system;
     std::mutex mutex;
     std::condition_variable cv;
     bool system_discovered = false;
 
-    while (true) {
-        Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::GroundStation}};
+    ConnectionResult connection_result = mavsdk.add_any_connection(connection_url);
+    if (connection_result != ConnectionResult::Success) {
+        std::cerr << "Connection failed: " << connection_result << '\n';
+        return nullptr;
+    }
 
-        ConnectionResult connection_result = mavsdk.add_any_connection(connection_url);
-        if (connection_result != ConnectionResult::Success) {
-            std::cerr << "Connection failed: " << connection_result << '\n';
-            sleep_for(seconds(5)); // Wait before retrying
-            continue;
+    std::cout << "Waiting for system to connect...\n";
+
+    mavsdk.subscribe_on_new_system([&]() {
+        std::lock_guard<std::mutex> lock(mutex);
+        system_discovered = true;
+        cv.notify_one();
+    });
+
+    {
+        std::unique_lock<std::mutex> lock(mutex);
+        if (!cv.wait_for(lock, seconds(10), [&] { return system_discovered; })) {
+            std::cerr << "Timed out waiting for system\n";
+            return nullptr;
         }
+    }
 
-        std::cout << "Waiting for system to connect...\n";
-
-        mavsdk.subscribe_on_new_system([&]() {
-            std::lock_guard<std::mutex> lock(mutex);
-            system_discovered = true;
-            cv.notify_one();
-        });
-
-        {
-            std::unique_lock<std::mutex> lock(mutex);
-            if (!cv.wait_for(lock, seconds(10), [&] { return system_discovered; })) {
-                std::cerr << "Timed out waiting for system\n";
-                continue;
-            }
-        }
-
-        auto systems = mavsdk.systems();
-        if (!systems.empty()) {
-            system = systems.at(0);
-            std::cout << "System connected successfully.\n";
-            break;
-        } else {
-            std::cerr << "No systems found\n";
-        }
-
-        sleep_for(seconds(5)); // Retry after a delay
+    auto systems = mavsdk.systems();
+    if (!systems.empty()) {
+        system = systems.at(0);
+        std::cout << "System connected successfully.\n";
+    } else {
+        std::cerr << "No systems found\n";
     }
 
     return system;
 }
 
 void monitor_and_reconnect(const char* connection_url) {
-    std::shared_ptr<System> system;
     std::shared_ptr<CommandManager> command_manager;
     std::shared_ptr<TelemetryManager> telemetry_manager;
+    Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::GroundStation}};
 
     try {
         while (true) {
-            if (!system || !system->is_connected()) {
-                std::cerr << "System disconnected or not available. Attempting to reconnect...\n";
-                system = connect_to_system(connection_url);
+            std::shared_ptr<System> system = connect_to_system(connection_url, mavsdk);
 
-                if (system) {
-                    // Initialize or reinitialize CommandManager and TelemetryManager independently
-                    command_manager = std::make_shared<CommandManager>(system);
-                    telemetry_manager = std::make_shared<TelemetryManager>(system);
-                    std::cout << "Initialized CommandManager and TelemetryManager after reconnection.\n";
+            if (system) {
+                // Reset before reassigning to avoid double-free
+                command_manager.reset();
+                telemetry_manager.reset();
+
+                // Initialize CommandManager and TelemetryManager
+                command_manager = std::make_shared<CommandManager>(system);
+                telemetry_manager = std::make_shared<TelemetryManager>(system);
+                std::cout << "Initialized CommandManager and TelemetryManager after reconnection.\n";
+
+                // Monitor the connection status
+                while (system->is_connected()) {
+                    sleep_for(seconds(3)); // Periodically check the connection
                 }
+                std::cerr << "System disconnected. Attempting to reconnect...\n";
+            } else {
+                std::cerr << "Failed to connect. Retrying in 5 seconds...\n";
+                sleep_for(seconds(5)); // Wait before retrying connection
             }
-            sleep_for(seconds(3)); // Check the connection status periodically
         }
     } catch (const std::exception& e) {
         std::cerr << "Exception in monitor_and_reconnect: " << e.what() << std::endl;
