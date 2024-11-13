@@ -138,9 +138,7 @@ int main(int argc, char** argv) {
     }));
 
     std::thread stream_thread(stream_thread_function);
-    std::thread main_thread(main_thread_function, std::make_shared<Mavsdk>(mavsdk), command_manager, telemetry_manager, communication_manager, connection_url);
-
-    std::cout << "OpenCV version: " << CV_VERSION << std::endl;
+    std::thread main_thread(main_thread_function, &mavsdk, command_manager, telemetry_manager, communication_manager, connection_url);
 
     main_thread.join();
     stream_thread.join();
