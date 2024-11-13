@@ -100,9 +100,7 @@ void UDPServer::processCommands() {
             auto [message, clientAddr] = commandQueue.front();
             commandQueue.pop();
             lock.unlock();
-
-            if (commandManager != nullptr && commandManager->IsViable()) {
-                size_t pos = message.find(':');
+            size_t pos = message.find(':');
                 if (pos != std::string::npos) {
                     std::string command = message.substr(0, pos);
                     std::string params_str = message.substr(pos + 1);
@@ -124,14 +122,14 @@ void UDPServer::processCommands() {
                             std::cerr << "Error parsing parameter: " << e.what() << std::endl;
                         }
                     }
-
                     if (command == "info") {
                         INVOKE_EVENT("InfoRequest");
                     }
-                    else if (command == "set_brightness") {
+                    if (command == "set_brightness") {
                         INVOKE_EVENT("set_brightness");
                     }
-                    else if (commandManager->is_command_valid(command)) {
+            if (commandManager != nullptr && commandManager->IsViable()) {
+                     if (commandManager->is_command_valid(command)) {
                         auto result = commandManager->handle_command(command, params);
                         if (result == CommandManager::Result::Success) {
                             std::cout << "Command " << command << " executed successfully." << std::endl;

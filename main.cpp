@@ -48,7 +48,7 @@ void main_thread_function(std::shared_ptr<System> system,
     telemetry_manager->start();
 
     while (true) {
-        std::this_thread::sleep_for(std::chrono::seconds(3));
+        sleep_for(std::chrono::seconds(3));
     }
 }
 
@@ -61,19 +61,14 @@ void stream_thread_function() {
     }
 }
 
-int main(int argc, char** argv) {
-
-    if (argc != 2) {
-        usage(argv[0]);
-        return 1;
-    }
+bool ConnectToSystem(char **argv, shared_ptr<System> &system) {
 
     Mavsdk mavsdk{Mavsdk::Configuration{Mavsdk::ComponentType::GroundStation}};
     ConnectionResult connection_result = mavsdk.add_any_connection(argv[1]);
 
     if (connection_result != ConnectionResult::Success) {
         std::cerr << "Connection failed: " << connection_result << '\n';
-        return 1;
+        return false;
     }
 
     // Wait for system to connect
@@ -89,34 +84,29 @@ int main(int argc, char** argv) {
     std::this_thread::sleep_for(std::chrono::seconds(3));
     if (!system_discovered) {
         std::cerr << "Timed out waiting for system\n";
-        return 1;
+        return false;
     }
 
     auto systems = mavsdk.systems();
     if (systems.empty()) {
         std::cerr << "No systems found\n";
-        return 1;
+        return false;
     }
 
-    auto system = systems.at(0);
+    system = systems.at(0);
+    return true;
+}
+
+int main(int argc, char** argv) {
+
+    if (argc != 2) {
+        usage(argv[0]);
+        return 1;
+    }
 
     CREATE_EVENT("InfoRequest");
     CREATE_EVENT("set_brightness");
 
-    auto command_manager = std::make_shared<CommandManager>(system);
-    auto telemetry_manager = std::make_shared<TelemetryManager>(system);
-    auto communication_manager = std::make_shared<CommunicationManager>(ECT_UDP,8080);
-
-    communication_manager->set_command(command_manager);
-
-    communication_manager->start();
-
-   sleep_for(std::chrono::seconds(3));
-
-
-    SUBSCRIBE_TO_EVENT("InfoRequest", ([telemetry_manager, communication_manager]() {
-    communication_manager->send_message_all(telemetry_manager->getTelemetryData().print());
-    }));
     auto manager = make_shared<AddonsManager>();
     manager->start();
 
@@ -125,11 +115,32 @@ int main(int argc, char** argv) {
         manager->executeCommand(1,"set_brightness");
     }));
 
+    shared_ptr<System> system;
+    auto communication_manager = std::make_shared<CommunicationManager>(ECT_UDP,8080);
+    communication_manager->start();
     std::thread stream_thread(stream_thread_function);
+
+
+     while(!ConnectToSystem(argv, system)) {
+        sleep_for(std::chrono::seconds(3));
+     }
+
+
+
+    auto command_manager = std::make_shared<CommandManager>(system);
+    auto telemetry_manager = std::make_shared<TelemetryManager>(system);
+
+    communication_manager->set_command(command_manager);
+
+   sleep_for(std::chrono::seconds(3));
+
+
+    SUBSCRIBE_TO_EVENT("InfoRequest", ([telemetry_manager, communication_manager]() {
+    communication_manager->send_message_all(telemetry_manager->getTelemetryData().print());
+    }));
+
+
     std::thread main_thread(main_thread_function, system, command_manager, telemetry_manager, communication_manager);
-
-
-    std::cout << "OpenCV version: " << CV_VERSION << std::endl;
 
 
     main_thread.join();
