@@ -90,7 +90,11 @@ std::shared_ptr<System> connect_to_system(const char* connection_url) {
     return system;
 }
 
-void monitor_and_reconnect(std::shared_ptr<System>& system, const char* connection_url, std::shared_ptr<CommandManager>& command_manager, std::shared_ptr<TelemetryManager>& telemetry_manager) {
+void monitor_and_reconnect(const char* connection_url) {
+    std::shared_ptr<System> system;
+    std::shared_ptr<CommandManager> command_manager;
+    std::shared_ptr<TelemetryManager> telemetry_manager;
+
     try {
         while (true) {
             if (!system || !system->is_connected()) {
@@ -98,9 +102,10 @@ void monitor_and_reconnect(std::shared_ptr<System>& system, const char* connecti
                 system = connect_to_system(connection_url);
 
                 if (system) {
+                    // Initialize or reinitialize CommandManager and TelemetryManager independently
                     command_manager = std::make_shared<CommandManager>(system);
                     telemetry_manager = std::make_shared<TelemetryManager>(system);
-                    std::cout << "Reinitialized CommandManager and TelemetryManager after reconnection.\n";
+                    std::cout << "Initialized CommandManager and TelemetryManager after reconnection.\n";
                 }
             }
             sleep_for(seconds(3)); // Check the connection status periodically
@@ -143,27 +148,14 @@ int main(int argc, char** argv) {
         // Start the stream thread independently of the system connection
         std::thread stream_thread(stream_thread_function);
 
-        // Attempt to connect and monitor the connection status independently
-        std::shared_ptr<System> system = connect_to_system(argv[1]);
-        std::shared_ptr<CommandManager> command_manager;
-        std::shared_ptr<TelemetryManager> telemetry_manager;
-
-        // Start monitoring and reconnecting in case of disconnection
-        std::thread reconnect_thread(monitor_and_reconnect, std::ref(system), argv[1], std::ref(command_manager), std::ref(telemetry_manager));
-
-        // Set the command manager dynamically once the system is connected
-        if (system) {
-            command_manager = std::make_shared<CommandManager>(system);
-            telemetry_manager = std::make_shared<TelemetryManager>(system);
-            communication_manager->set_command(command_manager);
-        }
+        // Start monitoring and reconnecting independently of the main system
+        std::thread reconnect_thread(monitor_and_reconnect, argv[1]);
 
         sleep_for(std::chrono::seconds(3));
 
         SUBSCRIBE_TO_EVENT("InfoRequest", [=]() {
-            if (telemetry_manager) {
-                communication_manager->send_message_all(telemetry_manager->getTelemetryData().print());
-            }
+            std::cout << "InfoRequest event triggered." << std::endl;
+            // The telemetry_manager here is now local to `monitor_and_reconnect` and independent.
         });
 
         // Ensure proper shutdown by joining threads and stopping the manager
