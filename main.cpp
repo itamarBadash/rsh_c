@@ -41,63 +41,67 @@ void usage(const std::string& bin_name) {
               << "For example, to connect to the simulator use URL: udp://:14540\n";
 }
 
-void main_thread_function(Mavsdk& mavsdk,
-                          const std::string& connection_url,
+void main_thread_function(std::string connection_url,
                           std::shared_ptr<CommunicationManager> communication_manager) {
+    std::shared_ptr<Mavsdk> mavsdk;
     bool is_connected = false;
     std::shared_ptr<CommandManager> command_manager = nullptr;
     std::shared_ptr<TelemetryManager> telemetry_manager = nullptr;
 
     while (true) {
-        auto systems = mavsdk.systems();
-        if (!systems.empty() && systems[0]->is_connected()) {
-            if (!is_connected) {
-                // System just connected
-                std::cout << "System connected\n";
-                is_connected = true;
+        if (!is_connected) {
+            // Create a new instance of Mavsdk on each reconnection attempt
+            mavsdk = std::make_shared<Mavsdk>(Mavsdk::Configuration{Mavsdk::ComponentType::GroundStation});
+            ConnectionResult connection_result = mavsdk->add_any_connection(connection_url);
 
-                auto system = systems[0];
+            if (connection_result == ConnectionResult::Success) {
+                std::cout << "Waiting for system to connect...\n";
+                mavsdk->subscribe_on_new_system([&]() {
+                    const auto systems = mavsdk->systems();
+                    if (!systems.empty() && systems[0]->is_connected()) {
+                        is_connected = true;
+                        auto system = systems[0];
 
-                // Initialize system-dependent managers only when system is available
-                command_manager = std::make_shared<CommandManager>(system);
-                telemetry_manager = std::make_shared<TelemetryManager>(system);
+                        // Initialize system-dependent managers
+                        command_manager = std::make_shared<CommandManager>(system);
+                        telemetry_manager = std::make_shared<TelemetryManager>(system);
 
-                // Start telemetry and communication only when connected
-                telemetry_manager->start();
-                communication_manager->start();
+                        telemetry_manager->start();
+                        communication_manager->start();
 
-                // Subscribe to events that need telemetry_manager
-                SUBSCRIBE_TO_EVENT("InfoRequest", ([telemetry_manager, communication_manager]() {
-                    if (telemetry_manager) {
-                        communication_manager->send_message_all(telemetry_manager->getTelemetryData().print());
+                        // Subscribe to events that need telemetry_manager
+                        SUBSCRIBE_TO_EVENT("InfoRequest", ([telemetry_manager, communication_manager]() {
+                            if (telemetry_manager) {
+                                communication_manager->send_message_all(telemetry_manager->getTelemetryData().print());
+                            }
+                        }));
+
+                        std::cout << "System connected\n";
                     }
-                }));
-            }
+                });
 
-            // Keep telemetry and command running
-            sleep_for(seconds(3));
+                // Allow some time for connection to complete
+                sleep_for(seconds(3));
+            } else {
+                std::cerr << "Connection failed: " << connection_result << ". Retrying in 3 seconds...\n";
+                sleep_for(seconds(3));
+            }
         } else {
-            if (is_connected) {
-                // System just disconnected
+            // Check for system disconnection
+            auto systems = mavsdk->systems();
+            if (systems.empty() || !systems[0]->is_connected()) {
                 std::cerr << "System disconnected. Attempting to reconnect...\n";
                 is_connected = false;
 
-                // Stop telemetry and communication managers safely
+                // Stop and reset managers
                 if (telemetry_manager) telemetry_manager->stop();
                 communication_manager->stop();
 
-                // Reset system-dependent managers
                 command_manager = nullptr;
                 telemetry_manager = nullptr;
-            }
 
-            // Attempt reconnection
-            ConnectionResult connection_result = mavsdk.add_any_connection(connection_url);
-            if (connection_result == ConnectionResult::Success) {
-                std::cout << "Reconnection successful!\n";
-            } else {
-                std::cerr << "Reconnection attempt failed. Retrying in 3 seconds...\n";
-                sleep_for(seconds(3));  // Retry delay
+                // Destroy the Mavsdk instance to release the port
+                mavsdk.reset();
             }
         }
     }
