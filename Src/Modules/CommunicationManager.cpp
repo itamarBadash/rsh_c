@@ -70,6 +70,12 @@ void CommunicationManager::start() {
     }
 }
 
+void CommunicationManager::stop() {
+    for (auto& communication : communication_ptrs) {
+        communication->stop();
+    }
+}
+
 void CommunicationManager::replace_communication_type(int index, CommunicationType new_communication, int port) {
     if (index < 0 || index >= communication_ptrs.size()) {
         throw std::out_of_range("Invalid communication index");
