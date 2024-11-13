@@ -99,6 +99,7 @@ int main(int argc, char** argv) {
 
     sleep_for(seconds(3));
     while (!system_discovered) {
+        sleep_for(seconds(10));
         std::cerr << "Timed out waiting for system\n";
     }
 
