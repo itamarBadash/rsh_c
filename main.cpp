@@ -72,6 +72,9 @@ int main(int argc, char** argv) {
 
     CREATE_EVENT("InfoRequest");
     CREATE_EVENT("set_brightness");
+    CREATE_EVENT("command_received", const std::string & command, const std::vector<float> & parameters);
+
+
     std::thread stream_thread(stream_thread_function);
 
     auto manager = make_shared<AddonsManager>();
@@ -125,6 +128,22 @@ int main(int argc, char** argv) {
     SUBSCRIBE_TO_EVENT("InfoRequest", ([telemetry_manager, communication_manager]() {
     communication_manager->send_message_all(telemetry_manager->getTelemetryData().print());
     }));
+
+    SUBSCRIBE_TO_EVENT("command_received", [command_manager](const std::string& command, const std::vector<float>& parameters) {
+        if (command_manager != nullptr && command_manager->IsViable()) {
+            if (command_manager->is_command_valid(command)){
+            auto result = command_manager->handle_command(command, parameters);
+            if(result != CommandManager::Result::Success)
+                cerr << "Command Failed" << std::endl;
+        }else {
+                std::cerr << "Invalid command: " << command << std::endl;
+            }
+        }
+        else {
+            std::cerr << "Command manager not set or not viable." << std::endl;
+        }
+    });
+
 
     std::thread main_thread(main_thread_function, system, command_manager, telemetry_manager, communication_manager);
 

@@ -130,24 +130,13 @@ void UDPServer::processCommands() {
                     INVOKE_EVENT("InfoRequest");
                 } else if (command == "set_brightness") {
                     INVOKE_EVENT("set_brightness");
-                } else if (commandManager != nullptr && commandManager->IsViable()) {
-                    if (commandManager->is_command_valid(command)) {
-                        auto result = commandManager->handle_command(command, params);
-                        if (result == CommandManager::Result::Success) {
-                            std::cout << "Command " << command << " executed successfully." << std::endl;
-                        } else {
-                            std::cerr << "Command " << command << " failed." << std::endl;
-                        }
-                    } else {
-                        std::cerr << "Invalid command: " << command << std::endl;
-                    }
-                } else {
-                    std::cerr << "Command manager not set or not viable." << std::endl;
+                }
+                else {
+                     INVOKE_EVENT("command_received", command, params);
                 }
             } else {
                 std::cerr << "Invalid message format: " << message << std::endl;
             }
-
             lock.lock();
         }
     }
