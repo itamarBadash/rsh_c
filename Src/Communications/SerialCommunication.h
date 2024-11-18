@@ -34,8 +34,6 @@ public:
     void stop() override;
 
     speed_t convertBaudRate(int baudRate);
-    void setCommandManager(std::shared_ptr<CommandManager> command) override;
-
 
 private:
     // Serial port configuration and management
@@ -60,7 +58,6 @@ private:
 
     std::mutex send_mutex;
 
-    std::shared_ptr<CommandManager> command_manager;
 };
 
 #endif // SERIALCOMMUNICATION_H

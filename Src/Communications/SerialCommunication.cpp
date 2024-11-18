@@ -11,6 +11,8 @@
 #include <map>
 #include <unordered_map>
 #include <stdexcept>
+#include "../../Events/EventManager.h"
+
 
 SerialCommunication::SerialCommunication(const std::string &port, int baud_rate)
         : port_name(port), baud_rate(baud_rate), serial_port(-1), stop_flag(false) {
@@ -59,10 +61,6 @@ speed_t SerialCommunication::convertBaudRate(int baudRate) {
         default:
             throw std::invalid_argument("Unsupported baud rate: " + std::to_string(baudRate));
     }
-}
-
-void SerialCommunication::setCommandManager(std::shared_ptr<CommandManager> command) {
-    command_manager = command;
 }
 
 void SerialCommunication::openPort() {
@@ -177,17 +175,19 @@ void SerialCommunication::processReceivedMessage(const std::string &message) {
         if (start < params_str.length()) {
             params.push_back(std::stof(params_str.substr(start)));
         }
-
-        if(command_manager != nullptr) {
-            auto result = command_manager->handle_command(command, params);
-            if (result == CommandManager::Result::Success) {
-                std::cout << "Command " << command << " executed successfully." << std::endl;
-            } else {
-                std::cerr << "Command " << command << " failed." << std::endl;
-            }
+        if (command == "info") {
+            INVOKE_EVENT("InfoRequest");
+        } else if (command == "set_brightness") {
+            INVOKE_EVENT("set_brightness");
         }
+        else {
+            INVOKE_EVENT("command_received", command, params);
+        }
+    } else {
+        std::cerr << "Invalid message format: " << message << std::endl;
     }
 }
+
 
 bool SerialCommunication::send_message(const std::string &message) {
     std::lock_guard<std::mutex> lock(send_mutex);
