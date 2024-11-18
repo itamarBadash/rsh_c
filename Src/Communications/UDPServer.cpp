@@ -10,7 +10,6 @@
 
 UDPServer::UDPServer(int port) : port(port), serverSocket(-1), running(false) {
     std::memset(&serverAddr, 0, sizeof(serverAddr));
-    commandManager = nullptr;
 }
 
 UDPServer::~UDPServer() {
@@ -189,5 +188,4 @@ std::string UDPServer::clientAddrToString(const sockaddr_in& clientAddr) {
 }
 
 void UDPServer::setCommandManager(std::shared_ptr<CommandManager> command) {
-    commandManager = command;
 }

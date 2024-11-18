@@ -35,8 +35,6 @@ private:
     std::atomic<bool> running;
     std::thread commandProcessorThread;
 
-    std::shared_ptr<CommandManager> commandManager;
-
     std::queue<std::pair<std::string, sockaddr_in>> commandQueue;
     std::mutex queueMutex;
     std::condition_variable queueCondition;
