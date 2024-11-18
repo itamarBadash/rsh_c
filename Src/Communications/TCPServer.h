@@ -24,7 +24,7 @@ public:
     void stop() override;
     void handleClient(int clientSocket);
     bool send_message(const std::string& message) override;
-    void setCommandManager(std::shared_ptr<CommandManager> command) override;
+    void setCommandManager(std::shared_ptr<CommandManager> command);
 
     bool send_frame(const cv::Mat& frame);
 
@@ -42,7 +42,6 @@ private:
     std::mutex queueMutex;
     std::condition_variable queueCondition;
     std::thread commandProcessorThread;
-    std::shared_ptr<CommandManager> commandManager;
 
     void setupServerAddress();
     void acceptConnections();

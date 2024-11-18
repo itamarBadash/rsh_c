@@ -119,9 +119,6 @@ int main(int argc, char** argv) {
     auto command_manager = std::make_shared<CommandManager>(system);
     auto telemetry_manager = std::make_shared<TelemetryManager>(system);
 
-    communication_manager->set_command(command_manager);
-
-
    sleep_for(std::chrono::seconds(3));
 
 

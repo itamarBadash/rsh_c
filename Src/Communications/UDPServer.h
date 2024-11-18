@@ -24,7 +24,6 @@ public:
     bool start() override;
     void stop() override;
     bool send_message(const std::string& message) override;
-    void setCommandManager(std::shared_ptr<CommandManager> command) override;
 
     bool send_frame(const cv::Mat &frame);
 

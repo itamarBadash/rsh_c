@@ -13,7 +13,6 @@ public:
     virtual bool start() = 0;
     virtual void stop() = 0;
     virtual bool send_message(const std::string &message) = 0;
-    virtual void setCommandManager(std::shared_ptr<CommandManager> command) = 0;
 };
 
 #endif //ICOMMUNICATION_H

@@ -186,6 +186,3 @@ std::string UDPServer::clientAddrToString(const sockaddr_in& clientAddr) {
     inet_ntop(AF_INET, &clientAddr.sin_addr, addr, sizeof(addr));
     return std::string(addr) + ":" + std::to_string(ntohs(clientAddr.sin_port));
 }
-
-void UDPServer::setCommandManager(std::shared_ptr<CommandManager> command) {
-}

@@ -20,7 +20,6 @@ public:
 
     void send_message_all(const std::string &message);
     void send_message_by_index(int index,const std::string &message);
-    void set_command(std::shared_ptr<CommandManager> command_manager);
     void start();
 
     void stop();

@@ -58,12 +58,6 @@ void CommunicationManager::send_message_by_index(int index,const std::string &me
     communication_ptrs[index]->send_message(message);
 }
 
-void CommunicationManager::set_command(std::shared_ptr<CommandManager> command_manager) {
-    for (auto& communication : communication_ptrs) {
-        communication->setCommandManager(command_manager);
-    }
-}
-
 void CommunicationManager::start() {
     for (auto& communication : communication_ptrs) {
         communication->start();

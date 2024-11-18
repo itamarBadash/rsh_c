@@ -11,7 +11,6 @@
 
 TCPServer::TCPServer(int port) : port(port), serverSocket(-1), running(false) {
     std::memset(&serverAddr, 0, sizeof(serverAddr));
-    commandManager = nullptr;
 }
 
 TCPServer::~TCPServer() {
@@ -125,7 +124,6 @@ void TCPServer::processCommands() {
             commandQueue.pop();
             lock.unlock();
 
-            if (commandManager != nullptr && commandManager->IsViable()) {
                 size_t pos = message.find(':');
                 if (pos != std::string::npos) {
                     std::string command = message.substr(0, pos);
@@ -148,27 +146,17 @@ void TCPServer::processCommands() {
                     else if (command == "set_brightness") {
                         INVOKE_EVENT("set_brightness");
                     }
-                    else if (commandManager->is_command_valid(command)) {
-                        auto result = commandManager->handle_command(command, params);
-                        if (result == CommandManager::Result::Success) {
-                            std::cout << "Command " << command << " executed successfully." << std::endl;
-                        } else {
-                            std::cerr << "Command " << command << " failed." << std::endl;
-                        }
-                    } else {
-                        std::cerr << "Invalid command: " << command << std::endl;
+                    else {
+                        INVOKE_EVENT("command_received", command, params);
                     }
                 } else {
                     std::cerr << "Invalid message format: " << message << std::endl;
                 }
-            } else {
-                std::cerr << "Command manager not set or not viable." << std::endl;
             }
 
             lock.lock();
         }
     }
-}
 
 void TCPServer::cleanupThreads() {
     for (auto& thread : clientThreads) {
@@ -203,8 +191,4 @@ bool TCPServer::send_message(const std::string& message) {
     }
 
     return true;
-}
-
-void TCPServer::setCommandManager(std::shared_ptr<CommandManager> command) {
-    commandManager = command;
 }
