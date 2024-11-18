@@ -20,17 +20,6 @@ using std::this_thread::sleep_for;
 using namespace mavsdk;
 using namespace cv;
 using namespace std;
-class Listener {
-public:
-    void onEvent(int value) {
-        std::cout << "Listener received event with value: " << value << std::endl;
-    }
-
-};
-
-void freeFunctionListener(int value) {
-    std::cout << "Free function listener received event with value: " << value << std::endl;
-}
 
 void usage(const std::string& bin_name) {
     std::cerr << "Usage: " << bin_name << " <connection_url>\n"
@@ -67,7 +56,7 @@ int main(int argc, char** argv) {
         usage(argv[0]);
         return 1;
     }
-    auto communication_manager = std::make_shared<CommunicationManager>(ECT_UDP,8080);
+    auto communication_manager = std::make_shared<CommunicationManager>(ECT_TCP,8080);
     communication_manager->start();
 
     CREATE_EVENT("InfoRequest");
