@@ -16,7 +16,6 @@
 
 SerialCommunication::SerialCommunication(const std::string &port, int baud_rate)
         : port_name(port), baud_rate(baud_rate), serial_port(-1), stop_flag(false) {
-    command_manager = nullptr;
     openPort();
 }
 
