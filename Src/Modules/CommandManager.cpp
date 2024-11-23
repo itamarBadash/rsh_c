@@ -65,20 +65,20 @@ bool CommandManager::is_command_valid(const std::string& command) const {
 }
 
 CommandManager::Result CommandManager::takeoff() {
-    INVOKE_EVENT("command_received","takeoff");
+    INVOKE_EVENT("send_ack","takeoff");
     action->set_takeoff_altitude(20);
     return execute_action([this]() { return action->takeoff(); }, "Takeoff");
 }
 
 CommandManager::Result CommandManager::land() {
 
-    INVOKE_EVENT("command_received","land");
+    INVOKE_EVENT("send_ack","land");
     return execute_action([this]() { return action->land(); }, "Landing");
 }
 
 CommandManager::Result CommandManager::return_to_launch() {
 
-    INVOKE_EVENT("command_received","RTL");
+    INVOKE_EVENT("send_ack","RTL");
     return execute_action([this]() { return action->return_to_launch(); }, "Return to launch");
 }
 
@@ -87,13 +87,13 @@ CommandManager::Result CommandManager::hold() {
 }
 
 CommandManager::Result CommandManager::set_flight_mode(uint8_t base_mode, uint32_t custom_mode) {
-    INVOKE_EVENT("command_received","FLight Mode");
+    INVOKE_EVENT("send_ack","FLight Mode");
 
     return send_mavlink_command(base_mode, custom_mode);
 }
 
 CommandManager::Result CommandManager::disarm() {
-    INVOKE_EVENT("command_received","Disarm");
+    INVOKE_EVENT("send_ack","Disarm");
     return execute_action([this]() { return action->disarm(); }, "Disarm");
 }
 
@@ -171,7 +171,7 @@ CommandManager::Result CommandManager::update_manual_control(const std::vector<u
 }
 
 CommandManager::Result CommandManager::arm() {
-    INVOKE_EVENT("command_received","Arm");
+    INVOKE_EVENT("send_ack","Arm");
     return execute_action([this]() { return action->arm(); }, "Arm");
 }
 

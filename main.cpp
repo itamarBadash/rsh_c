@@ -66,7 +66,7 @@ int main(int argc, char** argv) {
 
     std::thread stream_thread(stream_thread_function);
     SUBSCRIBE_TO_EVENT("send_ack", ([communication_manager]( const std::string & command) {
-        communication_manager->send_message_all("Ack: ");
+        communication_manager->send_message_all("Ack: " + command);
     }));
     auto manager = make_shared<AddonsManager>();
     manager->start();
