@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
         usage(argv[0]);
         return 1;
     }
-    auto communication_manager = std::make_shared<CommunicationManager>(ECT_TCP,8080);
+    auto communication_manager = std::make_shared<CommunicationManager>(ECT_UDP,8080);
     communication_manager->start();\
 
     CREATE_EVENT("send_ack" , const std::string & command);
