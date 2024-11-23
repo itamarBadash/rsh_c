@@ -59,14 +59,14 @@ int main(int argc, char** argv) {
     auto communication_manager = std::make_shared<CommunicationManager>(ECT_TCP,8080);
     communication_manager->start();\
 
-    CREATE_EVENT("send_ack");
+    CREATE_EVENT("send_ack" , const std::string & command);
     CREATE_EVENT("InfoRequest");
     CREATE_EVENT("set_brightness");
     CREATE_EVENT("command_received", const std::string & command, const std::vector<float> & parameters);
 
     std::thread stream_thread(stream_thread_function);
-    SUBSCRIBE_TO_EVENT("send_ack", ([communication_manager]() {
-        communication_manager->send_message_all("Ack: " );
+    SUBSCRIBE_TO_EVENT("send_ack", ([communication_manager]( const std::string & command) {
+        communication_manager->send_message_all("Ack: " + command);
     }));
     auto manager = make_shared<AddonsManager>();
     manager->start();
