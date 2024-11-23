@@ -1,93 +1,93 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\main.cpp">
+    <ClCompile Include="C:\Users\Badash\CLionProjects\base\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\TelemetryManager.cpp">
+    <ClCompile Include="C:\Users\Badash\CLionProjects\base\Src\Modules\TelemetryManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\CommandManager.cpp">
+    <ClCompile Include="C:\Users\Badash\CLionProjects\base\Src\Modules\CommandManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Communications\SerialCommunication.cpp">
+    <ClCompile Include="C:\Users\Badash\CLionProjects\base\Src\Communications\SerialCommunication.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\inih\ini.c">
+    <ClCompile Include="C:\Users\Badash\CLionProjects\base\inih\ini.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\inih\cpp\INIReader.cpp">
+    <ClCompile Include="C:\Users\Badash\CLionProjects\base\inih\cpp\INIReader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Addons\BaseAddon.cpp">
+    <ClCompile Include="C:\Users\Badash\CLionProjects\base\Src\Addons\BaseAddon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Communications\TCPServer.cpp">
+    <ClCompile Include="C:\Users\Badash\CLionProjects\base\Src\Communications\TCPServer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Communications\UDPServer.cpp">
+    <ClCompile Include="C:\Users\Badash\CLionProjects\base\Src\Communications\UDPServer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\CommunicationManager.cpp">
+    <ClCompile Include="C:\Users\Badash\CLionProjects\base\Src\Modules\CommunicationManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\UDPVideoStreamer.cpp">
+    <ClCompile Include="C:\Users\Badash\CLionProjects\base\Src\Modules\UDPVideoStreamer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\AddonsManager.cpp">
+    <ClCompile Include="C:\Users\Badash\CLionProjects\base\Src\Modules\AddonsManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\TelemetryManager.h">
+    <ClInclude Include="C:\Users\Badash\CLionProjects\base\Src\Modules\TelemetryManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\CommandManager.h">
+    <ClInclude Include="C:\Users\Badash\CLionProjects\base\Src\Modules\CommandManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Communications\SerialCommunication.h">
+    <ClInclude Include="C:\Users\Badash\CLionProjects\base\Src\Communications\SerialCommunication.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\inih\ini.h">
+    <ClInclude Include="C:\Users\Badash\CLionProjects\base\inih\ini.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\inih\cpp\INIReader.h">
+    <ClInclude Include="C:\Users\Badash\CLionProjects\base\inih\cpp\INIReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Events\EventManager.h">
+    <ClInclude Include="C:\Users\Badash\CLionProjects\base\Events\EventManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Addons\BaseAddon.h">
+    <ClInclude Include="C:\Users\Badash\CLionProjects\base\Src\Addons\BaseAddon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Communications\TCPServer.h">
+    <ClInclude Include="C:\Users\Badash\CLionProjects\base\Src\Communications\TCPServer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Communications\UDPServer.h">
+    <ClInclude Include="C:\Users\Badash\CLionProjects\base\Src\Communications\UDPServer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\CommunicationManager.h">
+    <ClInclude Include="C:\Users\Badash\CLionProjects\base\Src\Modules\CommunicationManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Communications\ICommunication.h">
+    <ClInclude Include="C:\Users\Badash\CLionProjects\base\Src\Communications\ICommunication.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\UDPVideoStreamer.h">
+    <ClInclude Include="C:\Users\Badash\CLionProjects\base\Src\Modules\UDPVideoStreamer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\Src\Modules\AddonsManager.h">
+    <ClInclude Include="C:\Users\Badash\CLionProjects\base\Src\Modules\AddonsManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\itaba\Desktop\Hoopoe\rsh_c\CMakeLists.txt" />
+    <CustomBuild Include="C:\Users\Badash\CLionProjects\base\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{98C625D9-453D-305E-BE60-6E4EFFA829C7}</UniqueIdentifier>
+      <UniqueIdentifier>{5B32F71D-0760-309D-A7BD-6282E526D554}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{8BE75B05-979F-3E03-B9AF-7D114878754D}</UniqueIdentifier>
+      <UniqueIdentifier>{EAEF60A8-8D38-3A1F-B6BA-8C0677746673}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
