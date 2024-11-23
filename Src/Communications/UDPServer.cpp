@@ -40,10 +40,6 @@ bool UDPServer::start() {
     running = true;
     std::cout << "UDP Server started on port " << port << std::endl;
 
-    SUBSCRIBE_TO_EVENT("send_ack", ([this]( const std::string & command) {
-        send_message("Ack: " + command);
-    }));
-
     std::thread(&UDPServer::receiveMessages, this).detach();
     commandProcessorThread = std::thread(&UDPServer::processCommands, this);
 
