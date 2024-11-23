@@ -56,10 +56,11 @@ int main(int argc, char** argv) {
         usage(argv[0]);
         return 1;
     }
+    CREATE_EVENT("send_ack" , const std::string & command);
+
     auto communication_manager = std::make_shared<CommunicationManager>(ECT_UDP,8080);
     communication_manager->start();\
 
-    CREATE_EVENT("send_ack" , const std::string & command);
     CREATE_EVENT("InfoRequest");
     CREATE_EVENT("set_brightness");
     CREATE_EVENT("command_received", const std::string & command, const std::vector<float> & parameters);
