@@ -79,7 +79,7 @@ if(WIN32)
 elseif(UNIX)
     # Linux specific OpenCV settings
     message(STATUS "Using system-installed OpenCV and libusb for Linux")
-
+    find_package(MAVSDK REQUIRED)
     # Find system-installed OpenCV
     find_package(OpenCV REQUIRED)
 
