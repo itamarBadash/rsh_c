@@ -4,8 +4,6 @@
 #include <string>
 #include <memory>
 
-class CommandManager; // Forward declaration
-
 class ICommunication {
 public:
     virtual ~ICommunication() = default;
