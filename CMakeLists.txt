@@ -104,17 +104,17 @@ elseif(UNIX)
     )
 endif()
 
-# Find MAVSDK (this will locate MAVSDK installed via vcpkg or other package managers)
-find_package(MAVSDK REQUIRED)
-
-# Link libraries to the executable
-if(WIN32)
-    target_link_libraries(base
-            MAVSDK::mavsdk  # Link MAVSDK on Windows
-    )
-elseif(UNIX)
-    target_link_libraries(base
-            MAVSDK::mavsdk  # Link MAVSDK on Linux
-            ${OpenCV_LIBS}  # System-installed OpenCV on Linux
-    )
-endif()
+## Find MAVSDK (this will locate MAVSDK installed via vcpkg or other package managers)
+#find_package(MAVSDK REQUIRED)
+#
+## Link libraries to the executable
+#if(WIN32)
+#    target_link_libraries(base
+#            MAVSDK::mavsdk  # Link MAVSDK on Windows
+#    )
+#elseif(UNIX)
+#    target_link_libraries(base
+#            MAVSDK::mavsdk  # Link MAVSDK on Linux
+#            ${OpenCV_LIBS}  # System-installed OpenCV on Linux
+#    )
+#endif()
