@@ -74,6 +74,12 @@ if(WIN32)
             COMMAND ${CMAKE_COMMAND} -E copy_directory
             "${CMAKE_SOURCE_DIR}/libusb/VS2022/MS64/dll" $<TARGET_FILE_DIR:base>)
 
+    find_package(MAVSDK REQUIRED)
+
+    target_link_libraries(base
+            MAVSDK::mavsdk  # Link MAVSDK on Windows
+    )
+
 
 
 elseif(UNIX)
@@ -103,18 +109,3 @@ elseif(UNIX)
             ${LIBUSB_LIBRARIES}  # Link libusb-1.0 on Linux
     )
 endif()
-
-## Find MAVSDK (this will locate MAVSDK installed via vcpkg or other package managers)
-#find_package(MAVSDK REQUIRED)
-#
-## Link libraries to the executable
-#if(WIN32)
-#    target_link_libraries(base
-#            MAVSDK::mavsdk  # Link MAVSDK on Windows
-#    )
-#elseif(UNIX)
-#    target_link_libraries(base
-#            MAVSDK::mavsdk  # Link MAVSDK on Linux
-#            ${OpenCV_LIBS}  # System-installed OpenCV on Linux
-#    )
-#endif()
