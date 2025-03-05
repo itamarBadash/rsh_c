@@ -56,7 +56,11 @@ void CommandManager::initialize_command_handlers() {
                 return Result::Failure;
             }},
             {"arm", [this](const std::vector<float>&) { return arm(); }},
-            {"disarm", [this](const std::vector<float>&) { return disarm(); }},
+            {"disarm", [this](const std::vector<float>&) { return disarm(); },
+             {"tap_to_fly", [this](const std::vector<float>&) { return tap_to_fly(); }},
+             {"fly_to", [this](const std::vector<float>& params) { return fly_to(params[0],params[1],params[2]); }},
+
+            },
     };
 }
 
@@ -279,4 +283,21 @@ CommandManager::Result CommandManager::send_rc_override(const std::vector<uint16
         return Result::Failure;
     }
     return Result::Success;
+}
+
+CommandManager::Result CommandManager::tap_to_fly() {
+
+    INVOKE_EVENT("send_ack",std::string ("tap_to_fly"));
+
+    return set_flight_mode(1,4);
+}
+
+CommandManager::Result CommandManager::fly_to(float lat, float lon, float alt) {
+    INVOKE_EVENT("send_ack",std::string ("fly_to"));
+
+    mavsdk::Action::Result actionResult= action->goto_location((double)lat,(double)lon,alt,0);
+
+    if(actionResult == mavsdk::Action::Result::Success)
+      return CommandManager::Result::Success;
+    return Result::CommandFailed;
 }

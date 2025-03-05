@@ -42,7 +42,8 @@ public:
     Result start_manual_control();
     Result stop_manual_control();
     Result update_manual_control(const std::vector<uint16_t>& channels);
-
+    Result tap_to_fly();
+    CommandManager::Result fly_to(float lat, float lon, float alt);
 
     Result send_rc_override(const std::vector<uint16_t>& channels);
 
