@@ -56,12 +56,10 @@ void CommandManager::initialize_command_handlers() {
                 return Result::Failure;
             }},
             {"arm", [this](const std::vector<float>&) { return arm(); }},
-            {"disarm", [this](const std::vector<float>&) { return disarm(); },
+            {"disarm", [this](const std::vector<float>&) { return disarm(); }},
              {"tap_to_fly", [this](const std::vector<float>&) { return tap_to_fly(); }},
-             {"fly_to", [this](const std::vector<float>& params) { return fly_to(params[0],params[1],params[2]); }},
-
-            },
-    };
+             {"fly_to", [this](const std::vector<float>& params) { return fly_to(params[0],params[1],params[2]); }}
+            };
 }
 
 bool CommandManager::is_command_valid(const std::string& command) const {
