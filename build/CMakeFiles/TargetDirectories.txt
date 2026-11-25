@@ -1,3 +1,0 @@
-/home/itamar/rsh_c/build/CMakeFiles/base.dir
-/home/itamar/rsh_c/build/CMakeFiles/edit_cache.dir
-/home/itamar/rsh_c/build/CMakeFiles/rebuild_cache.dir

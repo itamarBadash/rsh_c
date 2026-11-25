@@ -1,0 +1,54 @@
+# Build directories
+build/
+build-*/
+cmake-build-*/
+out/
+install/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+CMakeUserPresets.json
+cmake_install.cmake
+install_manifest.txt
+CTestTestfile.cmake
+Testing/
+_deps/
+compile_commands.json
+
+# Compiled objects and libraries
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.out
+*.pdb
+*.ilk
+*.exp
+
+# JetBrains (CLion)
+.idea/
+*.iml
+
+# Visual Studio
+.vs/
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+*.suo
+*.user
+*.tlog
+*.lastbuildstate
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
